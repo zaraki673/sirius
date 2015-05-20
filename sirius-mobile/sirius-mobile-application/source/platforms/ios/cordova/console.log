@@ -269,3 +269,27 @@ To disable web storage backup to iCloud, set the BackupWebStorage preference to 
 	"XPCErrorDescription" => <string: 0x356183c> { length = 22, contents = "Connection interrupted" }
 }>
 2015-05-20 17:28:10.959 SiriusMobile[28318:533334] Terminating since there is no system app.
+2015-05-20 17:56:19.005 SiriusMobile[29311:549211] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/twurman/Library/Developer/CoreSimulator/Devices/87D9EFA3-DF1B-4016-BE24-4723CAC192B7/data/Containers/Data/Application/620A9040-6399-42D4-9AE2-B337C7731439/Library/Cookies/Cookies.binarycookies
+2015-05-20 17:56:19.600 SiriusMobile[29311:549211] Apache Cordova native platform version 3.8.0 is starting.
+2015-05-20 17:56:19.602 SiriusMobile[29311:549211] Multi-tasking -> Device: YES, App: YES
+2015-05-20 17:56:19.628 SiriusMobile[29311:549211] Unlimited access to network resources
+2015-05-20 17:56:20.108 SiriusMobile[29311:549211] [CDVTimer][file] 4.332960ms
+2015-05-20 17:56:20.108 SiriusMobile[29311:549211] [CDVTimer][TotalPluginStartup] 5.766988ms
+2015-05-20 17:56:20.607 SiriusMobile[29311:549211] Resetting plugins due to page load.
+2015-05-20 17:56:20.835 SiriusMobile[29311:549211] Finished load of: file:///Users/twurman/Library/Developer/CoreSimulator/Devices/87D9EFA3-DF1B-4016-BE24-4723CAC192B7/data/Containers/Bundle/Application/5D4E0EB0-8F77-4D5C-AE3A-40CF30E350AF/SiriusMobile.app/www/index.html
+2015-05-20 17:59:32.159 SiriusMobile[29486:551140] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/twurman/Library/Developer/CoreSimulator/Devices/87D9EFA3-DF1B-4016-BE24-4723CAC192B7/data/Containers/Data/Application/286B0E0F-B088-4C9C-A339-B03D9732272D/Library/Cookies/Cookies.binarycookies
+2015-05-20 17:59:32.296 SiriusMobile[29486:551140] Apache Cordova native platform version 3.8.0 is starting.
+2015-05-20 17:59:32.296 SiriusMobile[29486:551140] Multi-tasking -> Device: YES, App: YES
+2015-05-20 17:59:32.299 SiriusMobile[29486:551140] Unlimited access to network resources
+2015-05-20 17:59:32.424 SiriusMobile[29486:551140] [CDVTimer][file] 4.387021ms
+2015-05-20 17:59:32.424 SiriusMobile[29486:551140] [CDVTimer][TotalPluginStartup] 4.633009ms
+2015-05-20 17:59:32.623 SiriusMobile[29486:551140] Resetting plugins due to page load.
+2015-05-20 17:59:32.706 SiriusMobile[29486:551140] Finished load of: file:///Users/twurman/Library/Developer/CoreSimulator/Devices/87D9EFA3-DF1B-4016-BE24-4723CAC192B7/data/Containers/Bundle/Application/075E236C-6656-4D4E-923D-6AFA0E559BA2/SiriusMobile.app/www/index.html
+2015-05-20 18:00:04.503 SiriusMobile[29633:552095] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/twurman/Library/Developer/CoreSimulator/Devices/87D9EFA3-DF1B-4016-BE24-4723CAC192B7/data/Containers/Data/Application/C0214025-9BA4-4576-8EEA-DDA57A172B2F/Library/Cookies/Cookies.binarycookies
+2015-05-20 18:00:04.646 SiriusMobile[29633:552095] Apache Cordova native platform version 3.8.0 is starting.
+2015-05-20 18:00:04.646 SiriusMobile[29633:552095] Multi-tasking -> Device: YES, App: YES
+2015-05-20 18:00:04.648 SiriusMobile[29633:552095] Unlimited access to network resources
+2015-05-20 18:00:04.762 SiriusMobile[29633:552095] [CDVTimer][file] 1.199007ms
+2015-05-20 18:00:04.763 SiriusMobile[29633:552095] [CDVTimer][TotalPluginStartup] 1.413941ms
+2015-05-20 18:00:04.964 SiriusMobile[29633:552095] Resetting plugins due to page load.
+2015-05-20 18:00:05.048 SiriusMobile[29633:552095] Finished load of: file:///Users/twurman/Library/Developer/CoreSimulator/Devices/87D9EFA3-DF1B-4016-BE24-4723CAC192B7/data/Containers/Bundle/Application/8002E88C-0521-4F43-AD4F-E17C319627E2/SiriusMobile.app/www/index.html
