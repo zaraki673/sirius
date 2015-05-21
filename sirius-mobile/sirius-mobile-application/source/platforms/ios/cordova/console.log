@@ -293,3 +293,11 @@ To disable web storage backup to iCloud, set the BackupWebStorage preference to 
 2015-05-20 18:00:04.763 SiriusMobile[29633:552095] [CDVTimer][TotalPluginStartup] 1.413941ms
 2015-05-20 18:00:04.964 SiriusMobile[29633:552095] Resetting plugins due to page load.
 2015-05-20 18:00:05.048 SiriusMobile[29633:552095] Finished load of: file:///Users/twurman/Library/Developer/CoreSimulator/Devices/87D9EFA3-DF1B-4016-BE24-4723CAC192B7/data/Containers/Bundle/Application/8002E88C-0521-4F43-AD4F-E17C319627E2/SiriusMobile.app/www/index.html
+2015-05-20 18:40:32.747 SiriusMobile[30470:566503] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/twurman/Library/Developer/CoreSimulator/Devices/87D9EFA3-DF1B-4016-BE24-4723CAC192B7/data/Containers/Data/Application/000819C1-15DD-4289-BD25-21B1B4D2AA56/Library/Cookies/Cookies.binarycookies
+2015-05-20 18:40:33.189 SiriusMobile[30470:566503] Apache Cordova native platform version 3.8.0 is starting.
+2015-05-20 18:40:33.190 SiriusMobile[30470:566503] Multi-tasking -> Device: YES, App: YES
+2015-05-20 18:40:33.210 SiriusMobile[30470:566503] Unlimited access to network resources
+2015-05-20 18:40:33.684 SiriusMobile[30470:566503] [CDVTimer][file] 3.325999ms
+2015-05-20 18:40:33.684 SiriusMobile[30470:566503] [CDVTimer][TotalPluginStartup] 4.082978ms
+2015-05-20 18:40:34.126 SiriusMobile[30470:566503] Resetting plugins due to page load.
+2015-05-20 18:40:34.336 SiriusMobile[30470:566503] Finished load of: file:///Users/twurman/Library/Developer/CoreSimulator/Devices/87D9EFA3-DF1B-4016-BE24-4723CAC192B7/data/Containers/Bundle/Application/DFA89362-EEDB-46A9-8008-CBB2257E3B3E/SiriusMobile.app/www/index.html
