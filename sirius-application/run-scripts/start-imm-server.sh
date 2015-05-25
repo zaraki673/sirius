@@ -11,7 +11,8 @@ if [ "$1" == "help" ]; then
   exit
 fi
 
-ip=localhost
+#ip=localhost
+ip=0.0.0.0
 port=8082
 
 if [[ -n "$1" ]]; then

@@ -16,7 +16,8 @@ if [ "$1" == "help" ]; then
 fi
 
 asr=kaldi
-ip=localhost
+#ip=localhost
+ip=0.0.0.0
 port=8081
 
 if [[ -n "$1" ]]; then
