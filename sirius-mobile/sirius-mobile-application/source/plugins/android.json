@@ -35,6 +35,10 @@
                         {
                             "xml": "<feature name=\"Notification\"><param name=\"android-package\" value=\"org.apache.cordova.dialogs.Notification\" /></feature>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"FileTransfer\"><param name=\"android-package\" value=\"org.apache.cordova.filetransfer.FileTransfer\" /></feature>",
+                            "count": 1
                         }
                     ]
                 }
@@ -44,7 +48,7 @@
                     "/*": [
                         {
                             "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
-                            "count": 4
+                            "count": 5
                         },
                         {
                             "xml": "<uses-permission android:name=\"android.permission.RECORD_AUDIO\" />",
@@ -103,6 +107,9 @@
             "PACKAGE_NAME": "com.mobile.sirius"
         },
         "com.wordsbaking.cordova.tts": {
+            "PACKAGE_NAME": "com.mobile.sirius"
+        },
+        "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "com.mobile.sirius"
         }
     },

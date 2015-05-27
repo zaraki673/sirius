@@ -1,6 +1,0 @@
-<server>
-	<ip>141.161.241.127</ip> <!-- port number -->
-	<asr>8080</asr> <!-- port number -->
-	<imm>8081</imm> <!-- port number -->
-	<qa>8082</qa> <!-- port number -->
-</server>

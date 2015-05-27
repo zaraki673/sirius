@@ -24,13 +24,19 @@
     <feature name="Notification">
         <param name="android-package" value="org.apache.cordova.dialogs.Notification" />
     </feature>
+    <feature name="FileTransfer">
+        <param name="android-package" value="org.apache.cordova.filetransfer.FileTransfer" />
+    </feature>
+    <feature name="TTS">
+        <param name="android-package" value="com.wordsbaking.cordova.tts.TTS" />
+        <param name="onload" value="true" />
+    </feature>
     <allow-intent href="market:*" />
     <name>SiriusMobile</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="claritylab.umich@gmail.com" href="http://sirius.clarity-lab.org/">
+        Clarity Lab Sirius Project
     </author>
     <content src="index.html" />
     <access origin="*" />
@@ -40,8 +46,4 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
-    <feature name="TTS">
-        <param name="android-package" value="com.wordsbaking.cordova.tts.TTS" />
-        <param name="onload" value="true" />
-    </feature>
 </widget>

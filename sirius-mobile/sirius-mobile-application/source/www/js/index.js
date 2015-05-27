@@ -86,6 +86,8 @@ function captureImageSuccess(mediaFiles) {
     for (i = 0, len = mediaFiles.length; i < len; i += 1) {
         //uploadFile(mediaFiles[i]);
         image = mediaFiles[i];
+        $('#image_file').empty();
+        $('#image_file').append("Image File Ready");
     }
 }
 
@@ -94,6 +96,9 @@ function captureAudioSuccess(mediaFiles) {
     for (i = 0, len = mediaFiles.length; i < len; i += 1) {
         //uploadFile(mediaFiles[i]);
         audio = mediaFiles[i];
+        $('#question').value = "";
+        $('#audio_file').empty();
+        $('#audio_file').append("Audio File Ready");
     }
 }
 
@@ -107,7 +112,7 @@ function captureError(error) {
 function captureAudio() {
     // Launch device audio recording application,
     // allowing user to capture up to 2 audio clips
-    navigator.device.capture.captureAudio(captureAudioSuccess, captureError, {limit: 1});
+    navigator.device.capture.captureAudio(captureAudioSuccess, captureError, { });
 }
 document.getElementById("captureAudio").addEventListener("click",captureAudio);
 
@@ -115,25 +120,30 @@ document.getElementById("captureAudio").addEventListener("click",captureAudio);
 function captureImage() {
     // Launch device camera application,
     // allowing user to capture up to 2 images
-    navigator.device.capture.captureImage(captureImageSuccess, captureError, {limit: 1});
+    navigator.device.capture.captureImage(captureImageSuccess, captureError, {});
 }
 document.getElementById("captureImage").addEventListener("click",captureImage);
 
 function sendToServer() {
+    
     if(image){
         // uploadFile(image);
-    } if(audio){
-        // uploadFile(audio);
     } else {
-        //send text to server
-        q = document.getElementById("question").value
-        if(q) {
+        if(audio){
             $('#response').empty();
             $('#response').append("<p>Sending...</p>");
-            queryServer(q);
+            uploadFile(audio, getAddress(asr_port), "audio/wav");
         } else {
-            $('#response').empty();
-            $('#response').append("<p>Nothing to send</p>");
+            //send text to server
+            q = document.getElementById("question").value
+            if(q) {
+                $('#response').empty();
+                $('#response').append("<p>Sending...</p>");
+                queryServer(q);
+            } else {
+                $('#response').empty();
+                $('#response').append("<p>Nothing to send</p>");
+            }
         }
     }
 }
@@ -146,42 +156,58 @@ function getAddress(port) {
 function queryServer(query) {
     q = getAddress(qa_port) + '?query=' + query;
     $.get(q).done(function( data ) {
-        $('#response').empty();
-        if(data) {
-            $('#response').append("<p>" + data + "</p>");
-            TTS.speak({
-                text: String(data),
-                locale: 'en-GB',
-                rate: 0.75
-            }, function () {
-                //do nothing
-            }, function (reason) {
-                alert(reason);
-            });
-        } else {
-            $('#response').append("<p>Response is empty</p>");
-        }
-        
+        processResponse(data);
     });
 }
 
 // Upload files to server
-function uploadFile(mediaFile, addr) {
+function uploadFile(mediaFile, addr, type) {
     var ft = new FileTransfer(),
         path = mediaFile.fullPath,
         name = mediaFile.name;
 
-    ft.upload(path,
-        addr,
+    var options = new FileUploadOptions();
+    options.fileKey = "audio";
+    // options.fileName = name.replace(name.substr(0, name.lastIndexOf('/')+1), '/tmp/');
+    options.fileName = name;
+    options.mimeType = type;
+    options.chunkedMode = false;
+    options.headers = {
+        Connection: "close"
+    };
+
+    ft.upload(
+        path.toURL(),
+        encodeURI(addr),
         function(result) {
             console.log('Upload success: ' + result.responseCode);
             console.log("Response: " + result.response);
             console.log(result.bytesSent + ' bytes sent');
+            processResponse(result.response);
         },
         function(error) {
+            $('#response').empty();
+            $('#response').append("<p>Error uploading file</p>");
             console.log('Error uploading file ' + path + ': ' + error.code);
         },
-        { fileName: name });
+        options);
 }
 
+function processResponse(data) {
+    $('#response').empty();
+    if(data) {
+        $('#response').append("<p>" + data + "</p>");
+        TTS.speak({
+            text: String(data),
+            locale: 'en-GB',
+            rate: 0.75
+        }, function () {
+            //do nothing
+        }, function (reason) {
+            navigator.notification.alert(reason, null, 'Uh oh!');
+        });
+    } else {
+        $('#response').append("<p>Response is empty</p>");
+    }
+}
 

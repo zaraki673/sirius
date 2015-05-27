@@ -28,113 +28,33 @@
             * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
                 * Enable inline JS: add 'unsafe-inline' to default-src
         -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
+        <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *"> -->
+        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
         <meta name="format-detection" content="telephone=no">
         <meta name="msapplication-tap-highlight" content="no">
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
         <link rel="stylesheet" type="text/css" href="css/index.css">
         <title>Sirius Mobile</title>
+        <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+        <script type="text/javascript" charset="utf-8" src="json2.js"></script>
     </head>
     <body>
         <div class="app">
-            <h1>Sirius Mobile</h1>
             <!-- <div id="deviceready" class="blink">
                 <p class="event listening">Connecting to Device</p>
                 <p class="event received">Device is Ready</p>
             </div> -->
             <div id="ip_info"></div>
-            <button onclick="captureImage();">Capture Image</button> <br>
-            <textarea id="" rows="3" style="margin: 5px"></textarea>
-            <button onclick="captureAudio();">Capture Audio</button> <br>
-            <button onclick="sendToServer();">Send to Server</button>
+            <button id="captureImage">Capture Image</button><div id="image_file"></div> <br>
+            <textarea id="question" rows="3" style="margin: 5px" placeholder="Ask your question"></textarea>
+            <button id="captureAudio">Capture Audio</button><div id="audio_file"></div> <br>
+            <button id="sendToServer">Send to Server</button> <br>
+            <div id="response"></div>
         </div>
-        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/jquery.min.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
-        <script type="text/javascript" src="js/loadxmldoc.js"></script>
-        <script type="text/javascript" charset="utf-8">
-
-            var image, audio;
-            var ip, asr_port, imm_port, qa_port;
-
-            function onload() {
-                var xmlDoc = loadXMLDoc("config.xml");
-                ip = xmlDoc.getElementsByTagName("ip")[0].childNodes[0].nodeValue;
-                asr_port = xmlDoc.getElementsByTagName("asr")[0].childNodes[0].nodeValue;
-                imm_port = xmlDoc.getElementsByTagName("imm")[0].childNodes[0].nodeValue;
-                qa_port = xmlDoc.getElementsByTagName("qa")[0].childNodes[0].nodeValue;
-                console.log(ip);
-                console.log(asr_port);
-                console.log(imm_port);
-                console.log(qa_port);
-                $('#ip_info').append("<p>" + ip + "<br>" + asr_port + "<br>" + imm_port + "<br>" + qa_port + "</p>");
-            }
-
-            // Called when capture operation is finished
-            function captureImageSuccess(mediaFiles) {
-                var i, len;
-                for (i = 0, len = mediaFiles.length; i < len; i += 1) {
-                    //uploadFile(mediaFiles[i]);
-                    image = mediaFiles[i];
-                }
-            }
-
-            function captureAudioSuccess(mediaFiles) {
-                var i, len;
-                for (i = 0, len = mediaFiles.length; i < len; i += 1) {
-                    //uploadFile(mediaFiles[i]);
-                    audio = mediaFiles[i];
-                }
-            }
-
-            // Called if something bad happens.
-            function captureError(error) {
-                var msg = 'An error occurred during capture: ' + error.code;
-                navigator.notification.alert(msg, null, 'Uh oh!');
-            }
-
-            // A button will call this function
-            function captureAudio() {
-                // Launch device audio recording application,
-                // allowing user to capture up to 2 audio clips
-                navigator.device.capture.captureAudio(captureAudioSuccess, captureError, {limit: 1});
-            }
-
-             // A button will call this function            
-            function captureImage() {
-                // Launch device camera application,
-                // allowing user to capture up to 2 images
-                navigator.device.capture.captureImage(captureImageSuccess, captureError, {limit: 1});
-            }
-
-            function sendToServer() {
-                if(image){
-                    uploadFile(image);
-                } if(audio){
-                    uploadFile(audio);
-                } else {
-                    //send text to server
-
-                }
-            }
-
-            // Upload files to server
-            function uploadFile(mediaFile, addr) {
-                var ft = new FileTransfer(),
-                    path = mediaFile.fullPath,
-                    name = mediaFile.name;
-
-                ft.upload(path,
-                    addr,
-                    function(result) {
-                        console.log('Upload success: ' + result.responseCode);
-                        console.log(result.bytesSent + ' bytes sent');
-                    },
-                    function(error) {
-                        console.log('Error uploading file ' + path + ': ' + error.code);
-                    },
-                    { fileName: name });
-            }
-
-        </script>
     </body>
 </html>
+
+
+

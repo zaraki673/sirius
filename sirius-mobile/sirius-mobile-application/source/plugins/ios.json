@@ -28,7 +28,7 @@
                     "AssetsLibrary.framework": [
                         {
                             "xml": false,
-                            "count": 2
+                            "count": 3
                         }
                     ],
                     "MobileCoreServices.framework": [
@@ -79,6 +79,10 @@
                         {
                             "xml": "<feature name=\"TTS\"><param name=\"ios-package\" value=\"CDVTTS\" /></feature>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"FileTransfer\"><param name=\"ios-package\" value=\"CDVFileTransfer\" /></feature>",
+                            "count": 1
                         }
                     ]
                 }
@@ -115,6 +119,9 @@
             "PACKAGE_NAME": "com.mobile.sirius"
         },
         "com.wordsbaking.cordova.tts": {
+            "PACKAGE_NAME": "com.mobile.sirius"
+        },
+        "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "com.mobile.sirius"
         }
     },

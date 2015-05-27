@@ -122,6 +122,25 @@ module.exports = [
         ]
     },
     {
+        "file": "plugins/cordova-plugin-file-transfer/www/FileTransferError.js",
+        "id": "cordova-plugin-file-transfer.FileTransferError",
+        "clobbers": [
+            "window.FileTransferError"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-file-transfer/www/FileTransfer.js",
+        "id": "cordova-plugin-file-transfer.FileTransfer",
+        "clobbers": [
+            "window.FileTransfer"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-file-transfer/www/firefoxos/FileTransferProxy.js",
+        "id": "cordova-plugin-file-transfer.FileTransferProxy",
+        "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-file/www/DirectoryEntry.js",
         "id": "cordova-plugin-file.DirectoryEntry",
         "clobbers": [
@@ -278,6 +297,7 @@ module.exports.metadata =
     "cordova-plugin-vibration": "1.1.0",
     "cordova-plugin-dialogs": "1.1.0",
     "com.wordsbaking.cordova.tts": "0.2.1",
+    "cordova-plugin-file-transfer": "1.2.1-dev",
     "cordova-plugin-file": "2.0.0"
 }
 // BOTTOM OF METADATA

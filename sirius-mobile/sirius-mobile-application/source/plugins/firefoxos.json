@@ -15,6 +15,10 @@
                         {
                             "xml": "<feature name=\"Notification\"><param name=\"firefoxos-package\" value=\"Notification\" /></feature>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<permission name=\"systemXHR\" privileged=\"true\" />",
+                            "count": 1
                         }
                     ]
                 }
@@ -51,6 +55,9 @@
             "PACKAGE_NAME": "com.mobile.sirius"
         },
         "com.wordsbaking.cordova.tts": {
+            "PACKAGE_NAME": "com.mobile.sirius"
+        },
+        "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "com.mobile.sirius"
         }
     },
