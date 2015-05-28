@@ -16,10 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-var ip = '141.212.106.114',
-    asr_port = '8080', 
-    imm_port = '8081', 
-    qa_port = '8082';
 
 var app = {
     // Application Constructor
@@ -56,6 +52,7 @@ var app = {
 app.initialize();
 
 var image, audio;
+var storage = window.localStorage;
 
 function loadXMLDoc(filename)
 {
@@ -75,10 +72,19 @@ function onload() {
     // asr_port = xmlDoc.getElementsByTagName("asr")[0].childNodes[0].nodeValue;
     // imm_port = xmlDoc.getElementsByTagName("imm")[0].childNodes[0].nodeValue;
     // qa_port = xmlDoc.getElementsByTagName("qa")[0].childNodes[0].nodeValue;
-    $('#ip_info').append("<p>IP: " + ip + "<br>ASR: " + asr_port + "<br>IMM: " + imm_port + "<br>QA: " + qa_port + "</p>");
+
+    document.getElementById("ip").value = storage.getItem("ip");
+    document.getElementById("asr").value = storage.getItem("asr");
+    document.getElementById("imm").value = storage.getItem("imm");
+    document.getElementById("qa").value = storage.getItem("qa");
+
 }
 
 window.addEventListener("load", onload);
+
+function updateDefaults(key, value) {
+    storage.setItem(key, value);
+}
 
 // Called when capture operation is finished
 function captureImageSuccess(mediaFiles) {
@@ -98,7 +104,7 @@ function captureAudioSuccess(mediaFiles) {
         audio = mediaFiles[i];
         $('#question').value = "";
         $('#audio_file').empty();
-        $('#audio_file').append("Audio File Ready");
+        $('#audio_file').append(audio.name);
     }
 }
 
@@ -132,7 +138,7 @@ function sendToServer() {
         if(audio){
             $('#response').empty();
             $('#response').append("<p>Sending...</p>");
-            uploadFile(audio, getAddress(asr_port));
+            uploadFile(audio, getAddress(getItem('asr')), "audio/vnd.wave");
         } else {
             //send text to server
             q = document.getElementById("question").value
@@ -149,24 +155,40 @@ function sendToServer() {
 }
 document.getElementById("sendToServer").addEventListener("click",sendToServer);
 
+function getItem(key) {
+    return document.getElementById(key).value;
+}
+
 function getAddress(port) {
-    return 'http://' + ip + ':' + port;
+    return 'http://' + getItem('ip') + ':' + port;
 }
 
 function queryServer(query) {
-    q = getAddress(qa_port) + '?query=' + query;
+    q = getAddress(getItem('qa')) + '?query=' + query;
     $.get(q).done(function( data ) {
         processResponse(data);
     });
 }
 
 // Upload files to server
-function uploadFile(mediaFile, addr) {
+function uploadFile(mediaFile, addr, type) {
     var ft = new FileTransfer(),
         path = mediaFile.fullPath,
         name = mediaFile.name;
 
-    ft.upload(path,
+    var options = new FileUploadOptions();
+    options.fileKey = type;
+    // options.fileName = name.replace(name.substr(0, name.lastIndexOf('/')+1), '/tmp/');
+    options.fileName = name;
+    options.mimeType = type;
+    options.chunkedMode = false;
+    options.headers = {
+        Connection: "Keep-Alive",
+        'Content-Type': String(type + '; rate=16000')
+    };
+
+    ft.upload(
+        encodeURI(path),
         encodeURI(addr),
         function(result) {
             console.log('Upload success: ' + result.responseCode);
@@ -175,9 +197,11 @@ function uploadFile(mediaFile, addr) {
             processResponse(result.response);
         },
         function(error) {
+            $('#response').empty();
+            $('#response').append("<p>Error uploading file</p>");
             console.log('Error uploading file ' + path + ': ' + error.code);
         },
-        { fileName: name });
+        options);
 }
 
 function processResponse(data) {
