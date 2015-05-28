@@ -45,10 +45,10 @@
                 <p class="event received">Device is Ready</p>
             </div> -->
             <div id="ip_info">
-                <label for="ip">IP:   </label><input type="text" id="ip" name="ip" size="20" /> <br>
-                <label for="asr">ASR: </label><input type="text" id="asr" name="asr" size="5" /> <br>
-                <label for="imm">IMM: </label><input type="text" id="imm" name="imm" size="5" /> <br>
-                <label for="qa">QA:   </label><input type="text" id="qa" name="qa" size="5" /> <br>
+                <label for="ip">IP: </label><input type="text" id="ip" name="ip" size="15" onchange="updateDefaults(this.id, this.value)" /> <br>
+                <label for="asr">ASR: </label><input type="text" id="asr" name="asr" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
+                <label for="imm">IMM: </label><input type="text" id="imm" name="imm" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
+                <label for="qa">QA: </label><input type="text" id="qa" name="qa" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
             </div>
             <br>
             <textarea id="question" rows="3" style="margin: 5px" placeholder="Ask your question"></textarea>

@@ -16,10 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-var ip = '141.212.106.114',
-    asr_port = '8080', 
-    imm_port = '8081', 
-    qa_port = '8082';
 
 var app = {
     // Application Constructor
@@ -56,6 +52,7 @@ var app = {
 app.initialize();
 
 var image, audio;
+var storage = window.localStorage;
 
 function loadXMLDoc(filename)
 {
@@ -76,14 +73,18 @@ function onload() {
     // imm_port = xmlDoc.getElementsByTagName("imm")[0].childNodes[0].nodeValue;
     // qa_port = xmlDoc.getElementsByTagName("qa")[0].childNodes[0].nodeValue;
 
-    document.getElementById("ip").value = ip;
-    document.getElementById("asr").value = asr_port;
-    document.getElementById("imm").value = imm_port;
-    document.getElementById("qa").value = qa_port;
+    document.getElementById("ip").value = storage.getItem("ip");
+    document.getElementById("asr").value = storage.getItem("asr");
+    document.getElementById("imm").value = storage.getItem("imm");
+    document.getElementById("qa").value = storage.getItem("qa");
 
 }
 
 window.addEventListener("load", onload);
+
+function updateDefaults(key, value) {
+    storage.setItem(key, value);
+}
 
 // Called when capture operation is finished
 function captureImageSuccess(mediaFiles) {
@@ -137,7 +138,7 @@ function sendToServer() {
         if(audio){
             $('#response').empty();
             $('#response').append("<p>Sending...</p>");
-            uploadFile(audio, getAddress(asr_port), "audio/vnd.wave");
+            uploadFile(audio, getAddress(getItem('asr')), "audio/vnd.wave");
         } else {
             //send text to server
             q = document.getElementById("question").value
@@ -154,12 +155,16 @@ function sendToServer() {
 }
 document.getElementById("sendToServer").addEventListener("click",sendToServer);
 
+function getItem(key) {
+    return document.getElementById(key).value;
+}
+
 function getAddress(port) {
-    return 'http://' + ip + ':' + port;
+    return 'http://' + getItem('ip') + ':' + port;
 }
 
 function queryServer(query) {
-    q = getAddress(qa_port) + '?query=' + query;
+    q = getAddress(getItem('qa')) + '?query=' + query;
     $.get(q).done(function( data ) {
         processResponse(data);
     });
