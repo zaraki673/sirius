@@ -75,7 +75,12 @@ function onload() {
     // asr_port = xmlDoc.getElementsByTagName("asr")[0].childNodes[0].nodeValue;
     // imm_port = xmlDoc.getElementsByTagName("imm")[0].childNodes[0].nodeValue;
     // qa_port = xmlDoc.getElementsByTagName("qa")[0].childNodes[0].nodeValue;
-    $('#ip_info').append("<p>IP: " + ip + "<br>ASR: " + asr_port + "<br>IMM: " + imm_port + "<br>QA: " + qa_port + "</p>");
+
+    document.getElementById("ip").value = ip;
+    document.getElementById("asr").value = asr_port;
+    document.getElementById("imm").value = imm_port;
+    document.getElementById("qa").value = qa_port;
+
 }
 
 window.addEventListener("load", onload);
@@ -98,7 +103,7 @@ function captureAudioSuccess(mediaFiles) {
         audio = mediaFiles[i];
         $('#question').value = "";
         $('#audio_file').empty();
-        $('#audio_file').append("Audio File Ready");
+        $('#audio_file').append(audio.name);
     }
 }
 
@@ -132,7 +137,7 @@ function sendToServer() {
         if(audio){
             $('#response').empty();
             $('#response').append("<p>Sending...</p>");
-            uploadFile(audio, getAddress(asr_port), "audio/wav");
+            uploadFile(audio, getAddress(asr_port), "audio/vnd.wave");
         } else {
             //send text to server
             q = document.getElementById("question").value
@@ -167,13 +172,14 @@ function uploadFile(mediaFile, addr, type) {
         name = mediaFile.name;
 
     var options = new FileUploadOptions();
-    options.fileKey = "file";
+    options.fileKey = type;
     // options.fileName = name.replace(name.substr(0, name.lastIndexOf('/')+1), '/tmp/');
     options.fileName = name;
     options.mimeType = type;
     options.chunkedMode = false;
     options.headers = {
-        Connection: "close"
+        Connection: "Keep-Alive",
+        'Content-Type': String(type + '; rate=16000')
     };
 
     ft.upload(
