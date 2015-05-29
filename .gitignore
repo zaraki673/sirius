@@ -1,3 +1,5 @@
 *.o
 *.class
 sirius-application/wiki_indri_index.tar.gz
+*.swp
+qaclient

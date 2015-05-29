@@ -22,9 +22,19 @@ class QAServiceHandler : virtual public QAServiceIf {
     // Your initialization goes here
   }
 
+  void askQuestion(const std::vector<std::string> & arguments) {
+    // Your implementation goes here
+    printf("askQuestion\n");
+  }
+
   void askFactoidThrift(std::string& _return, const std::string& question) {
     // Your implementation goes here
     printf("askFactoidThrift\n");
+  }
+
+  void askFactoidThriftDebug(std::string& _return, const std::string& question) {
+    // Your implementation goes here
+    printf("askFactoidThriftDebug\n");
   }
 
 };

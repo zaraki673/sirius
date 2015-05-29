@@ -30,20 +30,43 @@ int main(int argc, char** argv)
 		// Extract question from input
 		std::string question(argv[1]);
 		std::string answer;
-		//std::vector<std::string> qvec;
-		//qvec.push_back(question);
+		std::vector<std::string> qvec;
+		qvec.push_back(question);
 
                 transport->open();
 
+		// ask question
+		cout << "calling askQuestion():" << endl;
+		gettimeofday(&tv1, NULL);
+		client.askQuestion(qvec);
+	        gettimeofday(&tv2, NULL);
+                unsigned int query_latency = (tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec);
+                cout << "client sent the question successfully..." << endl;
+                cout << "server replied within " << fixed << setprecision(2) << (double)query_latency / 1000 << " ms" << endl;
+		cout << endl;		
+
+		// ask factoid question
+		cout << "calling askFactoidThrift():" << endl;
 		gettimeofday(&tv1, NULL);
                 client.askFactoidThrift(answer, question); // pass QAService a question
                 gettimeofday(&tv2, NULL);
-                unsigned int query_latency = (tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec);
-
-                 cout << "client sent the question successfully..." << endl;
-                cout << answer << endl;
+                query_latency = (tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec);
+                cout << "client sent the question successfully..." << endl;
+                cout << "ANSWER = " << answer << endl;
                 cout << "server replied within " << fixed << setprecision(2) << (double)query_latency / 1000 << " ms" << endl;
                 // cout << fixed << setprecision(2) << (double)query_latency / 1000 << endl;
+		cout << endl;
+
+		// ask factoid debug question
+		cout << "calling askFactoidThriftDebug():" << endl;
+		gettimeofday(&tv1, NULL);
+                client.askFactoidThriftDebug(answer, question); // pass QAService a question
+                gettimeofday(&tv2, NULL);
+                query_latency = (tv2.tv_sec - tv1.tv_sec) * 1000000 + (tv2.tv_usec - tv1.tv_usec);
+                cout << "client sent the question successfully..." << endl;
+                cout << "ANSWER = " << answer << endl;
+                cout << "server replied within " << fixed << setprecision(2) << (double)query_latency / 1000 << " ms" << endl;
+		cout << endl;
 
                 transport->close();
         } catch(TException &tx) {

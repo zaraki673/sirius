@@ -8,5 +8,9 @@ namespace cpp qastubs
 
 service QAService
 {
-	string askFactoidThrift(1:string question)
+	void askQuestion(1:list<string> arguments),
+
+	string askFactoidThrift(1:string question),
+
+	string askFactoidThriftDebug(1:string question)
 }
