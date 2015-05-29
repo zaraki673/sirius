@@ -12,5 +12,7 @@ service QAService
 
 	string askFactoidThrift(1:string question),
 
-	string askFactoidThriftDebug(1:string question)
+	string askFactoidThriftDebug(1:string question),
+
+	list<string> askListThrift(1:string question)
 }

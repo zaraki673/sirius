@@ -16,3 +16,4 @@ make
 
 5) Query server:
 ./qaclient "what is the speed of light?"
+./qaclient "name the presidents of the united states"

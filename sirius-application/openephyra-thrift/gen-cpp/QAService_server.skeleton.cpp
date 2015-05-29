@@ -37,6 +37,11 @@ class QAServiceHandler : virtual public QAServiceIf {
     printf("askFactoidThriftDebug\n");
   }
 
+  void askListThrift(std::vector<std::string> & _return, const std::string& question) {
+    // Your implementation goes here
+    printf("askListThrift\n");
+  }
+
 };
 
 int main(int argc, char **argv) {

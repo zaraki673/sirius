@@ -50,11 +50,12 @@ import info.ephyra.search.Search;
 import info.ephyra.search.searchers.BingKM;
 import info.ephyra.search.searchers.IndriKM;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
+import java.util.*;
 
 // Interface definition
 import qastubs.QAService;
-import java.util.List;
+//import java.util.List;
 
 public class QAServiceHandler implements QAService.Iface {
 	public void askQuestion(List<String> arguments)
@@ -159,6 +160,30 @@ public class QAServiceHandler implements QAService.Iface {
 		String answer = results[0].getAnswer();
 		System.out.println("Java handler says: your answer is " + answer);
 		return answer;
+	}
+
+	public List<String> askListThrift(String question)
+	{
+		System.out.println("askListThrift():");
+		String dir = "";
+		float relThresh = 0.5f; //let user change this value
+		
+		// enable msg printing to screen (logging not enabled)
+		MsgPrinter.enableStatusMsgs(true);
+		MsgPrinter.enableErrorMsgs(true);
+		MsgPrinter.printStatusMsg("askListThrift(): Arg = " + question);
+
+		OpenEphyra oe  = new OpenEphyra(dir);
+		Result[] results = oe.askList(question, relThresh);
+		
+		List<String> answersList = new ArrayList<String>();
+		// add all answers to answersList
+		for (Result r : results)
+		{
+			answersList.add(r.getAnswer());
+		}
+		return answersList;
+
 	}
 }
 

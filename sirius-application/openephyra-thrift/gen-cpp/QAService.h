@@ -18,6 +18,7 @@ class QAServiceIf {
   virtual void askQuestion(const std::vector<std::string> & arguments) = 0;
   virtual void askFactoidThrift(std::string& _return, const std::string& question) = 0;
   virtual void askFactoidThriftDebug(std::string& _return, const std::string& question) = 0;
+  virtual void askListThrift(std::vector<std::string> & _return, const std::string& question) = 0;
 };
 
 class QAServiceIfFactory {
@@ -54,6 +55,9 @@ class QAServiceNull : virtual public QAServiceIf {
     return;
   }
   void askFactoidThriftDebug(std::string& /* _return */, const std::string& /* question */) {
+    return;
+  }
+  void askListThrift(std::vector<std::string> & /* _return */, const std::string& /* question */) {
     return;
   }
 };
@@ -400,6 +404,126 @@ class QAService_askFactoidThriftDebug_presult {
   friend std::ostream& operator<<(std::ostream& out, const QAService_askFactoidThriftDebug_presult& obj);
 };
 
+typedef struct _QAService_askListThrift_args__isset {
+  _QAService_askListThrift_args__isset() : question(false) {}
+  bool question :1;
+} _QAService_askListThrift_args__isset;
+
+class QAService_askListThrift_args {
+ public:
+
+  static const char* ascii_fingerprint; // = "EFB929595D312AC8F305D5A794CFEDA1";
+  static const uint8_t binary_fingerprint[16]; // = {0xEF,0xB9,0x29,0x59,0x5D,0x31,0x2A,0xC8,0xF3,0x05,0xD5,0xA7,0x94,0xCF,0xED,0xA1};
+
+  QAService_askListThrift_args(const QAService_askListThrift_args&);
+  QAService_askListThrift_args& operator=(const QAService_askListThrift_args&);
+  QAService_askListThrift_args() : question() {
+  }
+
+  virtual ~QAService_askListThrift_args() throw();
+  std::string question;
+
+  _QAService_askListThrift_args__isset __isset;
+
+  void __set_question(const std::string& val);
+
+  bool operator == (const QAService_askListThrift_args & rhs) const
+  {
+    if (!(question == rhs.question))
+      return false;
+    return true;
+  }
+  bool operator != (const QAService_askListThrift_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const QAService_askListThrift_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  friend std::ostream& operator<<(std::ostream& out, const QAService_askListThrift_args& obj);
+};
+
+
+class QAService_askListThrift_pargs {
+ public:
+
+  static const char* ascii_fingerprint; // = "EFB929595D312AC8F305D5A794CFEDA1";
+  static const uint8_t binary_fingerprint[16]; // = {0xEF,0xB9,0x29,0x59,0x5D,0x31,0x2A,0xC8,0xF3,0x05,0xD5,0xA7,0x94,0xCF,0xED,0xA1};
+
+
+  virtual ~QAService_askListThrift_pargs() throw();
+  const std::string* question;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  friend std::ostream& operator<<(std::ostream& out, const QAService_askListThrift_pargs& obj);
+};
+
+typedef struct _QAService_askListThrift_result__isset {
+  _QAService_askListThrift_result__isset() : success(false) {}
+  bool success :1;
+} _QAService_askListThrift_result__isset;
+
+class QAService_askListThrift_result {
+ public:
+
+  static const char* ascii_fingerprint; // = "C844643081B14EA3A81E57199FB2B504";
+  static const uint8_t binary_fingerprint[16]; // = {0xC8,0x44,0x64,0x30,0x81,0xB1,0x4E,0xA3,0xA8,0x1E,0x57,0x19,0x9F,0xB2,0xB5,0x04};
+
+  QAService_askListThrift_result(const QAService_askListThrift_result&);
+  QAService_askListThrift_result& operator=(const QAService_askListThrift_result&);
+  QAService_askListThrift_result() {
+  }
+
+  virtual ~QAService_askListThrift_result() throw();
+  std::vector<std::string>  success;
+
+  _QAService_askListThrift_result__isset __isset;
+
+  void __set_success(const std::vector<std::string> & val);
+
+  bool operator == (const QAService_askListThrift_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const QAService_askListThrift_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const QAService_askListThrift_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  friend std::ostream& operator<<(std::ostream& out, const QAService_askListThrift_result& obj);
+};
+
+typedef struct _QAService_askListThrift_presult__isset {
+  _QAService_askListThrift_presult__isset() : success(false) {}
+  bool success :1;
+} _QAService_askListThrift_presult__isset;
+
+class QAService_askListThrift_presult {
+ public:
+
+  static const char* ascii_fingerprint; // = "C844643081B14EA3A81E57199FB2B504";
+  static const uint8_t binary_fingerprint[16]; // = {0xC8,0x44,0x64,0x30,0x81,0xB1,0x4E,0xA3,0xA8,0x1E,0x57,0x19,0x9F,0xB2,0xB5,0x04};
+
+
+  virtual ~QAService_askListThrift_presult() throw();
+  std::vector<std::string> * success;
+
+  _QAService_askListThrift_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+  friend std::ostream& operator<<(std::ostream& out, const QAService_askListThrift_presult& obj);
+};
+
 class QAServiceClient : virtual public QAServiceIf {
  public:
   QAServiceClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) {
@@ -434,6 +558,9 @@ class QAServiceClient : virtual public QAServiceIf {
   void askFactoidThriftDebug(std::string& _return, const std::string& question);
   void send_askFactoidThriftDebug(const std::string& question);
   void recv_askFactoidThriftDebug(std::string& _return);
+  void askListThrift(std::vector<std::string> & _return, const std::string& question);
+  void send_askListThrift(const std::string& question);
+  void recv_askListThrift(std::vector<std::string> & _return);
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -452,12 +579,14 @@ class QAServiceProcessor : public ::apache::thrift::TDispatchProcessor {
   void process_askQuestion(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_askFactoidThrift(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_askFactoidThriftDebug(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_askListThrift(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
   QAServiceProcessor(boost::shared_ptr<QAServiceIf> iface) :
     iface_(iface) {
     processMap_["askQuestion"] = &QAServiceProcessor::process_askQuestion;
     processMap_["askFactoidThrift"] = &QAServiceProcessor::process_askFactoidThrift;
     processMap_["askFactoidThriftDebug"] = &QAServiceProcessor::process_askFactoidThriftDebug;
+    processMap_["askListThrift"] = &QAServiceProcessor::process_askListThrift;
   }
 
   virtual ~QAServiceProcessor() {}
@@ -512,6 +641,16 @@ class QAServiceMultiface : virtual public QAServiceIf {
       ifaces_[i]->askFactoidThriftDebug(_return, question);
     }
     ifaces_[i]->askFactoidThriftDebug(_return, question);
+    return;
+  }
+
+  void askListThrift(std::vector<std::string> & _return, const std::string& question) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->askListThrift(_return, question);
+    }
+    ifaces_[i]->askListThrift(_return, question);
     return;
   }
 
