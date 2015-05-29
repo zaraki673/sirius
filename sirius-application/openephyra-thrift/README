@@ -1,2 +1,18 @@
 Question Answer Thrift implementation
 C++ client; Java server; Open Ephyra handler
+
+1) Generate client/server stubs:
+thrift --gen cpp qaservice.thrift
+thrift --gen java qaservice.thrift
+
+2) Compile server:
+./compile-qa-server-thrift.sh
+
+3) Compile client:
+make
+
+4) Start server:
+./start-qa-server-thrift.sh
+
+5) Query server:
+./qaclient "what is the speed of light?"
