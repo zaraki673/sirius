@@ -53,18 +53,8 @@ app.initialize();
 
 var image, audio;
 var storage = window.localStorage;
-
-function loadXMLDoc(filename)
-{
-    if (window.XMLHttpRequest) {
-      xhttp=new XMLHttpRequest();
-    } else {
-      xhttp=new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xhttp.open("GET",filename,false);
-    xhttp.send();
-    return xhttp.responseXML;
-}
+var mediaTimer = null;
+var media = null;
 
 function onload() {
     // var xmlDoc = loadXMLDoc("config.xml");
@@ -93,7 +83,7 @@ function captureImageSuccess(mediaFiles) {
         //uploadFile(mediaFiles[i]);
         image = mediaFiles[i];
         $('#image_file').empty();
-        $('#image_file').append("Image File Ready");
+        $('#image_file').append(image.name);
     }
 }
 
@@ -102,9 +92,19 @@ function captureAudioSuccess(mediaFiles) {
     for (i = 0, len = mediaFiles.length; i < len; i += 1) {
         //uploadFile(mediaFiles[i]);
         audio = mediaFiles[i];
+        console.log(audio.type);
         $('#question').value = "";
         $('#audio_file').empty();
         $('#audio_file').append(audio.name);
+        // "<button id='playAudio'>Play</button>"
+        $('#audio_file').append("<button class='btn2' id='playAudio' style='margin-left:3px'>Play</button>");
+        // $('#audio_file').append("<button class='btn2' id='pauseAudio'>Pause</button>");
+        // $('#audio_file').append("<button class='btn2' id='stopAudio'>Stop</button>");
+        // <p id='audio_position'></p>
+        // $('#audio_file').append("<p id='audio_position'></p>");
+        document.getElementById("playAudio").addEventListener("click",playAudio);
+        // document.getElementById("pauseAudio").addEventListener("click",pauseAudio);
+        // document.getElementById("stopAudio").addEventListener("click",stopAudio);
     }
 }
 
@@ -118,7 +118,7 @@ function captureError(error) {
 function captureAudio() {
     // Launch device audio recording application,
     // allowing user to capture up to 2 audio clips
-    navigator.device.capture.captureAudio(captureAudioSuccess, captureError, { });
+    navigator.device.capture.captureAudio(captureAudioSuccess, captureError, { limit: 1 });
 }
 document.getElementById("captureAudio").addEventListener("click",captureAudio);
 
@@ -126,19 +126,113 @@ document.getElementById("captureAudio").addEventListener("click",captureAudio);
 function captureImage() {
     // Launch device camera application,
     // allowing user to capture up to 2 images
-    navigator.device.capture.captureImage(captureImageSuccess, captureError, {});
+    navigator.device.capture.captureImage(captureImageSuccess, captureError, { limit: 1 });
 }
 document.getElementById("captureImage").addEventListener("click",captureImage);
+
+function playAudio() {
+    if (audio == null) {
+        // Nothing to play
+        return;
+    } 
+    media = new Media(audio.fullPath, onSuccess, onError);
+    // Play audio
+    media.play();
+
+    // Update my_media position every second
+    // if (mediaTimer == null) {
+    //     mediaTimer = setInterval(function() {
+    //         // get my_media position
+    //         media.getCurrentPosition(
+    //             // success callback
+    //             function(position) {
+    //                 if (position > -1) {
+    //                     setAudioPosition((position) + " sec");
+    //                 }
+    //             },
+    //             // error callback
+    //             function(e) {
+    //                 console.log("Error getting pos=" + e);
+    //                 setAudioPosition("Error: " + e);
+    //             }
+    //         );
+    //     }, 1000);
+    // }
+}
+
+// Pause audio
+//
+function pauseAudio() {
+    if (media) {
+        media.pause();
+    }
+}
+
+// Stop audio
+//
+function stopAudio() {
+    if (media) {
+        media.stop();
+    }
+    clearInterval(mediaTimer);
+    mediaTimer = null;
+}
+
+// onSuccess Callback
+//
+function onSuccess() {
+    console.log("playAudio():Audio Success");
+}
+
+// onError Callback
+//
+function onError(error) {
+    alert('code: '    + error.code    + '\n' +
+          'message: ' + error.message + '\n');
+}
+
+// Set audio position
+//
+function setAudioPosition(position) {
+    document.getElementById('audio_position').innerHTML = position;
+}
+
+// function getPhoto() {
+//     // Retrieve image file location from specified source
+//     navigator.camera.getPicture(captureImageSuccess, captureError, {
+//         quality: 30,
+//         targetWidth: 600,
+//         targetHeight: 600,
+//         destinationType: destinationType.FILE_URI,
+//         sourceType: pictureSource.PHOTOLIBRARY
+//     });
+// }
+// document.getElementById("getImage").addEventListener("click",getPhoto());
+
 
 function sendToServer() {
     
     if(image){
         // uploadFile(image);
+        $('#response').empty();
+        $('#response').append("<p>Sending...</p>");
+        type = "image/jpeg";
+        headers = {
+            Connection: "Close",
+            'Content-Type': String(type)
+        };
+        uploadFile(image, getAddress(getItem('imm')), type, headers);
     } else {
         if(audio){
             $('#response').empty();
             $('#response').append("<p>Sending...</p>");
-            uploadFile(audio, getAddress(getItem('asr')), "audio/vnd.wave");
+            type = "audio/wav";
+            headers = {
+                Connection: "Close",
+                'Content-Type': String(type + '; rate=16000')
+                // 'Content-Type': String(type)
+            };
+            uploadFile(audio, getAddress(getItem('asr')), type, headers);
         } else {
             //send text to server
             q = document.getElementById("question").value
@@ -171,21 +265,18 @@ function queryServer(query) {
 }
 
 // Upload files to server
-function uploadFile(mediaFile, addr, type) {
+function uploadFile(mediaFile, addr, type, headers) {
     var ft = new FileTransfer(),
         path = mediaFile.fullPath,
         name = mediaFile.name;
 
     var options = new FileUploadOptions();
-    options.fileKey = type;
+    options.fileKey = 'file';
     // options.fileName = name.replace(name.substr(0, name.lastIndexOf('/')+1), '/tmp/');
     options.fileName = name;
     options.mimeType = type;
     options.chunkedMode = false;
-    options.headers = {
-        Connection: "Keep-Alive",
-        'Content-Type': String(type + '; rate=16000')
-    };
+    options.headers = headers;
 
     ft.upload(
         encodeURI(path),
