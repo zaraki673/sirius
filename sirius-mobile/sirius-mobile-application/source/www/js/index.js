@@ -192,6 +192,10 @@ function setAudioPosition(position) {
 // }
 // document.getElementById("getImage").addEventListener("click",getPhoto());
 
+function pingServer() {
+    console.log(client.ping());
+}
+document.getElementById("pingServer").addEventListener("click",pingServer());
 
 function sendToServer() {
     
