@@ -11,6 +11,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <sox.h>
 
 #include "KaldiService.h"
 #include <thrift/protocol/TBinaryProtocol.h>
@@ -27,7 +28,7 @@ using namespace ::apache::thrift::server;
 using boost::shared_ptr;
 
 void readFromPipe(int,string&);
-
+void sox();
 
 class KaldiServiceHandler : virtual public KaldiServiceIf {
  public:
@@ -36,14 +37,7 @@ class KaldiServiceHandler : virtual public KaldiServiceIf {
   	
 	}
   void kaldi_asr(std::string& _return, const std::string& audio_file) {
-    // Your implementation goes here
-	std::cout << "Decoding audio file...." <<std::endl;
-	//Still need to implement the decoding of the file
-	std::string audio_path = "inputserver.wav";
-	ofstream audiofile(audio_path.c_str(), ios::binary);
-	audiofile.write(audio_file.c_str(),audio_file.size());
-	audiofile.close();
-	string kotae;
+		string kotae;
 	
 	pid_t pid;
 	int fds[2];
@@ -72,17 +66,26 @@ class KaldiServiceHandler : virtual public KaldiServiceIf {
 					"\"ark:echo utterance-id1 utterance-id1|\"",
 					"\"scp:echo utterance-id1 null|\"",
 					"ark:/dev/null",(char*)NULL);
-
-		}
-		else if(pid <0){
-			perror("fork");
-		}
-		else {
+	
+		perror("Launch process fail");	
+	}	
+	else if(pid <0){
+		perror("fork");
+	}
+	else {
+			std::string audio_path = "inputserver.wav";
+			ofstream audiofile(audio_path.c_str(), ios::binary);
+			audiofile.write(audio_file.c_str(),audio_file.size());
+			audiofile.close();
+	
+			std::cout << "Decoding audio file...." <<std::endl;
+			sox();
+		
 			FILE * stream;
 			close (fds[0]);
 			close (fds2[1]);
 			stream = fdopen (fds[1],"w");
-			fprintf (stream, "inputserver.wav");
+			fprintf (stream, "inputserver1.wav");
 			fflush(stream);
 			close(fds[1]);
 			readFromPipe(fds2[0],kotae);
@@ -116,4 +119,68 @@ void readFromPipe( int fd, string& kotae )
     while ( fgets (buffer, sizeof (buffer), stream) != NULL )
 				kotae =buffer;
     fflush( stream );
+}
+
+void sox(){
+
+ static sox_format_t * in, * out; /* input and output files */
+  sox_effects_chain_t * chain;
+  sox_effect_t * e;
+  char * args[10];
+  sox_signalinfo_t interm_signal; /* @ intermediate points in the chain. */
+   
+	sox_signalinfo_t out_signal = {
+    8000,
+    1,
+    SOX_DEFAULT_PRECISION,
+    SOX_UNKNOWN_LEN,
+    NULL
+  };
+
+  assert(sox_init() == SOX_SUCCESS);
+  assert(in = sox_open_read("inputserver.wav", NULL, NULL, NULL));
+  assert(out = sox_open_write("inputserver1.wav", &out_signal, NULL, NULL, NULL, NULL));
+
+  chain = sox_create_effects_chain(&in->encoding, &out->encoding);
+
+  interm_signal = in->signal; /* NB: deep copy */
+
+  e = sox_create_effect(sox_find_effect("input"));
+  args[0] = (char *)in, assert(sox_effect_options(e, 1, args) == SOX_SUCCESS);
+  assert(sox_add_effect(chain, e, &in->signal, &in->signal) == SOX_SUCCESS);
+  free(e);
+
+  if (in->signal.rate != out->signal.rate) {
+    e = sox_create_effect(sox_find_effect("rate"));
+    assert(sox_effect_options(e, 0, NULL) == SOX_SUCCESS);
+    assert(sox_add_effect(chain, e, &interm_signal, &out->signal) == SOX_SUCCESS);
+    free(e);
+  }
+  if (in->signal.channels != out->signal.channels) {
+    e = sox_create_effect(sox_find_effect("channels"));
+    assert(sox_effect_options(e, 0, NULL) == SOX_SUCCESS);
+    assert(sox_add_effect(chain, e, &interm_signal, &out->signal) == SOX_SUCCESS);
+    free(e);
+  }
+
+  /* Create the `flanger' effect, and initialise it with default parameters: */
+  e = sox_create_effect(sox_find_effect("norm"));
+  assert(sox_effect_options(e, 0, NULL) == SOX_SUCCESS);
+  /* Add the effect to the end of the effects processing chain: */
+  assert(sox_add_effect(chain, e, &interm_signal, &out->signal) == SOX_SUCCESS);
+  free(e);
+
+
+	e = sox_create_effect(sox_find_effect("output"));
+  args[0] = (char *)out, assert(sox_effect_options(e, 1, args) == SOX_SUCCESS);
+  assert(sox_add_effect(chain, e, &interm_signal, &out->signal) == SOX_SUCCESS);
+  free(e);
+
+  sox_flow_effects(chain, NULL, NULL);
+
+  sox_delete_effects_chain(chain);
+  sox_close(out);
+  sox_close(in);
+  sox_quit();
+
 }
