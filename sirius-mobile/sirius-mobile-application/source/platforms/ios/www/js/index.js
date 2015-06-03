@@ -55,25 +55,29 @@ var image, audio;
 var storage = window.localStorage;
 var mediaTimer = null;
 var media = null;
+var transport = new Thrift.Transport("/thrift/service/commandCenter/");
+var protocol  = new Thrift.Protocol(transport);
+var client    = new CommandCenterClient(protocol);
 
 function onload() {
-    // var xmlDoc = loadXMLDoc("config.xml");
-    // ip = xmlDoc.getElementsByTagName("ip")[0].childNodes[0].nodeValue;
-    // asr_port = xmlDoc.getElementsByTagName("asr")[0].childNodes[0].nodeValue;
-    // imm_port = xmlDoc.getElementsByTagName("imm")[0].childNodes[0].nodeValue;
-    // qa_port = xmlDoc.getElementsByTagName("qa")[0].childNodes[0].nodeValue;
-
     document.getElementById("ip").value = storage.getItem("ip");
     document.getElementById("asr").value = storage.getItem("asr");
     document.getElementById("imm").value = storage.getItem("imm");
     document.getElementById("qa").value = storage.getItem("qa");
 
+    transport = new Thrift.Transport("/thrift/service/commandCenter/");
+    protocol  = new Thrift.Protocol(transport);
+    client    = new CommandCenterClient(protocol);
 }
 
 window.addEventListener("load", onload);
 
 function updateDefaults(key, value) {
     storage.setItem(key, value);
+    var addr = 'http://' + storage.getItem('ip') + ':9090/';
+    transport = new Thrift.Transport(addr);
+    protocol  = new Thrift.Protocol(transport);
+    client    = new CommandCenterClient(protocol);
 }
 
 // Called when capture operation is finished
@@ -92,17 +96,16 @@ function captureAudioSuccess(mediaFiles) {
     for (i = 0, len = mediaFiles.length; i < len; i += 1) {
         //uploadFile(mediaFiles[i]);
         audio = mediaFiles[i];
-        console.log(audio.type);
         $('#question').value = "";
         $('#audio_file').empty();
         $('#audio_file').append(audio.name);
-        // "<button id='playAudio'>Play</button>"
         $('#audio_file').append("<button class='btn2' id='playAudio' style='margin-left:3px'>Play</button>");
+        document.getElementById("playAudio").addEventListener("click",playAudio);
+
         // $('#audio_file').append("<button class='btn2' id='pauseAudio'>Pause</button>");
         // $('#audio_file').append("<button class='btn2' id='stopAudio'>Stop</button>");
         // <p id='audio_position'></p>
         // $('#audio_file').append("<p id='audio_position'></p>");
-        document.getElementById("playAudio").addEventListener("click",playAudio);
         // document.getElementById("pauseAudio").addEventListener("click",pauseAudio);
         // document.getElementById("stopAudio").addEventListener("click",stopAudio);
     }
@@ -138,26 +141,6 @@ function playAudio() {
     media = new Media(audio.fullPath, onSuccess, onError);
     // Play audio
     media.play();
-
-    // Update my_media position every second
-    // if (mediaTimer == null) {
-    //     mediaTimer = setInterval(function() {
-    //         // get my_media position
-    //         media.getCurrentPosition(
-    //             // success callback
-    //             function(position) {
-    //                 if (position > -1) {
-    //                     setAudioPosition((position) + " sec");
-    //                 }
-    //             },
-    //             // error callback
-    //             function(e) {
-    //                 console.log("Error getting pos=" + e);
-    //                 setAudioPosition("Error: " + e);
-    //             }
-    //         );
-    //     }, 1000);
-    // }
 }
 
 // Pause audio
@@ -221,7 +204,7 @@ function sendToServer() {
             Connection: "Close",
             'Content-Type': String(type)
         };
-        uploadFile(image, getAddress(getItem('imm')), type, headers);
+        //uploadFile(image, getAddress(getItem('imm')), type, headers);
     } else {
         if(audio){
             $('#response').empty();
@@ -232,7 +215,10 @@ function sendToServer() {
                 'Content-Type': String(type + '; rate=16000')
                 // 'Content-Type': String(type)
             };
-            uploadFile(audio, getAddress(getItem('asr')), type, headers);
+            // if(String(window.device.platform) == "iOS"){
+            //     window.encodeAudio(audio.fullPath, success, fail);
+            // }
+            //uploadFile(audio, getAddress(getItem('asr')), type, headers);
         } else {
             //send text to server
             q = document.getElementById("question").value

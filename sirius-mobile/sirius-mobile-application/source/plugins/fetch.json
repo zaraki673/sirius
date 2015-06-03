@@ -71,5 +71,31 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "com.cirrustech.plugins.audiorecorder": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/CirrusTech/cordova-audiorecorder-plugin.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "org.apache.cordova.device": {
+        "source": {
+            "type": "registry",
+            "id": "org.apache.cordova.device"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "de.appplant.cordova.plugin.email-composer": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/katzer/cordova-plugin-email-composer.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

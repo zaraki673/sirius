@@ -128,6 +128,28 @@ module.exports = [
         ]
     },
     {
+        "file": "plugins/com.cirrustech.plugins.audiorecorder/www/AudioRecorder.js",
+        "id": "com.cirrustech.plugins.audiorecorder.AudioRecorder",
+        "clobbers": [
+            "window.plugins.audiorecorder"
+        ]
+    },
+    {
+        "file": "plugins/org.apache.cordova.device/www/device.js",
+        "id": "org.apache.cordova.device.device",
+        "clobbers": [
+            "device"
+        ]
+    },
+    {
+        "file": "plugins/de.appplant.cordova.plugin.email-composer/www/email_composer.js",
+        "id": "de.appplant.cordova.plugin.email-composer.EmailComposer",
+        "clobbers": [
+            "cordova.plugins.email",
+            "plugin.email"
+        ]
+    },
+    {
         "file": "plugins/cordova-plugin-file/www/DirectoryEntry.js",
         "id": "cordova-plugin-file.DirectoryEntry",
         "clobbers": [
@@ -285,6 +307,9 @@ module.exports.metadata =
     "cordova-plugin-dialogs": "1.1.0",
     "com.wordsbaking.cordova.tts": "0.2.1",
     "cordova-plugin-file-transfer": "1.2.1-dev",
+    "com.cirrustech.plugins.audiorecorder": "0.0.1",
+    "org.apache.cordova.device": "0.3.0",
+    "de.appplant.cordova.plugin.email-composer": "0.8.2",
     "cordova-plugin-file": "2.0.0"
 }
 // BOTTOM OF METADATA

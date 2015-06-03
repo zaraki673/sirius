@@ -11,6 +11,9 @@
         <param name="firefoxos-package" value="Notification" />
     </feature>
     <permission name="systemXHR" privileged="true" />
+    <feature name="Device">
+        <param name="firefoxos-package" value="Device" />
+    </feature>
     <name>SiriusMobile</name>
     <description>
     </description>

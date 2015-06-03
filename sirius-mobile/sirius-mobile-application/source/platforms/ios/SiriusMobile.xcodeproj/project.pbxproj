@@ -56,6 +56,9 @@
 		E1C5D7680B784854B77ACEA2 /* CDVNotification.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9B1C636EB9A046DDA9172824 /* CDVNotification.bundle */; };
 		F6C1F6724E8647D69731CCD2 /* UIImage+CropScaleOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 335D30A563D14CA49D5DF0B3 /* UIImage+CropScaleOrientation.m */; };
 		72693ED56B3742E985941200 /* CDVFileTransfer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6E66EAA5CEC64044B1A34A8E /* CDVFileTransfer.m */; };
+		21C86C2D4F69456DAA653135 /* CDVDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = DBC967A44F2C4B3A80C7A9A4 /* CDVDevice.m */; };
+		0944FF44873246508F89E68A /* APPEmailComposer.m in Sources */ = {isa = PBXBuildFile; fileRef = 978132E0580947378834D186 /* APPEmailComposer.m */; };
+		FD50DAB5772947AFAF840E60 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F766A39C25894771A8D2860C /* MessageUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,6 +152,11 @@
 		F840E1F0165FE0F500CFE078 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = SiriusMobile/config.xml; sourceTree = "<group>"; };
 		6E66EAA5CEC64044B1A34A8E /* CDVFileTransfer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "CDVFileTransfer.m"; path = "cordova-plugin-file-transfer/CDVFileTransfer.m"; sourceTree = "<group>"; fileEncoding = 4; };
 		92BDDCD647BC40CAB9E3A2CC /* CDVFileTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CDVFileTransfer.h"; path = "cordova-plugin-file-transfer/CDVFileTransfer.h"; sourceTree = "<group>"; fileEncoding = 4; };
+		DBC967A44F2C4B3A80C7A9A4 /* CDVDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "CDVDevice.m"; path = "org.apache.cordova.device/CDVDevice.m"; sourceTree = "<group>"; fileEncoding = 4; };
+		7793CDEDA767488D8BC536F0 /* CDVDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CDVDevice.h"; path = "org.apache.cordova.device/CDVDevice.h"; sourceTree = "<group>"; fileEncoding = 4; };
+		978132E0580947378834D186 /* APPEmailComposer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "APPEmailComposer.m"; path = "de.appplant.cordova.plugin.email-composer/APPEmailComposer.m"; sourceTree = "<group>"; fileEncoding = 4; };
+		224E860555DF4EADA8DFC67B /* APPEmailComposer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "APPEmailComposer.h"; path = "de.appplant.cordova.plugin.email-composer/APPEmailComposer.h"; sourceTree = "<group>"; fileEncoding = 4; };
+		F766A39C25894771A8D2860C /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "MessageUI.framework"; path = "System/Library/Frameworks/MessageUI.framework"; sourceTree = SDKROOT; fileEncoding = 4; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +171,7 @@
 				4B6E47BE1D214E659DD17F4D /* ImageIO.framework in Frameworks */,
 				6E72C1E129AB4DEFB7C2EFFC /* CoreLocation.framework in Frameworks */,
 				B52651B904EA40F1BA27F5D2 /* AudioToolbox.framework in Frameworks */,
+				FD50DAB5772947AFAF840E60 /* MessageUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,6 +249,7 @@
 				260F090C67294A59BF935991 /* ImageIO.framework */,
 				450AF55651764E61B5E0BB1D /* CoreLocation.framework */,
 				C882DC8AB3244B85B96239AF /* AudioToolbox.framework */,
+				F766A39C25894771A8D2860C /* MessageUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -280,6 +290,10 @@
 				24471E3D34244D878B86CAAE /* CDVTTS.h */,
 				6E66EAA5CEC64044B1A34A8E /* CDVFileTransfer.m */,
 				92BDDCD647BC40CAB9E3A2CC /* CDVFileTransfer.h */,
+				DBC967A44F2C4B3A80C7A9A4 /* CDVDevice.m */,
+				7793CDEDA767488D8BC536F0 /* CDVDevice.h */,
+				978132E0580947378834D186 /* APPEmailComposer.m */,
+				224E860555DF4EADA8DFC67B /* APPEmailComposer.h */,
 			);
 			name = Plugins;
 			path = SiriusMobile/Plugins;
@@ -483,6 +497,8 @@
 				94D161A16C074241973E1BAB /* CDVNotification.m in Sources */,
 				01B45710500E4BC6BAB52457 /* CDVTTS.m in Sources */,
 				72693ED56B3742E985941200 /* CDVFileTransfer.m in Sources */,
+				21C86C2D4F69456DAA653135 /* CDVDevice.m in Sources */,
+				0944FF44873246508F89E68A /* APPEmailComposer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
