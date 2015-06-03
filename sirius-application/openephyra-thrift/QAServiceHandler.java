@@ -58,6 +58,63 @@ import qastubs.QAService;
 //import java.util.List;
 
 public class QAServiceHandler implements QAService.Iface {
+	private OpenEphyra oe;
+
+	public QAServiceHandler()
+	{
+		System.out.println("QAServiceHandler() ctor: creating a new OE obj\n");
+		String dir = "";
+
+		MsgPrinter.enableStatusMsgs(true);
+		MsgPrinter.enableErrorMsgs(true);
+
+		oe = new OpenEphyra(dir);
+	}
+
+	public String askFactoidThrift(String question)
+	{
+		System.out.println("askFactoidThrift():");
+		//String dir = "";
+		
+		// enable msg printing to screen (logging not enabled)
+		//MsgPrinter.enableStatusMsgs(true);
+		//MsgPrinter.enableErrorMsgs(true);
+		MsgPrinter.printStatusMsg("askFactoidThrift(): Arg = " + question);
+
+		//OpenEphyra oe  = new OpenEphyra(dir);
+		Result result = oe.askFactoid(question);
+		String answer = result.getAnswer();
+		return answer;
+	}
+
+	public List<String> askListThrift(String question)
+	{
+		System.out.println("askListThrift():");
+		//String dir = "";
+		float relThresh = 0.5f; //let user change this value
+		
+		// enable msg printing to screen (logging not enabled)
+		//MsgPrinter.enableStatusMsgs(true);
+		//MsgPrinter.enableErrorMsgs(true);
+		MsgPrinter.printStatusMsg("askListThrift(): Arg = " + question);
+
+		//OpenEphyra oe  = new OpenEphyra(dir);
+		Result[] results = oe.askList(question, relThresh);
+		
+		List<String> answersList = new ArrayList<String>();
+		// add all answers to answersList
+		for (Result r : results)
+		{
+			answersList.add(r.getAnswer());
+		}
+		return answersList;
+	}
+
+	//////////////////////////////////////////////////////////////////////
+	// NOTE: askQuestion() is just for testing. It has a number of problems,
+	// including instantiating a new instance of Open Ephyra every time it's called
+	// and not returning an answer to the client. USE askFactoidThrift() OR
+	// askListThrift() INSTEAD!
 	public void askQuestion(List<String> arguments)
 	{
 		System.out.println("askQuestion():");
@@ -65,33 +122,17 @@ public class QAServiceHandler implements QAService.Iface {
 		OpenEphyra.main(argString);
 	}
 
-	public String askFactoidThrift(String question)
-	{
-		System.out.println("askFactoidThrift():");
-		String dir = "";
-		
-		// enable msg printing to screen (logging not enabled)
-		MsgPrinter.enableStatusMsgs(true);
-		MsgPrinter.enableErrorMsgs(true);
-		MsgPrinter.printStatusMsg("askFactoidThrift(): Arg = " + question);
-
-		OpenEphyra oe  = new OpenEphyra(dir);
-		Result result = oe.askFactoid(question);
-		String answer = result.getAnswer();
-		return answer;
-	}
-
 	public String askFactoidThriftDebug(String question)
 	{
 		System.out.println("askFactoidThriftDebug():");
 		//String dir = "~/sirius/sirius-application/question-answer/";
-		String dir = "";
+		//String dir = "";
 		// enable msg printing to screen (logging not enabled)
-		MsgPrinter.enableStatusMsgs(true);
-		MsgPrinter.enableErrorMsgs(true);
+		//MsgPrinter.enableStatusMsgs(true);
+		//MsgPrinter.enableErrorMsgs(true);
 		MsgPrinter.printStatusMsg("askFactoidThrift(): Arg = " + question);
 
-		OpenEphyra oe  = new OpenEphyra(dir);
+		//OpenEphyra oe  = new OpenEphyra(dir);
 		// FUNCTION: initFactoid():
 		// question analysis
 		Ontology wordNet = new WordNet();
@@ -162,28 +203,5 @@ public class QAServiceHandler implements QAService.Iface {
 		return answer;
 	}
 
-	public List<String> askListThrift(String question)
-	{
-		System.out.println("askListThrift():");
-		String dir = "";
-		float relThresh = 0.5f; //let user change this value
-		
-		// enable msg printing to screen (logging not enabled)
-		MsgPrinter.enableStatusMsgs(true);
-		MsgPrinter.enableErrorMsgs(true);
-		MsgPrinter.printStatusMsg("askListThrift(): Arg = " + question);
-
-		OpenEphyra oe  = new OpenEphyra(dir);
-		Result[] results = oe.askList(question, relThresh);
-		
-		List<String> answersList = new ArrayList<String>();
-		// add all answers to answersList
-		for (Result r : results)
-		{
-			answersList.add(r.getAnswer());
-		}
-		return answersList;
-
-	}
 }
 

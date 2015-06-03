@@ -88,7 +88,7 @@ void clientAskFactoid(qastubs::QAServiceClient& client, std::string question)
 	cout << endl;
 
 	// ask factoid debug question
-	cout << "calling askFactoidThriftDebug():" << endl;
+	/*cout << "calling askFactoidThriftDebug():" << endl;
 	gettimeofday(&tv1, NULL);
         client.askFactoidThriftDebug(answer, question); // pass QAService a question
         gettimeofday(&tv2, NULL);
@@ -97,6 +97,7 @@ void clientAskFactoid(qastubs::QAServiceClient& client, std::string question)
         cout << "ANSWER = " << answer << endl;
         cout << "server replied within " << fixed << setprecision(2) << (double)query_latency / 1000 << " ms" << endl;
 	cout << endl;
+	*/
 }
 
 void clientAskList(qastubs::QAServiceClient& client, std::string question)

@@ -39,7 +39,8 @@ public class QADaemon {
 		try {
 			TServerTransport serverTransport = new TServerSocket(9090);
 			TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
-			System.out.println("Starting the simple server...");
+			//TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
+			System.out.println("Starting the server...");
 			server.serve();
 		} catch (Exception e) {
 			e.printStackTrace();
