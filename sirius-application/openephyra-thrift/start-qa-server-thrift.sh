@@ -5,14 +5,14 @@
 # However, javac still needs the classpath to the package.
 
 # Add thrift libraries to class path
-export CLASSPATH=/home/tollben/thrift-0.9.2/lib/java/build/libthrift-0.9.2.jar:/home/tollben/thrift-0.9.2/lib/java/build/lib/slf4j-api-1.5.8.jar:/home/tollben/thrift-0.9.2/lib/java/build/lib/slf4j-log4j12-1.5.8.jar:/home/tollben/thrift-0.9.2/lib/java/build/lib/log4j-1.2.14.jar
+export CLASSPATH=~/thrift-0.9.2/lib/java/build/libthrift-0.9.2.jar:~/thrift-0.9.2/lib/java/build/lib/slf4j-api-1.5.8.jar:~/thrift-0.9.2/lib/java/build/lib/slf4j-log4j12-1.5.8.jar:~/thrift-0.9.2/lib/java/build/lib/log4j-1.2.14.jar
 
 # Add open ephyra libraries to class path
-# export CLASSPATH=$CLASSPATH:/home/tollben/sirius/sirius-application/question-answer/bin
+# export CLASSPATH=$CLASSPATH:~/sirius/sirius-application/question-answer/bin
 
 # Add my classes to class path
 # NOTE: these class paths are only necessary when running the program
-export CLASSPATH=$CLASSPATH:/home/tollben/sirius/sirius-application/question-answer/openephyra-thrift:/home/tollben/sirius/sirius-application/question-answer/openephyra-thrift/gen-java
+export CLASSPATH=$CLASSPATH:~/sirius/sirius-application/question-answer/openephyra-thrift:~/sirius/sirius-application/question-answer/openephyra-thrift/gen-java
 
 # Add command center to class path
 export CLASSPATH=$CLASSPATH:~/sirius/sirius-application/command-center/gen-java
