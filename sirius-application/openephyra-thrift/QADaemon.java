@@ -51,8 +51,8 @@ public class QADaemon {
 	public static void simple(QAService.Processor processor) {
 		try {
 			// Register this server with the command center
-			int port = 9090;
-			int cmdcenterport = 8080;
+			int port = 9091;
+			int cmdcenterport = 8081;
 			TTransport transport = new TSocket("localhost", cmdcenterport);
 			transport.open();
 			TProtocol protocol = new TBinaryProtocol(transport);

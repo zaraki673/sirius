@@ -12,5 +12,8 @@ service CommandCenter
 	void registerService(1:string machineName, 2:i32 port, 3:string serviceType),
 
 	# command center <--> client API
-	string askTextQuestion(1:string question)
+	string askTextQuestion(1:string question),
+
+	# simple function to test connections
+	void ping()
 }
