@@ -1,5 +1,5 @@
 CXX = g++
-CXX_FLAGS = -Wall #-Wno-unused -Wno-sign-compare
+CXX_FLAGS = -Wall
 
 LINK_FLAGS = -lopencv_core \
                          -lopencv_highgui \
