@@ -5,7 +5,7 @@
 # However, javac still needs the classpath to the package.
 
 # Add thrift libraries to class path
-export CLASSPATH=/usr/local/bin/thrift/lib/java/build/libthrift.jar:/usr/local/bin/thrift/lib/java/build/lib/slf4j-api-1.5.8.jar:/usr/local/bin/thrift/lib/java/build/lib/slf4j-log4j12-1.5.8.jar:/usr/local/bin/thrift/lib/java/build/lib/log4j-1.2.14.jar
+export CLASSPATH=~/thrift-0.9.2/lib/java/build/libthrift-0.9.2.jar:~/thrift-0.9.2/lib/java/build/lib/slf4j-api-1.5.8.jar:~/thrift-0.9.2/lib/java/build/lib/slf4j-log4j12-1.5.8.jar:~/thrift-0.9.2/lib/java/build/lib/log4j-1.2.14.jar
 
 # Add open ephyra libraries to class path
 # export CLASSPATH=$CLASSPATH:~/sirius/sirius-application/question-answer/bin
