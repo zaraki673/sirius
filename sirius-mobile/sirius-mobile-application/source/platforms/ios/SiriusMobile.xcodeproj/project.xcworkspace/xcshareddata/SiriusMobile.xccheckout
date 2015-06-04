@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>261B63D5-3EE8-4488-B71D-6F56D2BBFC20</string>
+	<key>IDESourceControlProjectName</key>
+	<string>project</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>50029E1EACF9CF7E24F70031A6647F657585EA81</key>
+		<string>github.com:claritylab/sirius.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>sirius-mobile/sirius-mobile-application/source/platforms/ios/SiriusMobile.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>50029E1EACF9CF7E24F70031A6647F657585EA81</key>
+		<string>../../../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:claritylab/sirius.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>50029E1EACF9CF7E24F70031A6647F657585EA81</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>50029E1EACF9CF7E24F70031A6647F657585EA81</string>
+			<key>IDESourceControlWCCName</key>
+			<string>sirius</string>
+		</dict>
+	</array>
+</dict>
+</plist>
