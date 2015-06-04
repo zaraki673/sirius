@@ -14,6 +14,9 @@ export CLASSPATH=/home/tollben/thrift-0.9.2/lib/java/build/libthrift-0.9.2.jar:/
 # NOTE: these class paths are only necessary when running the program
 export CLASSPATH=$CLASSPATH:/home/tollben/sirius/sirius-application/question-answer/openephyra-thrift:/home/tollben/sirius/sirius-application/question-answer/openephyra-thrift/gen-java
 
+# Add command center to class path
+export CLASSPATH=$CLASSPATH:~/sirius/sirius-application/command-center/gen-java
+
 # Add open ephyra libraries to class path; start from top directory (question-answer)
 cd ..;
 
