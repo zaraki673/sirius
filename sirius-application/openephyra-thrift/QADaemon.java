@@ -59,7 +59,7 @@ public class QADaemon {
 			CommandCenter.Client client = new CommandCenter.Client(protocol);
 			System.out.println("Registering question-answer server with command center...");
 
-			client.registerService("localhost", port, 1);
+			client.registerService("localhost", port, "QA");
 			transport.close();
 
 			// Start the question-answer server
