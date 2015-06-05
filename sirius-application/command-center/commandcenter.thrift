@@ -6,12 +6,6 @@
 namespace cpp cmdcenterstubs
 namespace java cmdcenterstubs
 
-struct Service {
-  1: string machine_name,
-  2: i32 port,
-  3: string type,
-}
-
 service CommandCenter
 {
 	# service <--> command center API

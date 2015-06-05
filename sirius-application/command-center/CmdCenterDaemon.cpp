@@ -36,6 +36,13 @@ using namespace apache::thrift::server;
 using namespace cmdcenterstubs;
 using namespace qastubs;
 
+struct Service
+{
+	std::string machine_name,
+	int32_t port,
+	std::string type
+};
+
 class CommandCenterHandler : public CommandCenterIf
 {
 public:
@@ -95,9 +102,9 @@ public:
 
 private:
 	// command center's tables
-	cmdcenterstubs::Service qa;
-	cmdcenterstubs::Service imm;
-	cmdcenterstubs::Service asr;
+	Service qa;
+	Service imm;
+	Service asr;
 	
 };
 
