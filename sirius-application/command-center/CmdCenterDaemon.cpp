@@ -21,6 +21,7 @@
 
 // Thrift-generated stubs for RPC handling
 #include "gen-cpp/CommandCenter.h"
+#include "gen-cpp/commandcenter_types.h"
 
 // Thrift-generated stubs for communicating with registered
 // services
@@ -43,7 +44,7 @@ public:
 
 	// (dtor defined in CommandCenter.h)
 
-	virtual void registerService(const std::string& machine_name, const int32_t port, const Service_Type::type type) {
+	virtual void registerService(const std::string& machine_name, const int32_t port, const Service_Type type) {
 	{
 		cout << "received request from " << machine_name << ":" << port << ", serviceType = " << type << endl;
 		if(type == Service_Type.QA){
