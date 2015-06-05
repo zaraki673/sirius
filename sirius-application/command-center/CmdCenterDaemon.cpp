@@ -43,9 +43,9 @@ public:
 
 	// (dtor defined in CommandCenter.h)
 
-	virtual void registerService(const std::string& machineName, const int32_t port, const std::string& serviceType)
+	virtual void registerService(const std::string& machine_name, const int32_t port, const Service_Type::type type) {
 	{
-		cout << "received request from " << machineName << ":" << port << ", serviceType = " << serviceType << endl;
+		cout << "received request from " << machine_name << ":" << port << ", serviceType = " << type << endl;
 	}
 
 	virtual void askTextQuestion(std::string& _return, const std::string& question)
