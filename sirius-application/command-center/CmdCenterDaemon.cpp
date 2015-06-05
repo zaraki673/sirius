@@ -38,9 +38,14 @@ using namespace qastubs;
 
 struct Service
 {
-	std::string machine_name,
-	int32_t port,
-	std::string type
+	std::string machine_name;
+	int32_t port;
+	std::string type;
+	Service(std::string machine_name_in, int32_t port_in, std::string type_in){
+		machine_name = machine_name_in;
+		port = port_in;
+		type = type_in;
+	}
 };
 
 class CommandCenterHandler : public CommandCenterIf
