@@ -37,6 +37,7 @@
         <title>Sirius Mobile</title>
         <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
         <script type="text/javascript" charset="utf-8" src="json2.js"></script>
+        <script type="text/javascript" src="js/jquery.min.js"></script>
     </head>
     <body>
         <div class="app">
@@ -57,14 +58,14 @@
             <div id="audio_file"></div> 
             <br>
 
-            <button class="btn" id="pingServer">Ping Server</button>
+            <button class="btn" id="thriftMessage">Thrift Question</button>
             <button class="btn" id="sendToServer">Send to Server</button> <br>
             <div id="response"></div>
         </div>
-        <script type="text/javascript" src="js/AudioEncode.js"></script>
-        <script type="text/javascript" src="js/jquery.min.js"></script>
-        <script type="text/javascript" src="thrift/gen-js/commandCenter_types.js"></script>
-        <script type="text/javascript" src="thrift/gen-js/CommandCenter.js"></script>
+
+        <script type="text/javascript" src="js/thrift/thrift.js"></script>
+        <script type="text/javascript" src="js/thrift/commandcenter_types.js"></script>
+        <script type="text/javascript" src="js/thrift/CommandCenter.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         
     </body>

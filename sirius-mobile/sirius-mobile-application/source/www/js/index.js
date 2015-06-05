@@ -1,20 +1,7 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Sirius Mobile Application
+ * Developed with Apache Cordova and Apache Thrift
+ * More info at http://sirius.clarity-lab.org/
  */
 
 var app = {
@@ -55,29 +42,18 @@ var image, audio;
 var storage = window.localStorage;
 var mediaTimer = null;
 var media = null;
-var transport = new Thrift.Transport("/thrift/service/commandCenter/");
-var protocol  = new Thrift.Protocol(transport);
-var client    = new CommandCenterClient(protocol);
 
 function onload() {
     document.getElementById("ip").value = storage.getItem("ip");
     document.getElementById("asr").value = storage.getItem("asr");
     document.getElementById("imm").value = storage.getItem("imm");
     document.getElementById("qa").value = storage.getItem("qa");
-
-    transport = new Thrift.Transport("/thrift/service/commandCenter/");
-    protocol  = new Thrift.Protocol(transport);
-    client    = new CommandCenterClient(protocol);
 }
 
 window.addEventListener("load", onload);
 
 function updateDefaults(key, value) {
     storage.setItem(key, value);
-    var addr = 'http://' + storage.getItem('ip') + ':9090/';
-    transport = new Thrift.Transport(addr);
-    protocol  = new Thrift.Protocol(transport);
-    client    = new CommandCenterClient(protocol);
 }
 
 // Called when capture operation is finished
@@ -119,16 +95,14 @@ function captureError(error) {
 
 // A button will call this function
 function captureAudio() {
-    // Launch device audio recording application,
-    // allowing user to capture up to 2 audio clips
+    // Launch device audio recording application, allowing user to capture up to 1 audio clips
     navigator.device.capture.captureAudio(captureAudioSuccess, captureError, { limit: 1 });
 }
 document.getElementById("captureAudio").addEventListener("click",captureAudio);
 
  // A button will call this function            
 function captureImage() {
-    // Launch device camera application,
-    // allowing user to capture up to 2 images
+    // Launch device camera application, allowing user to capture up to 1 images
     navigator.device.capture.captureImage(captureImageSuccess, captureError, { limit: 1 });
 }
 document.getElementById("captureImage").addEventListener("click",captureImage);
@@ -141,24 +115,6 @@ function playAudio() {
     media = new Media(audio.fullPath, onSuccess, onError);
     // Play audio
     media.play();
-}
-
-// Pause audio
-//
-function pauseAudio() {
-    if (media) {
-        media.pause();
-    }
-}
-
-// Stop audio
-//
-function stopAudio() {
-    if (media) {
-        media.stop();
-    }
-    clearInterval(mediaTimer);
-    mediaTimer = null;
 }
 
 // onSuccess Callback
@@ -174,12 +130,6 @@ function onError(error) {
           'message: ' + error.message + '\n');
 }
 
-// Set audio position
-//
-function setAudioPosition(position) {
-    document.getElementById('audio_position').innerHTML = position;
-}
-
 // function getPhoto() {
 //     // Retrieve image file location from specified source
 //     navigator.camera.getPicture(captureImageSuccess, captureError, {
@@ -190,12 +140,19 @@ function setAudioPosition(position) {
 //         sourceType: pictureSource.PHOTOLIBRARY
 //     });
 // }
-// document.getElementById("getImage").addEventListener("click",getPhoto());
+// document.getElementById("getImage").addEventListener("click",getPhoto;
 
-function pingServer() {
-    console.log(client.ping());
+function thriftMessage(){
+    console.log("Creating client");
+    var addr = 'http://clarity04.eecs.umich.edu:8081';
+    console.log(addr);
+    var transport = new Thrift.Transport(addr);
+    var protocol  = new Thrift.Protocol(transport);
+    var client    = new CommandCenterClient(protocol);
+    client.ping( function() { console.log("pinged server"); } );
+    console.log("Client Created");
 }
-document.getElementById("pingServer").addEventListener("click",pingServer());
+document.getElementById("thriftMessage").addEventListener("click",thriftMessage);
 
 function sendToServer() {
     

@@ -87,6 +87,7 @@ public:
 
 private:
 	// command center's tables
+
 	
 };
 

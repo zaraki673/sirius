@@ -5,13 +5,3 @@
 //
 
 
-Request_Type = {
-  'VC' : 1,
-  'VQ' : 2,
-  'VIQ' : 3
-};
-Service_Type = {
-  'ASR' : 1,
-  'IMM' : 2,
-  'QA' : 3
-};
