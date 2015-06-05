@@ -46,6 +46,13 @@ public:
 	virtual void registerService(const std::string& machine_name, const int32_t port, const Service_Type::type type) {
 	{
 		cout << "received request from " << machine_name << ":" << port << ", serviceType = " << type << endl;
+		if(type == Service_Type.QA){
+			qa = Service(machine_name, port, type);
+		} else if(type == Service_Type.IMM){
+			imm = Service(machine_name, port, type);
+		} else if(type == Service_Type.ASR){
+			asr = Service(machine_name, port, type);
+		}
 	}
 
 	virtual void askTextQuestion(std::string& _return, const std::string& question)
@@ -87,7 +94,9 @@ public:
 
 private:
 	// command center's tables
-
+	Service qa;
+	Service imm;
+	Service asr;
 	
 };
 
