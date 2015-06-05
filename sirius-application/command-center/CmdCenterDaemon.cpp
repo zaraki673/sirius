@@ -95,9 +95,9 @@ public:
 
 private:
 	// command center's tables
-	Service qa;
-	Service imm;
-	Service asr;
+	cmdcenterstubs::Service qa;
+	cmdcenterstubs::Service imm;
+	cmdcenterstubs::Service asr;
 	
 };
 
