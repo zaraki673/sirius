@@ -41,6 +41,7 @@ struct Service
 	std::string machine_name;
 	int32_t port;
 	std::string type;
+	Service(){};
 	Service(std::string machine_name_in, int32_t port_in, std::string type_in){
 		machine_name = machine_name_in;
 		port = port_in;
