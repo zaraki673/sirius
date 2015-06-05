@@ -6,22 +6,16 @@
 namespace cpp cmdcenterstubs
 namespace java cmdcenterstubs
 
-enum Service_Type {
-  QA = 1,
-  IMM = 2,
-  ASR = 3
-}
-
 struct Service {
   1: string machine_name,
   2: i32 port,
-  3: Service_Type type,
+  3: string type,
 }
 
 service CommandCenter
 {
 	# service <--> command center API
-	void registerService(1:string machine_name, 2: i32 port, 3:Service_Type type),
+	void registerService(1:string machine_name, 2: i32 port, 3:string type),
 
 	# command center <--> client API
 	string askTextQuestion(1:string question),

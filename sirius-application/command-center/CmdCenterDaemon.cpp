@@ -44,14 +44,14 @@ public:
 
 	// (dtor defined in CommandCenter.h)
 
-	virtual void registerService(const std::string& machine_name, const int32_t port, const Service_Type type)
+	virtual void registerService(const std::string& machine_name, const int32_t port, const std::string& type)
 	{
 		cout << "received request from " << machine_name << ":" << port << ", serviceType = " << type << endl;
-		if(type == Service_Type.QA){
+		if(type == "QA"){
 			qa = Service(machine_name, port, type);
-		} else if(type == Service_Type.IMM){
+		} else if(type == "IMM"){
 			imm = Service(machine_name, port, type);
-		} else if(type == Service_Type.ASR){
+		} else if(type == "ASR"){
 			asr = Service(machine_name, port, type);
 		}
 	}
