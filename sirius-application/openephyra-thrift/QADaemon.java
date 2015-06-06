@@ -80,6 +80,7 @@ public class QADaemon {
 			TProtocol protocol = new TBinaryProtocol(transport);
 			CommandCenter.Client client = new CommandCenter.Client(protocol);
 			System.out.println("Registering question-answer server with command center...");
+
 			client.registerService("localhost", port, "QA");
 			transport.close();
 

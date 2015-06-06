@@ -44,6 +44,6 @@ CmdCenterDaemon.o : CmdCenterDaemon.cpp
 	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 clean:
-	rm -rf $(TARGET_SERVER) *.o ../question-answer/openephyra-thrift/QAService.o gen-cpp/*.o
+	rm -rf $(TARGET_SERVER) ccclient ccserver *.o ../question-answer/openephyra-thrift/QAService.o gen-cpp/*.o
 
 .PHONY:	all

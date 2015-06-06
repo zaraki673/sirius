@@ -16,7 +16,7 @@ namespace java cmdcenterstubs
 service CommandCenter
 {
 	# service <--> command center API
-	void registerService(1:string machineName, 2:i32 port, 3:string serviceType),
+	void registerService(1:string machine_name, 2: i32 port, 3:string type),
 
 	# command center <--> client API
 	#string handleRequest(1:string queryType, 2:QueryData data),

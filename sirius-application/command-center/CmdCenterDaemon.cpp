@@ -20,6 +20,7 @@
 
 // Thrift-generated stubs for RPC handling
 #include "gen-cpp/CommandCenter.h"
+#include "gen-cpp/commandcenter_types.h"
 
 // Thrift-generated stubs for communicating with registered
 // services
@@ -45,6 +46,21 @@ private:
 	std::string machineName;
 	int32_t port;
 };
+
+/*
+struct Service
+{
+	std::string machine_name;
+	int32_t port;
+	std::string type;
+	Service(){};
+	Service(std::string machine_name_in, int32_t port_in, std::string type_in){
+		machine_name = machine_name_in;
+		port = port_in;
+		type = type_in;
+	}
+};
+*/
 
 class CommandCenterHandler : public CommandCenterIf
 {
@@ -76,6 +92,14 @@ public:
 			     << (*it).second.getPort() << endl;
 		}
 		// END_DEBUG
+		/*cout << "received request from " << machine_name << ":" << port << ", serviceType = " << type << endl;
+		if(type == "QA"){
+			qa = Service(machine_name, port, type);
+		} else if(type == "IMM"){
+			imm = Service(machine_name, port, type);
+		} else if(type == "ASR"){
+			asr = Service(machine_name, port, type);
+		}*/
 	}
 
 	virtual void askTextQuestion(std::string& _return, const std::string& question)
@@ -120,6 +144,12 @@ private:
 	// the command center via the registerService() method
 	// NOTE: eventually we'll replace this with a better structure
 	std::multimap<std::string, MachineData> registeredServices;
+/*	
+	// command center's tables
+	Service qa;
+	Service imm;
+	Service asr;
+*/
 	
 };
 
