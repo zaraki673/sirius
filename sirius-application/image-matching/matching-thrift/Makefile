@@ -23,13 +23,15 @@ TARGET_SERVER = imserver
 OBJECTS_CLIENT = ImageMatchingService.o IMSClient.o 
 OBJECTS_SERVER = ImageMatchingService.o detect.o kp_protobuf.o keypoints.pb.cc store_mat.pb.cc IMSDaemon.o
 
+BOOST_LOCATION = /usr/local/boost_1_58_0
+BOOST_LIB = -L/usr/local/lib
 all: $(TARGET_SERVER) $(TARGET_CLIENT)
 
 $(TARGET_CLIENT): $(OBJECTS_CLIENT)
-	$(CXX) $(OBJECTS_CLIENT) -o $(TARGET_CLIENT) $(LINK_FLAGS)
+	$(CXX) -I $(BOOST_LOCATION) $(OBJECTS_CLIENT) -o $(TARGET_CLIENT) $(BOOST_LIB) $(LINK_FLAGS)
 
 $(TARGET_SERVER): $(OBJECTS_SERVER)
-	$(CXX) $(OBJECTS_SERVER) -o $(TARGET_SERVER) $(LINK_FLAGS)
+	$(CXX) -I $(BOOST_LOCATION) $(OBJECTS_SERVER) -o $(TARGET_SERVER) $(BOOST_LIB) $(LINK_FLAGS)
 
 %.o: %.cpp
 	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
