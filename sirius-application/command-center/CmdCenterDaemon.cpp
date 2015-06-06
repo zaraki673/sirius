@@ -1,18 +1,16 @@
 // C++ thrift headers 
 #include <thrift/concurrency/ThreadManager.h>
 #include <thrift/concurrency/PosixThreadFactory.h>
-//#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/server/TThreadPoolServer.h>
 #include <thrift/server/TThreadedServer.h>
 #include <thrift/transport/TServerSocket.h>
-//#include <thrift/transport/TTransportUtils.h>
+#include <thrift/transport/TTransportUtils.h>
 #include <thrift/TToString.h>
 
 // Additional C++ headers for querying registered services
-#include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
-#include <thrift/transport/TTransportUtils.h>
 
 // Useful C++ headers
 #include <iostream>
@@ -36,17 +34,49 @@ using namespace apache::thrift::server;
 using namespace cmdcenterstubs;
 using namespace qastubs;
 
+class MachineData
+{
+public:
+	MachineData(const std::string& _machineName, const int32_t _port)
+		: machineName(_machineName), port(_port) {}
+	std::string getMachineName() { return machineName; }
+	int32_t getPort() { return port; }
+private:
+	std::string machineName;
+	int32_t port;
+};
+
 class CommandCenterHandler : public CommandCenterIf
 {
 public:
 	// ctor: initialize command center's tables
-	CommandCenterHandler() {}
+	CommandCenterHandler()
+	{
+		registeredServices = std::multimap<std::string, MachineData>();
+	}
 
 	// (dtor defined in CommandCenter.h)
 
 	virtual void registerService(const std::string& machineName, const int32_t port, const std::string& serviceType)
 	{
-		cout << "received request from " << machineName << ":" << port << ", serviceType = " << serviceType << endl;
+		cout << "received request from " << machineName
+		     << ":" << port << ", serviceType = " << serviceType
+		     << endl;
+		MachineData mDataObj(machineName, port);
+		registeredServices.insert( std::pair<std::string, MachineData>(serviceType, mDataObj) );
+	
+		// DEBUG information (testing only)
+		cout << "There are now " << registeredServices.size() << " registered services" << endl;
+		cout << "LIST OF REGISTERED SERVICES:" << endl;
+		std::multimap<std::string, MachineData>::iterator it;
+		for (it = registeredServices.begin(); it != registeredServices.end(); ++it)
+		{
+			cout << "\t" << (*it).first << "\t"
+			     << (*it).second.getMachineName() << ":"
+			     << (*it).second.getPort() << endl;
+		}
+		// END_DEBUG
+
 	}
 
 	virtual void askTextQuestion(std::string& _return, const std::string& question)
@@ -87,7 +117,10 @@ public:
 	}
 
 private:
-	// command center's tables
+	// registeredServices: a table of all servers that registered with
+	// the command center via the registerService() method
+	// NOTE: eventually we'll replace this with a better structure
+	std::multimap<std::string, MachineData> registeredServices;
 	
 };
 
