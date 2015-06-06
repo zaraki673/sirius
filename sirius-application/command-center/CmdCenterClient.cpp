@@ -27,7 +27,6 @@ int main(int argc, char **argv) {
 		transport->open();
 	
 		client.askTextQuestion(answer, question);
-		cout << "The answer is " << answer << endl;
 	
 		transport->close();
 	} catch(TException &tx) {

@@ -20,8 +20,8 @@ LINK_FLAGS = -lopencv_core \
 TARGET_CLIENT = ccclient
 TARGET_SERVER = ccserver
 
-OBJECTS_CLIENT = gen-cpp/CommandCenter.o CmdCenterClient.o
-OBJECTS_SERVER = ../question-answer/openephyra-thrift/QAService.o gen-cpp/CommandCenter.o CmdCenterDaemon.o 
+OBJECTS_CLIENT = gen-cpp/CommandCenter.o gen-cpp/commandcenter_types.o CmdCenterClient.o
+OBJECTS_SERVER = ../question-answer/openephyra-thrift/QAService.o gen-cpp/CommandCenter.o gen-cpp/commandcenter_types.o CmdCenterDaemon.o 
 
 all: $(TARGET_SERVER) $(TARGET_CLIENT)
 
@@ -35,6 +35,9 @@ $(TARGET_SERVER): $(OBJECTS_SERVER)
 	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 gen-cpp/CommandCenter.o : gen-cpp/CommandCenter.cpp
+	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
+
+gen-cpp/commandcenter_types.o : gen-cpp/commandcenter_types.cpp
 	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 CmdCenterClient.o : CmdCenterClient.cpp

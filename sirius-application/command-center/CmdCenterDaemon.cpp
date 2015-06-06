@@ -35,7 +35,7 @@ using namespace apache::thrift::server;
 using namespace cmdcenterstubs;
 using namespace qastubs;
 
-class MachineData
+/*class MachineData
 {
 public:
 	MachineData(const std::string& _machineName, const int32_t _port)
@@ -47,7 +47,6 @@ private:
 	int32_t port;
 };
 
-/*
 struct Service
 {
 	std::string machine_name;
@@ -73,12 +72,11 @@ public:
 
 	// (dtor defined in CommandCenter.h)
 
-	virtual void registerService(const std::string& machineName, const int32_t port, const std::string& serviceType)
+	virtual void registerService(const std::string& serviceType, const MachineData& mDataObj)
 	{
-		cout << "received request from " << machineName
-		     << ":" << port << ", serviceType = " << serviceType
+		cout << "received request from " << mDataObj.name
+		     << ":" << mDataObj.port << ", serviceType = " << serviceType
 		     << endl;
-		MachineData mDataObj(machineName, port);
 		registeredServices.insert( std::pair<std::string, MachineData>(serviceType, mDataObj) );
 	
 		// DEBUG information (testing only)
@@ -88,8 +86,8 @@ public:
 		for (it = registeredServices.begin(); it != registeredServices.end(); ++it)
 		{
 			cout << "\t" << (*it).first << "\t"
-			     << (*it).second.getMachineName() << ":"
-			     << (*it).second.getPort() << endl;
+			     << (*it).second.name << ":"
+			     << (*it).second.port << endl;
 		}
 		// END_DEBUG
 		/*cout << "received request from " << machine_name << ":" << port << ", serviceType = " << type << endl;

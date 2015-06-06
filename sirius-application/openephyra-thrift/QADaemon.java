@@ -20,6 +20,7 @@ import org.apache.thrift.protocol.TProtocol;
 // Generated code
 import qastubs.QAService;
 import cmdcenterstubs.CommandCenter;
+import cmdcenterstubs.MachineData;
 
 // Java libraries
 import java.util.HashMap;
@@ -81,7 +82,8 @@ public class QADaemon {
 			CommandCenter.Client client = new CommandCenter.Client(protocol);
 			System.out.println("Registering question-answer server with command center...");
 
-			client.registerService("localhost", port, "QA");
+			MachineData mDataObj = new MachineData("localhost", port);
+			client.registerService("QA", mDataObj);
 			transport.close();
 
 			// Start the question-answer server
