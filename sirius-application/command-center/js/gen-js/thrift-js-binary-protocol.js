@@ -585,5 +585,10 @@ Thrift.TBinaryProtocol.prototype = {
       //  - https://github.com/mozilla/pdf.js/issues/1955
       //  - https://github.com/mozilla/pdf.js/issues/1008
       return String.fromCharCode.apply(null, new Uint8Array(barr));
+    },
+    getTransport: function() {
+        return this.transport;
     }
 };
+
+
