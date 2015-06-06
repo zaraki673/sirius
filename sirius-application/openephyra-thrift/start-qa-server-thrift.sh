@@ -28,7 +28,8 @@ export INDRI_INDEX=`pwd`/wiki_indri_index/
 #  export THREADS=8
 #fi
 
-java -Djava.library.path=lib/search/ -server -Xms1024m -Xmx2048m QADaemon
+# arg0 = qa server port ; arg1 = cmd center port
+java -Djava.library.path=lib/search/ -server -Xms1024m -Xmx2048m QADaemon 9090 9091
 
 #java QADaemon
 #java -agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n QADaemon

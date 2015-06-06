@@ -15,7 +15,7 @@ using namespace cmdcenterstubs;
 
 int main(int argc, char **argv) {
 	int port = 8081;
-	boost::shared_ptr<TTransport> socket(new TSocket("localhost", port));
+	boost::shared_ptr<TTransport> socket(new TSocket("clarity04.eecs.umich.edu", port));
 	boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
 	boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
 	CommandCenterClient client(protocol);

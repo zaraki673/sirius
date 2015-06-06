@@ -30,6 +30,28 @@ public class QADaemon {
 	public static QAService.Processor<QAServiceHandler> processor;
 	public static void main(String [] args) {
 		try {
+			int tmp_port = 9091;
+			int tmp_cmdcenterport = 8081;
+			if (args.length == 2)
+			{
+				tmp_port = Integer.parseInt(args[0].trim());
+				tmp_cmdcenterport = Integer.parseInt(args[1].trim());	
+			}
+			else if (args.length == 1)
+			{
+				tmp_port = Integer.parseInt(args[0].trim());
+				System.out.println("Using default port for command center: " + tmp_cmdcenterport);
+			}
+			else
+			{
+				System.out.println("Using default port for question answer service: " + tmp_port);
+				System.out.println("Using default port for command center: " + tmp_cmdcenterport);
+			}
+			// inner classes receive copies of local variables to work with.
+			// Local vars must not change to ensure that inner classes are synced.
+			final int port = tmp_port;
+			final int cmdcenterport = tmp_cmdcenterport;
+
 			// the handler implements the generated java interface
 			// that was originally specified in the thrift file.
 			// When it's called, an Open Ephyra object is created.
@@ -38,7 +60,7 @@ public class QADaemon {
 			Runnable simple = new Runnable() {
 				// This is the code that the thread will run
 				public void run() {
-					simple(processor);
+					simple(processor, port, cmdcenterport);
 				}
 			};
 			// Let system schedule the thread
@@ -48,11 +70,11 @@ public class QADaemon {
 		}
 	}
 
-	public static void simple(QAService.Processor processor) {
+	public static void simple(QAService.Processor processor, int port, int cmdcenterport) {
 		try {
 			// Register this server with the command center
-			int port = 9091;
-			int cmdcenterport = 8081;
+			//int port = 9091;
+			//int cmdcenterport = 8081;
 			TTransport transport = new TSocket("localhost", cmdcenterport);
 			transport.open();
 			TProtocol protocol = new TBinaryProtocol(transport);

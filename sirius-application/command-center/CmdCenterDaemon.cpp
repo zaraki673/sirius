@@ -1,12 +1,12 @@
 // C++ thrift headers 
 #include <thrift/concurrency/ThreadManager.h>
 #include <thrift/concurrency/PosixThreadFactory.h>
-#include <thrift/protocol/TBinaryProtocol.h>
+//#include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/server/TThreadPoolServer.h>
 #include <thrift/server/TThreadedServer.h>
 #include <thrift/transport/TServerSocket.h>
-#include <thrift/transport/TTransportUtils.h>
+//#include <thrift/transport/TTransportUtils.h>
 #include <thrift/TToString.h>
 
 // Additional C++ headers for querying registered services
@@ -18,6 +18,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
+#include <cstdlib>
 
 // Thrift-generated stubs for RPC handling
 #include "gen-cpp/CommandCenter.h"
@@ -90,8 +91,17 @@ private:
 	
 };
 
-int main() {
+int main(int argc, char **argv) {
 	int port = 8081;
+	if (argv[1])
+	{
+		port = atoi(argv[1]);
+	}
+	else
+	{
+		cout << "Command center port not specified; using default" << endl;
+	}
+
 	boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 	boost::shared_ptr<CommandCenterHandler> handler(new CommandCenterHandler());
 	boost::shared_ptr<TProcessor> processor(new CommandCenterProcessor(handler));
