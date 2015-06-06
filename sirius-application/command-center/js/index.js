@@ -1,6 +1,6 @@
 function pingServer(){
     console.log("Creating client");
-    var addr = 'http://localhost:8081';
+    var addr = '//localhost:8081';
     console.log(addr);
     var transport = new Thrift.Transport(addr);
     var protocol  = new Thrift.Protocol(transport);
