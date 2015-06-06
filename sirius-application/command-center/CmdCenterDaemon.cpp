@@ -76,7 +76,6 @@ public:
 			     << (*it).second.getPort() << endl;
 		}
 		// END_DEBUG
-
 	}
 
 	virtual void askTextQuestion(std::string& _return, const std::string& question)
