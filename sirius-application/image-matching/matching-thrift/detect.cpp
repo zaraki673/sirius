@@ -335,7 +335,7 @@ void build_model(DescriptorMatcher *matcher, vector<string> *trainImgs){
 
 	// Generate desc
 	// FIXME this is only used for testing
-	fs::path p = fs::system_complete("/home/momo/Research/sirius/sirius-application/image-matching/matching/landmarks/db");
+	fs::path p = fs::system_complete("/home/tollben/sirius/sirius-application/image-matching/matching/landmarks/db");
 	assert(fs::is_directory(p));
 
 	fs::directory_iterator end_iter;
