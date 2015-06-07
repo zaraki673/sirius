@@ -1,0 +1,4 @@
+# Ignore thrift generated code
+/gen-*/
+/gen-*/**/**
+qaclient
