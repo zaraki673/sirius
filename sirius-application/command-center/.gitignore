@@ -1,1 +1,7 @@
+# Ignore thrift-generated code
+/gen-*/
+/gen-*/** # not sure if this adds anything
+
+# Ignore command center executables
+ccclient
 ccserver

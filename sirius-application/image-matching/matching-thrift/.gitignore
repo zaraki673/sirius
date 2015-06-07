@@ -1,0 +1,9 @@
+# Ignore thrift-generated code
+
+# Ignore IMM executables
+imclient
+imserver
+
+# Ignore other
+*.log
+input-*.jpg

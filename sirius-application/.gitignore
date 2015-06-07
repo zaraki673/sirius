@@ -31,3 +31,6 @@ wiki_indri_index/
 *.pb.*
 *.pb
 *.pickle
+
+# (tar files, if you haven't deleted them)
+wiki_indri_index.tar.gz
