@@ -20,8 +20,13 @@ LINK_FLAGS = -lopencv_core \
 TARGET_CLIENT = ccclient
 TARGET_SERVER = ccserver
 
+# As long as the object files are present in the specified locations,
+# linking should work.
 OBJECTS_CLIENT = gen-cpp/CommandCenter.o gen-cpp/commandcenter_types.o CmdCenterClient.o
-OBJECTS_SERVER = ../question-answer/openephyra-thrift/QAService.o gen-cpp/CommandCenter.o gen-cpp/commandcenter_types.o CmdCenterDaemon.o 
+OBJECTS_SERVER = ../question-answer/openephyra-thrift/QAService.o \
+		 ../speech-recognition/kaldi/scripts/kaldi-thrift/gen-cpp/KaldiService.o \
+		../image-matching/matching-thrift/ImageMatchingService.o \
+		gen-cpp/CommandCenter.o gen-cpp/commandcenter_types.o CmdCenterDaemon.o 
 
 all: $(TARGET_SERVER) $(TARGET_CLIENT)
 
@@ -31,8 +36,9 @@ $(TARGET_CLIENT): $(OBJECTS_CLIENT)
 $(TARGET_SERVER): $(OBJECTS_SERVER)
 	$(CXX) $(OBJECTS_SERVER) -o $(TARGET_SERVER) $(LINK_FLAGS)
 
-../question-answer/openephyra-thrift/QAService.o: ../question-answer/openephyra-thrift/gen-cpp/QAService.cpp
-	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
+# FIXME: services should be responsible for making themselves
+#../question-answer/openephyra-thrift/QAService.o: ../question-answer/openephyra-thrift/gen-cpp/QAService.cpp
+#	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 gen-cpp/CommandCenter.o : gen-cpp/CommandCenter.cpp
 	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
@@ -47,6 +53,6 @@ CmdCenterDaemon.o : CmdCenterDaemon.cpp
 	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 clean:
-	rm -rf $(TARGET_SERVER) ccclient ccserver *.o ../question-answer/openephyra-thrift/QAService.o gen-cpp/*.o
+	rm -rf $(TARGET_SERVER) ccclient ccserver *.o gen-cpp/*.o
 
 .PHONY:	all

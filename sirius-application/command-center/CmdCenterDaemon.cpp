@@ -25,6 +25,8 @@
 // Thrift-generated stubs for communicating with registered
 // services
 #include "../question-answer/openephyra-thrift/gen-cpp/QAService.h"
+#include "../speech-recognition/kaldi/scripts/kaldi-thrift/gen-cpp/KaldiService.h"
+#include "../image-matching/matching-thrift/ImageMatchingService.h"
 
 using namespace std;
 using namespace apache::thrift;
@@ -118,7 +120,7 @@ public:
 				);
 				boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
 				boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
-				QAServiceClient client(protocol);
+				KaldiServiceClient asr_client(protocol);
 				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 				     << " for ASR server" << endl;
 			}
@@ -138,7 +140,7 @@ public:
 				);
 				boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
 				boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
-				QAServiceClient client(protocol);
+				QAServiceClient qa_client(protocol);
 				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 				     << " for QA server" << endl;
 
@@ -159,7 +161,7 @@ public:
 				);
 				boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
 				boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
-				QAServiceClient client(protocol);
+				ImageMatchingServiceClient imm_client(protocol);
 				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 				     << " for IMM server" << endl;
 			}
