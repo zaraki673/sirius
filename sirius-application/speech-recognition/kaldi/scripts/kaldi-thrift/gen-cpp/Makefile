@@ -5,9 +5,11 @@ TARGET_SERVER = server
 LINK_FLAGS = -lthrift \
 	     -lsox
 
+CMDOBJECT_SERVER = /home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.o \
+									/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.o 
+									
 OBJECTS_CLIENT = KaldiService.o Kaldi_Client.o
-OBJECTS_SERVER = KaldiService.o Kaldi_Server.o
-
+OBJECTS_SERVER = KaldiService.o Kaldi_Server.o $(CMDOBJECT_SERVER) 
 all: $(TARGET_SERVER) $(TARGET_CLIENT)
 
 $(TARGET_CLIENT): $(OBJECTS_CLIENT)

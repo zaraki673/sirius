@@ -24,7 +24,7 @@
 
 // Thrift-generated stubs for communicating with registered
 // services
-#include "../question-answer/openephyra-thrift/gen-cpp/QAService.h"
+#include "../openephyra-thrift/gen-cpp/QAService.h"
 #include "../speech-recognition/kaldi/scripts/kaldi-thrift/gen-cpp/KaldiService.h"
 #include "../image-matching/matching-thrift/ImageMatchingService.h"
 
@@ -222,13 +222,20 @@ public:
 		}
 		else if (qTypeObj.ASR)
 		{
-			cout << "ASR query not implemented" << endl;
+			asr_transport->open();
+			asr_client.kaldi_asr(answer,data.audioFile);
+			asr_transport->close();
 		}
 		else if (qTypeObj.QA)
 		{
 			qa_transport->open();
 			qa_client.askFactoidThrift(answer, data.textFile);
 			qa_transport->close();
+		}
+		else if(qTypeObj.IMM){
+			imm_transport->open();
+			imm_client.match_img(answer,data.imgFile);
+			imm_transport->close();
 		}
 		else
 		{
