@@ -35,17 +35,17 @@ int main(int argc, char **argv) {
 		ostrm_audio <<fin_audio.rdbuf();
 		std::string audio_file(ostrm_audio.str());	
 		
-		//Image FIle
+		//Image File
 		ifstream fin_image("test.jpg", ios::binary);
 		ostringstream ostrm_image;
-    ostrm_image << fin_image.rdbuf();
+		ostrm_image << fin_image.rdbuf();
 		string image_file(ostrm_image.str());
 		// TODO: this initialization is stupid, but thrift doesn't
 		// generate more helpful ctors
 		QueryType qTypeObj;
-		qTypeObj.ASR = false;
+		qTypeObj.ASR = true;
 		qTypeObj.QA = false;
-		qTypeObj.IMM = true;
+		qTypeObj.IMM = false;
 
 		QueryData data;
 
