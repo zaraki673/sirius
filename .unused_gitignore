@@ -1,7 +1,0 @@
-*.o
-*.class
-sirius-application/wiki_indri_index.tar.gz
-*.swp
-qaclient
-sirius-application/openephyra-thrift/gen-cpp
-sirius-application/openephyra-thrift/gen-java
