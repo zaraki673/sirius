@@ -23,7 +23,7 @@ TARGET_SERVER = ccserver
 # As long as the object files are present in the specified locations,
 # linking should work.
 OBJECTS_CLIENT = gen-cpp/CommandCenter.o gen-cpp/commandcenter_types.o CmdCenterClient.o
-OBJECTS_SERVER = ../question-answer/openephyra-thrift/QAService.o \
+OBJECTS_SERVER = ../openephyra-thrift/QAService.o \
 		 ../speech-recognition/kaldi/scripts/kaldi-thrift/gen-cpp/KaldiService.o \
 		../image-matching/matching-thrift/ImageMatchingService.o \
 		gen-cpp/CommandCenter.o gen-cpp/commandcenter_types.o CmdCenterDaemon.o 

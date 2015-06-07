@@ -14,18 +14,23 @@
 #include <sox.h>
 
 #include "KaldiService.h"
+#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.h"
+#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TBufferTransports.h>
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/transport/TSocket.h>
+#include <thrift/transport/TTransportUtils.h>
 
 using namespace std;
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
 using namespace ::apache::thrift::transport;
 using namespace ::apache::thrift::server;
-
 using boost::shared_ptr;
+using namespace cmdcenterstubs;
 
 void readFromPipe(int,string&);
 void sox();
@@ -42,6 +47,7 @@ class KaldiServiceHandler : virtual public KaldiServiceIf {
 	pid_t pid;
 	int fds[2];
 	int fds2[2];	
+	int status;
 	
 	pipe (fds);
 	pipe (fds2);
@@ -89,6 +95,7 @@ class KaldiServiceHandler : virtual public KaldiServiceIf {
 			fflush(stream);
 			close(fds[1]);
 			readFromPipe(fds2[0],kotae);
+			wait(&status);
 		}	
 		_return = kotae;
   }
@@ -97,14 +104,31 @@ class KaldiServiceHandler : virtual public KaldiServiceIf {
 
 int main(int argc, char **argv) {
   int port = 9090;
-  shared_ptr<KaldiServiceHandler> handler(new KaldiServiceHandler());
+   //Register with the command center 
+	int cmdcenterport = 8081;
+	boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
+	boost::shared_ptr<TTransport> cmdtransport(new TBufferedTransport(cmdsocket));
+	boost::shared_ptr<TProtocol> cmdprotocol(new TBinaryProtocol(cmdtransport));
+	CommandCenterClient cmdclient(cmdprotocol);
+	cmdtransport->open();	
+	cout<<"Registering automatic speech recognition server with command center..."<<endl;
+	MachineData mDataObj;
+	mDataObj.name="localhost";
+	mDataObj.port=port;
+	cmdclient.registerService("ASR", mDataObj);
+	cmdtransport->close();
+	
+
+	shared_ptr<KaldiServiceHandler> handler(new KaldiServiceHandler());
   shared_ptr<TProcessor> processor(new KaldiServiceProcessor(handler));
   shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
   shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
   shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
   TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
-  server.serve();
+ 
+	cout<<"Starting the automatic speech recognition server at port "<<port<<"..."<<endl;
+	server.serve();
   return 0;
 }
 void readFromPipe( int fd, string& kotae )

@@ -14,6 +14,7 @@
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 #include <thrift/TToString.h>
+#include <thrift/transport/TSocket.h>
 
 // import common utility headers
 #include <iostream>
@@ -26,6 +27,8 @@
 // import the service headers
 #include "ImageMatchingService.h"
 #include "detect.h"
+#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.h"
+#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.h"
 
 // define the namespace
 using namespace std;
@@ -34,6 +37,7 @@ using namespace apache::thrift::concurrency;
 using namespace apache::thrift::protocol;
 using namespace apache::thrift::transport;
 using namespace apache::thrift::server;
+using namespace cmdcenterstubs;
 
 // define the constant
 #define THREAD_WORKS 16
@@ -64,6 +68,21 @@ class ImageMatchingServiceHandler : public ImageMatchingServiceIf {
 };
 
 int main(int argc, char **argv){
+  int port = 9090;
+  //Register with the command center 
+  int cmdcenterport = 8081;
+  boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
+  boost::shared_ptr<TTransport> cmdtransport(new TBufferedTransport(cmdsocket));
+  boost::shared_ptr<TProtocol> cmdprotocol(new TBinaryProtocol(cmdtransport));
+  CommandCenterClient cmdclient(cmdprotocol);
+  cmdtransport->open();
+  cout<<"Registering automatic speech recognition server with command center..."<<endl;
+  MachineData mDataObj;
+  mDataObj.name="localhost";
+  mDataObj.port=port;
+  cmdclient.registerService("IMM", mDataObj);
+  cmdtransport->close();
+
 	// initial the transport factory
 	boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
 	boost::shared_ptr<TServerTransport> serverTransport(new TServerSocket(9090));

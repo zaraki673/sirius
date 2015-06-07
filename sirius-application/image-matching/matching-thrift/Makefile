@@ -20,8 +20,11 @@ LINK_FLAGS = -lopencv_core \
 TARGET_CLIENT = imclient 
 TARGET_SERVER = imserver
 
+CMDOBJECT_SERVER = /home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.o \
+                  /home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.o
+
 OBJECTS_CLIENT = ImageMatchingService.o IMSClient.o 
-OBJECTS_SERVER = ImageMatchingService.o detect.o kp_protobuf.o keypoints.pb.cc store_mat.pb.cc IMSDaemon.o
+OBJECTS_SERVER = $(CMDOBJECT_SERVER) ImageMatchingService.o detect.o kp_protobuf.o keypoints.pb.cc store_mat.pb.cc IMSDaemon.o
 
 BOOST_LOCATION = /usr/local/boost_1_58_0
 BOOST_LIB = -L/usr/local/lib

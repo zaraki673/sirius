@@ -1,4 +1,8 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+
 
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
@@ -15,7 +19,7 @@ using namespace cmdcenterstubs;
 
 int main(int argc, char **argv) {
 	int port = 8081;
-	boost::shared_ptr<TTransport> socket(new TSocket("clarity04.eecs.umich.edu", port));
+	boost::shared_ptr<TTransport> socket(new TSocket("localhost", port));
 	boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
 	boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
 	CommandCenterClient client(protocol);
@@ -24,17 +28,30 @@ int main(int argc, char **argv) {
 	{
 		//std::string question(argv[1]);
 		std::string answer;
+
+		//Audio File
+		ifstream fin_audio("test.wav",ios::binary);
+		ostringstream ostrm_audio;
+		ostrm_audio <<fin_audio.rdbuf();
+		std::string audio_file(ostrm_audio.str());	
+		
+		//Image FIle
+		ifstream fin_image("test.jpg", ios::binary);
+		ostringstream ostrm_image;
+    ostrm_image << fin_image.rdbuf();
+		string image_file(ostrm_image.str());
 		// TODO: this initialization is stupid, but thrift doesn't
 		// generate more helpful ctors
 		QueryType qTypeObj;
 		qTypeObj.ASR = false;
-		qTypeObj.QA = true;
-		qTypeObj.IMM = false;
+		qTypeObj.QA = false;
+		qTypeObj.IMM = true;
 
 		QueryData data;
-		data.audioFile = "";
+
+		data.audioFile = audio_file;
 		data.textFile = "what is the speed of light?";
-		data.imgFile = "";
+		data.imgFile = image_file;
 
 		transport->open();
 	
