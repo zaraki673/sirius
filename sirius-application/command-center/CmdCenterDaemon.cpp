@@ -105,22 +105,50 @@ public:
 
 	virtual void handleRequest(std::string& _return, const QueryType& qTypeObj, const QueryData& data)
 	{
-		// TODO: this program will just crash given a request for services
-		// that aren't available
 		cout << "/-----handleRequest()-----/" << endl;
-		// Select services based on the client's query
+
+		// TODO: refactor
+		// NOTE: hard to break this up, b/c you need to pass the N clients around
+		// I suppose you could use a struct
+
+		//----Select services based on the client's query----//
 		std::multimap<std::string, MachineData>::iterator it;
+		
+		// TODO: figure out how to resolve scoping to make clients visible
+		// Must instantiate all clients in this way.
+		// NOTE: TSocket values are irrelevant; the clients to be used
+		// will have their values overwritten, and the rest will be ignored
+		boost::shared_ptr<TTransport> asr_socket(new TSocket("localhost", 8080));
+		boost::shared_ptr<TTransport> asr_transport(new TBufferedTransport(asr_socket));
+		boost::shared_ptr<TProtocol> asr_protocol(new TBinaryProtocol(asr_transport));
+		KaldiServiceClient asr_client(asr_protocol);
+
+		boost::shared_ptr<TTransport> qa_socket(new TSocket("localhost", 8080));
+		boost::shared_ptr<TTransport> qa_transport(new TBufferedTransport(qa_socket));
+		boost::shared_ptr<TProtocol> qa_protocol(new TBinaryProtocol(qa_transport));
+		QAServiceClient qa_client(qa_protocol);
+		
+		boost::shared_ptr<TTransport> imm_socket(new TSocket("localhost", 8080));
+		boost::shared_ptr<TTransport> imm_transport(new TBufferedTransport(imm_socket));
+		boost::shared_ptr<TProtocol> imm_protocol(new TBinaryProtocol(imm_transport));
+		ImageMatchingServiceClient imm_client(imm_protocol);
+
 		if (qTypeObj.ASR)
 		{
 			it = registeredServices.find("ASR");
 			if (it != registeredServices.end())
 			{
-				boost::shared_ptr<TTransport> socket(
+				boost::shared_ptr<TTransport> tmp_socket(
 					new TSocket((*it).second.name, (*it).second.port)
 				);
-				boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
-				boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
-				KaldiServiceClient asr_client(protocol);
+				boost::shared_ptr<TTransport> tmp_transport(new TBufferedTransport(tmp_socket));
+				boost::shared_ptr<TProtocol> tmp_protocol(new TBinaryProtocol(tmp_transport));
+				KaldiServiceClient tmp_client(tmp_protocol);
+			
+				asr_socket = tmp_socket;
+				asr_transport = tmp_transport;
+				asr_protocol = tmp_protocol;	
+				asr_client = tmp_client;
 				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 				     << " for ASR server" << endl;
 			}
@@ -135,12 +163,17 @@ public:
 			it = registeredServices.find("QA");
 			if (it != registeredServices.end())
 			{
-				boost::shared_ptr<TTransport> socket(
+				boost::shared_ptr<TTransport> tmp_socket(
 					new TSocket((*it).second.name, (*it).second.port)
 				);
-				boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
-				boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
-				QAServiceClient qa_client(protocol);
+				boost::shared_ptr<TTransport> tmp_transport(new TBufferedTransport(tmp_socket));
+				boost::shared_ptr<TProtocol> tmp_protocol(new TBinaryProtocol(tmp_transport));
+				QAServiceClient tmp_client(tmp_protocol);
+
+				qa_socket = tmp_socket;
+				qa_transport = tmp_transport;
+				qa_protocol = tmp_protocol;
+				qa_client = tmp_client;
 				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 				     << " for QA server" << endl;
 
@@ -156,12 +189,17 @@ public:
 			it = registeredServices.find("IMM");
 			if (it != registeredServices.end())
 			{
-				boost::shared_ptr<TTransport> socket(
+				boost::shared_ptr<TTransport> tmp_socket(
 					new TSocket((*it).second.name, (*it).second.port)
 				);
-				boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
-				boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
-				ImageMatchingServiceClient imm_client(protocol);
+				boost::shared_ptr<TTransport> tmp_transport(new TBufferedTransport(tmp_socket));
+				boost::shared_ptr<TProtocol> tmp_protocol(new TBinaryProtocol(tmp_transport));
+				ImageMatchingServiceClient tmp_client(tmp_protocol);
+
+				imm_socket = tmp_socket;
+				imm_transport = tmp_transport;
+				imm_protocol = tmp_protocol;
+				imm_client = tmp_client;
 				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 				     << " for IMM server" << endl;
 			}
@@ -171,7 +209,34 @@ public:
 				return;
 			}
 		}
+
+		//----Run pipeline----//
+		std::string answer;
+		if (qTypeObj.ASR && qTypeObj.QA && qTypeObj.IMM)
+		{
+			cout << "ASR-QA-IMM query not implemented" << endl;
+		}
+		else if (qTypeObj.ASR && qTypeObj.QA)
+		{
+			cout << "ASR-QA query not implemented" << endl;
+		}
+		else if (qTypeObj.ASR)
+		{
+			cout << "ASR query not implemented" << endl;
+		}
+		else if (qTypeObj.QA)
+		{
+			qa_transport->open();
+			qa_client.askFactoidThrift(answer, data.textFile);
+			qa_transport->close();
+		}
+		else
+		{
+			cout << "Nothing in the pipeline" << endl;
+		}
 	}
+
+	
 
 	virtual void askTextQuestion(std::string& _return, const std::string& question)
 	{
@@ -217,7 +282,6 @@ private:
 	// select available servers easily, for a given key.
 	std::multimap<std::string, MachineData> registeredServices;
 
-	
 /*	
 	// command center's tables
 	Service qa;
