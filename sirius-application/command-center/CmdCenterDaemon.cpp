@@ -74,6 +74,7 @@ public:
 
 	virtual void registerService(const std::string& serviceType, const MachineData& mDataObj)
 	{
+		cout << "/-----registerService()-----/" << endl;
 		cout << "received request from " << mDataObj.name
 		     << ":" << mDataObj.port << ", serviceType = " << serviceType
 		     << endl;
@@ -98,6 +99,76 @@ public:
 		} else if(type == "ASR"){
 			asr = Service(machine_name, port, type);
 		}*/
+	}
+
+	virtual void handleRequest(std::string& _return, const QueryType& qTypeObj, const QueryData& data)
+	{
+		// TODO: this program will just crash given a request for services
+		// that aren't available
+		cout << "/-----handleRequest()-----/" << endl;
+		// Select services based on the client's query
+		std::multimap<std::string, MachineData>::iterator it;
+		if (qTypeObj.ASR)
+		{
+			it = registeredServices.find("ASR");
+			if (it != registeredServices.end())
+			{
+				boost::shared_ptr<TTransport> socket(
+					new TSocket((*it).second.name, (*it).second.port)
+				);
+				boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+				boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
+				QAServiceClient client(protocol);
+				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
+				     << " for ASR server" << endl;
+			}
+			else
+			{
+				cout << "ASR requested, but not found" << endl;
+				return;
+			}
+		}
+		if (qTypeObj.QA)
+		{
+			it = registeredServices.find("QA");
+			if (it != registeredServices.end())
+			{
+				boost::shared_ptr<TTransport> socket(
+					new TSocket((*it).second.name, (*it).second.port)
+				);
+				boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+				boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
+				QAServiceClient client(protocol);
+				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
+				     << " for QA server" << endl;
+
+			}
+			else
+			{
+				cout << "QA requested, but not found" << endl;
+				return;
+			}
+		}
+		if (qTypeObj.IMM)
+		{
+			it = registeredServices.find("IMM");
+			if (it != registeredServices.end())
+			{
+				boost::shared_ptr<TTransport> socket(
+					new TSocket((*it).second.name, (*it).second.port)
+				);
+				boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+				boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
+				QAServiceClient client(protocol);
+				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
+				     << " for IMM server" << endl;
+			}
+			else
+			{
+				cout << "IMM requested, but not found" << endl;
+				return;
+			}
+		}
 	}
 
 	virtual void askTextQuestion(std::string& _return, const std::string& question)
@@ -140,8 +211,11 @@ public:
 private:
 	// registeredServices: a table of all servers that registered with
 	// the command center via the registerService() method
-	// NOTE: eventually we'll replace this with a better structure
+	// TODO: this is a poor model, because it doesn't allow you to
+	// select available servers easily, for a given key.
 	std::multimap<std::string, MachineData> registeredServices;
+
+	
 /*	
 	// command center's tables
 	Service qa;

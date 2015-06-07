@@ -14,6 +14,15 @@ struct MachineData
 	2:i32 port
 }
 
+# QueryType is the struct that clients send
+# to inform the command center of what services they need.
+struct QueryType
+{
+	1:bool ASR,
+	2:bool QA,
+	3:bool IMM
+}
+
 # QueryData is the information that clients send
 # when they wish to communicate with the command center.
 struct QueryData
@@ -29,7 +38,7 @@ service CommandCenter
 	void registerService(1:string serviceType, 2:MachineData mDataObj),
 
 	# command center <--> client API
-	#string handleRequest(1:string queryType, 2:QueryData data),
+	string handleRequest(1:QueryType qTypeObj, 2:QueryData data),
 
 	# deprecated
 	string askTextQuestion(1:string question),

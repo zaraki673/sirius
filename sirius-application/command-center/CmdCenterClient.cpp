@@ -22,11 +22,25 @@ int main(int argc, char **argv) {
 
 	try
 	{
-		std::string question(argv[1]);
+		//std::string question(argv[1]);
 		std::string answer;
+		// TODO: this initialization is stupid, but thrift doesn't
+		// generate more helpful ctors
+		QueryType qTypeObj;
+		qTypeObj.ASR = false;
+		qTypeObj.QA = true;
+		qTypeObj.IMM = false;
+
+		QueryData data;
+		data.audioFile = "";
+		data.textFile = "what is the speed of light?";
+		data.imgFile = "";
+
 		transport->open();
 	
-		client.askTextQuestion(answer, question);
+		//client.askTextQuestion(answer, question);
+		
+		client.handleRequest(answer, qTypeObj, data);
 	
 		transport->close();
 	} catch(TException &tx) {
