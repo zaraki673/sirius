@@ -17,3 +17,32 @@ make
 5) Query server:
 ./qaclient "what is the speed of light?"
 ./qaclient "name the presidents of the united states"
+
+TROUBLESHOOTING:
+3) Errors when starting the server:
+a) Problem as of 06/07/15
+	-Error message: 
+	Exception in thread "main" java.lang.NoClassDefFoundError: info/ephyra/util/Dictionary
+	...
+
+	-Solution:
+	If you haven't already, run:
+	tar xvf question-answer.tar.gz
+
+	Then:
+	cd question-answer/
+	ln -s ../openephyra-thrift // creates symbolic link
+	cd ~sirius/sirius-application/question-answer/openephyra-thrift
+	./start-qa-server-thrift.sh
+
+b) Problem as of 06/07/15
+	-Error message:
+	org.apache.thrift.transport.TTransportException: java.net.ConnectException: Connection refused	
+
+	-Solution:
+	The QA service automatically tries to register with the command center
+	at the port specified in start-qa-server-thrift.sh.
+	If the command center is not running, then the registration fails,
+	and this message is reported.
+	To solve this problem, first start the command center server
+	located at ~/sirius/sirius-application/command-center
