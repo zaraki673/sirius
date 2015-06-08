@@ -14,13 +14,15 @@
 #include <sox.h>
 
 #include "KaldiService.h"
-#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.h"
-#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.h"
+#include "CommandCenter.h"
+#include "commandcenter_types.h"
+//#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.h"
+//#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TBufferTransports.h>
-#include <thrift/protocol/TBinaryProtocol.h>
+//#include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 

@@ -30,7 +30,8 @@ int main(int argc, char **argv) {
 		std::string answer;
 
 		//Audio File
-		ifstream fin_audio("test.wav",ios::binary);
+		//ifstream fin_audio("test.wav",ios::binary);
+		ifstream fin_audio("how.tall.is.this.wav",ios::binary);
 		ostringstream ostrm_audio;
 		ostrm_audio <<fin_audio.rdbuf();
 		std::string audio_file(ostrm_audio.str());	
@@ -44,8 +45,8 @@ int main(int argc, char **argv) {
 		// generate more helpful ctors
 		QueryType qTypeObj;
 		qTypeObj.ASR = true;
-		qTypeObj.QA = false;
-		qTypeObj.IMM = false;
+		qTypeObj.QA = true;
+		qTypeObj.IMM = true;
 
 		QueryData data;
 
@@ -58,6 +59,7 @@ int main(int argc, char **argv) {
 		//client.askTextQuestion(answer, question);
 		
 		client.handleRequest(answer, qTypeObj, data);
+		cout << "ANSWER = " << answer << endl;
 	
 		transport->close();
 	} catch(TException &tx) {

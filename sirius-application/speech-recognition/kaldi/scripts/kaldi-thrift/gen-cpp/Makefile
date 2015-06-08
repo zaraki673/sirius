@@ -5,8 +5,11 @@ TARGET_SERVER = server
 LINK_FLAGS = -lthrift \
 	     -lsox
 
-CMDOBJECT_SERVER = /home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.o \
-									/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.o 
+# Needed for finding header files during preprocessing
+INCLUDES_DIR = /home/tollben/sirius/sirius-application/command-center/gen-cpp
+
+CMDOBJECT_SERVER = /home/tollben/sirius/sirius-application/command-center/gen-cpp/CommandCenter.o \
+		/home/tollben/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.o 
 									
 OBJECTS_CLIENT = KaldiService.o Kaldi_Client.o
 OBJECTS_SERVER = KaldiService.o Kaldi_Server.o $(CMDOBJECT_SERVER) 
@@ -19,7 +22,7 @@ $(TARGET_SERVER): $(OBJECTS_SERVER)
 	$(CXX) $(OBJECTS_SERVER) -o $(TARGET_SERVER) $(LINK_FLAGS)
 
 %.o: %.cpp
-	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
+	$(CXX) -I$(INCLUDES_DIR) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 clean:
 	rm -rf $(TARGET_CLIENT) $(TARGET_SERVER) *.o

@@ -5,3 +5,7 @@
 # Ignore command center executables
 ccclient
 ccserver
+
+# Ignore other files
+*.wav
+*.jpg

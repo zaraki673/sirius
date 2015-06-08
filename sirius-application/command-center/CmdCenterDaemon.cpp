@@ -218,11 +218,12 @@ public:
 		//----Run pipeline----//
 		std::string asrRetVal = "";
 		std::string immRetVal = "";
+		std::string question = "";
 		//std::string answer = "";
 		if (qTypeObj.ASR && qTypeObj.QA && qTypeObj.IMM)
 		{
 			cout << "Starting ASR-IMM-QA pipeline..." << endl;
-
+			//---Image matching
 			imm_transport->open();
 			imm_client.match_img(immRetVal, data.imgFile);
 			imm_transport->close();
@@ -238,13 +239,17 @@ public:
 				throw;
 			}
 
+			//---Speech recognition
 			asr_transport->open();
 			asr_client.kaldi_asr(asrRetVal, data.audioFile);
 			asr_transport->close();
-
-			// TODO: FORM TEXT QUESTION
+			
+			
+			//---Question answer
+			question = asrRetVal + " " + immRetVal;
+			cout << "Your new question is: " << question << endl;
 			qa_transport->open();
-			qa_client.askFactoidThrift(_return, asrRetVal);
+			qa_client.askFactoidThrift(_return, question);
 			qa_transport->close();
 		}
 		else if (qTypeObj.ASR && qTypeObj.QA)
@@ -282,8 +287,6 @@ public:
 		}
 
 	}
-
-	
 
 	virtual void askTextQuestion(std::string& _return, const std::string& question)
 	{
@@ -331,7 +334,27 @@ private:
 
 	std::string parseImgFile(const std::string& immRetVal)
 	{
-		return immRetVal;
+		// Everything must be escaped twice
+		const char *regexPattern = "\\A(/?)([\\w\\-]+/)*([\\w\\-]+)(\\.jpg)\\z";
+		std::cout << "Passing the following pattern to regex engine: "
+			<< regexPattern << std::endl;
+		boost::regex re(regexPattern);
+		std::string fmt("$3");
+		std::string outstr = immRetVal;
+		if (boost::regex_match(immRetVal, re))
+		{
+			std::cout << immRetVal << " matches pattern"  << std::endl;
+			outstr = boost::regex_replace(immRetVal, re, fmt);
+			std::cout << "Input: " << immRetVal << std::endl;
+			std::cout << "Result: " << outstr << std::endl;
+		}
+		else
+		{
+			std::cout << "No match for " << immRetVal << "..." << std::endl;
+			throw(BadImgFileException());
+		}
+
+		return outstr;
 	}
 
 /*	
