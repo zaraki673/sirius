@@ -227,7 +227,7 @@ function sendFile(){
 
 // function ping(){
 //     console.log("Pinging server");
-//     var addr = getAddress(8585) + '/fts';
+//     var addr = getAddress(getItem('port'), 'fts');
 //     console.log(addr);
 //     var transport = new Thrift.TXHRTransport(addr);
 //     var protocol  = new Thrift.TJSONProtocol(transport);
