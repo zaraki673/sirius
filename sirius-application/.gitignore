@@ -20,7 +20,7 @@ pocketsphinx_continuous
 # Folders
 /opencv-*
 /question-answer
-/example/**
+#/example/**
 */bin/*
 **/log/*
 */doc/*

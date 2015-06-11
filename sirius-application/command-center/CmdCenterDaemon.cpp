@@ -122,8 +122,16 @@ public:
 
 		// TODO: refactor
 		//---- Select the data to be passed to the services ----//
-		std::string binary_audio = data.audioFile.file;
-		std::string binary_img = data.imgFile.file;
+		// TODO: THIS BREAKS MY COMMAND CENTER CLIENT TESTS
+		std::string binary_audio = data.audioFile;
+		std::string binary_img = data.imgFile;
+		
+		cout << "Decoding audio..." << endl;
+		binary_audio = base64_decode(data.audioFile);
+		
+		cout << "Decoding img..." << endl;
+		binary_img = base64_decode(data.imgFile);
+/*
 		if (data.audioFile.b64format)
 		{
 			cout << "Decoding audio..." << endl;
@@ -135,7 +143,7 @@ public:
 			cout << "Decoding img..." << endl;
 			binary_img = base64_decode(data.imgFile.file);
 		}
-
+*/
 		// NOTE: hard to break this up, b/c you need to pass the N clients around
 		// I suppose you could use a struct
 		//----Select services based on the client's query----//
@@ -294,7 +302,7 @@ public:
 		else if (qTypeObj.QA)
 		{
 			qa_transport->open();
-			qa_client.askFactoidThrift(_return, data.textFile.file);
+			qa_client.askFactoidThrift(_return, data.textFile);
 			qa_transport->close();
 		}
 		else if (qTypeObj.IMM)

@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 		asrqaimm_qTypeObj.ASR = true;
 		asrqaimm_qTypeObj.QA = true;
 		asrqaimm_qTypeObj.IMM = true;
-
+/*
 		File audioFile00;
 		audioFile00.file = capital_italy_audio_file;
 		audioFile00.b64format = false;
@@ -88,12 +88,16 @@ int main(int argc, char **argv) {
 		how_tall.audioFile = audioFile01;
 		how_tall.textFile = textFile;
 		how_tall.imgFile = imgFile;
-
-		//DEBUG
-		/*QueryData capital_italy;
+*/
+		QueryData capital_italy;
 		capital_italy.audioFile = capital_italy_audio_file;
 		capital_italy.textFile = "";
-		capital_italy.imgFile = "";*/
+		capital_italy.imgFile = "";
+
+		QueryData how_tall;
+		how_tall.audioFile = how_tall_audio_file;
+		how_tall.textFile = "";
+		how_tall.imgFile = image_file;
 
 		transport->open();
 		//client.askTextQuestion(answer, question);
