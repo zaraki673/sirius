@@ -23,14 +23,29 @@ struct QueryType
 	3:bool IMM
 }
 
+# File contains the string info and the string's format
+struct File
+{
+	1:string file = "",
+	2:bool b64format = false
+}
+
+
 # QueryData is the information that clients send
 # when they wish to communicate with the command center.
 struct QueryData
 {
-	1:string audioFile = "",
-	2:string textFile = "",
-	3:string imgFile = ""
+	1:File audioFile,
+	2:File textFile,
+	3:File imgFile
 }
+
+#struct QueryData
+#{
+#	1:string audioFile = "",
+#	2:string textFile = "",
+#	3:string imgFile = ""
+#}
 
 service CommandCenter
 {

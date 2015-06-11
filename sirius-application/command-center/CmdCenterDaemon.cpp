@@ -8,6 +8,7 @@
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 #include <thrift/TToString.h>
+#include <thrift/processor/TMultiplexedProcessor.h>
 
 // Additional C++ headers for querying registered services
 #include <thrift/transport/TSocket.h>
@@ -30,6 +31,13 @@
 
 // Boost libraries
 #include <boost/regex.hpp>
+
+// Extras
+#include "base64.h"
+
+// define the number of threads in pool
+#define THREAD_WORKS 16
+
 
 using namespace std;
 using namespace apache::thrift;
@@ -113,15 +121,29 @@ public:
 		cout << "/-----handleRequest()-----/" << endl;
 
 		// TODO: refactor
+		//---- Select the data to be passed to the services ----//
+		std::string binary_audio = data.audioFile.file;
+		std::string binary_img = data.imgFile.file;
+		if (data.audioFile.b64format)
+		{
+			cout << "Decoding audio..." << endl;
+			binary_audio = base64_decode(data.audioFile.file);
+		}
+
+		if (data.imgFile.b64format)
+		{
+			cout << "Decoding img..." << endl;
+			binary_img = base64_decode(data.imgFile.file);
+		}
+
 		// NOTE: hard to break this up, b/c you need to pass the N clients around
 		// I suppose you could use a struct
-
 		//----Select services based on the client's query----//
 		std::multimap<std::string, MachineData>::iterator it;
 		
 		// TODO: figure out how to resolve scoping to make clients visible
 		// Must instantiate all clients in this way.
-		// NOTE: TSocket values are irrelevant; the clients to be used
+		// NOTE: TSocket values below are irrelevant; the clients to be used
 		// will have their values overwritten, and the rest will be ignored
 		boost::shared_ptr<TTransport> asr_socket(new TSocket("localhost", 8080));
 		boost::shared_ptr<TTransport> asr_transport(new TBufferedTransport(asr_socket));
@@ -225,7 +247,7 @@ public:
 			cout << "Starting ASR-IMM-QA pipeline..." << endl;
 			//---Image matching
 			imm_transport->open();
-			imm_client.match_img(immRetVal, data.imgFile);
+			imm_client.match_img(immRetVal, binary_img);
 			imm_transport->close();
 			cout << "IMG = " << immRetVal << endl;
 			// image filename parsing
@@ -241,7 +263,7 @@ public:
 
 			//---Speech recognition
 			asr_transport->open();
-			asr_client.kaldi_asr(asrRetVal, data.audioFile);
+			asr_client.kaldi_asr(asrRetVal, binary_audio);
 			asr_transport->close();
 			
 			
@@ -256,7 +278,7 @@ public:
 		{
 			cout << "Starting ASR-QA pipeline..." << endl;
 			asr_transport->open();
-			asr_client.kaldi_asr(asrRetVal, data.audioFile);
+			asr_client.kaldi_asr(asrRetVal, binary_audio);
 			asr_transport->close();
 	
 			qa_transport->open();
@@ -266,19 +288,19 @@ public:
 		else if (qTypeObj.ASR)
 		{
 			asr_transport->open();
-			asr_client.kaldi_asr(_return, data.audioFile);
+			asr_client.kaldi_asr(_return, binary_audio);
 			asr_transport->close();
 		}
 		else if (qTypeObj.QA)
 		{
 			qa_transport->open();
-			qa_client.askFactoidThrift(_return, data.textFile);
+			qa_client.askFactoidThrift(_return, data.textFile.file);
 			qa_transport->close();
 		}
 		else if (qTypeObj.IMM)
 		{
 			imm_transport->open();
-			imm_client.match_img(_return, data.imgFile);
+			imm_client.match_img(_return, binary_img);
 			imm_transport->close();
 		}
 		else
@@ -380,6 +402,12 @@ int main(int argc, char **argv) {
 	boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 	boost::shared_ptr<CommandCenterHandler> handler(new CommandCenterHandler());
 	boost::shared_ptr<TProcessor> processor(new CommandCenterProcessor(handler));
+	/*TMultiplexedProcessor multiplexed_processor = new TMultiplexedProcessor();
+	multiplexed_processor.registerProcessor(
+		"cmdcenter",
+		processor
+	);*/
+
 	boost::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
 	boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
 
@@ -387,7 +415,18 @@ int main(int argc, char **argv) {
 	// The server listens for packets transmitted via <transport> in <protocol> format.
 	// The processor handles serialization/deserialization and communication w/ handler.
 	TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
+	//TSimpleServer server(multiplexed_processor, serverTransport, transportFactory, protocolFactory);
 
+
+	// initialize the thread manager and factory
+	/*boost::shared_ptr<ThreadManager> threadManager = ThreadManager::newSimpleThreadManager(THREAD_WORKS);
+	boost::shared_ptr<PosixThreadFactory> threadFactory = boost::shared_ptr<PosixThreadFactory>(new PosixThreadFactory());
+	threadManager->threadFactory(threadFactory);
+	threadManager->start();
+
+	// initialize the image matching server
+	TThreadPoolServer server(processor, serverTransport, transportFactory, protocolFactory, threadManager);
+	*/
 	cout << "Starting the command center server on port " << port << "..." << endl;
 	server.serve();
 	cout << "Done." << endl;
