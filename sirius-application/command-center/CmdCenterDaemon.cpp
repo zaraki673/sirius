@@ -28,6 +28,9 @@
 #include "../speech-recognition/kaldi/scripts/kaldi-thrift/gen-cpp/KaldiService.h"
 #include "../image-matching/matching-thrift/ImageMatchingService.h"
 
+// Boost libraries
+#include <boost/regex.hpp>
+
 using namespace std;
 using namespace apache::thrift;
 using namespace apache::thrift::concurrency;
@@ -62,6 +65,8 @@ struct Service
 	}
 };
 */
+
+class BadImgFileException {};
 
 class CommandCenterHandler : public CommandCenterIf
 {
@@ -214,39 +219,77 @@ public:
 		}
 
 		//----Run pipeline----//
-		std::string answer;
+		std::string asrRetVal = "";
+		std::string immRetVal = "";
+		std::string question = "";
+		//std::string answer = "";
 		if (qTypeObj.ASR && qTypeObj.QA && qTypeObj.IMM)
 		{
-			cout << "ASR-QA-IMM query not implemented" << endl;
+			cout << "Starting ASR-IMM-QA pipeline..." << endl;
+			//---Image matching
+			imm_transport->open();
+			imm_client.match_img(immRetVal, data.imgFile);
+			imm_transport->close();
+			cout << "IMG = " << immRetVal << endl;
+			// image filename parsing
+			try
+			{
+				immRetVal = parseImgFile(immRetVal);
+			}
+			catch (BadImgFileException)
+			{
+				cout << "Cmd Center: BadImgFileException" << endl;
+				throw;
+			}
+
+			//---Speech recognition
+			asr_transport->open();
+			asr_client.kaldi_asr(asrRetVal, data.audioFile);
+			asr_transport->close();
+			
+			
+			//---Question answer
+			question = asrRetVal + " " + immRetVal;
+			cout << "Your new question is: " << question << endl;
+			qa_transport->open();
+			qa_client.askFactoidThrift(_return, question);
+			qa_transport->close();
 		}
 		else if (qTypeObj.ASR && qTypeObj.QA)
 		{
-			cout << "ASR-QA query not implemented" << endl;
+			cout << "Starting ASR-QA pipeline..." << endl;
+			asr_transport->open();
+			asr_client.kaldi_asr(asrRetVal, data.audioFile);
+			asr_transport->close();
+	
+			qa_transport->open();
+			qa_client.askFactoidThrift(_return, asrRetVal);
+			qa_transport->close();
 		}
 		else if (qTypeObj.ASR)
 		{
 			asr_transport->open();
-			asr_client.kaldi_asr(answer,data.audioFile);
+			asr_client.kaldi_asr(_return, data.audioFile);
 			asr_transport->close();
 		}
 		else if (qTypeObj.QA)
 		{
 			qa_transport->open();
-			qa_client.askFactoidThrift(answer, data.textFile);
+			qa_client.askFactoidThrift(_return, data.textFile);
 			qa_transport->close();
 		}
-		else if(qTypeObj.IMM){
+		else if (qTypeObj.IMM)
+		{
 			imm_transport->open();
-			imm_client.match_img(answer,data.imgFile);
+			imm_client.match_img(_return, data.imgFile);
 			imm_transport->close();
 		}
 		else
 		{
 			cout << "Nothing in the pipeline" << endl;
 		}
-	}
 
-	
+	}
 
 	virtual void askTextQuestion(std::string& _return, const std::string& question)
 	{
@@ -291,6 +334,31 @@ private:
 	// TODO: this is a poor model, because it doesn't allow you to
 	// select available servers easily, for a given key.
 	std::multimap<std::string, MachineData> registeredServices;
+
+	std::string parseImgFile(const std::string& immRetVal)
+	{
+		// Everything must be escaped twice
+		const char *regexPattern = "\\A(/?)([\\w\\-]+/)*([\\w\\-]+)(\\.jpg)\\z";
+		std::cout << "Passing the following pattern to regex engine: "
+			<< regexPattern << std::endl;
+		boost::regex re(regexPattern);
+		std::string fmt("$3");
+		std::string outstr = immRetVal;
+		if (boost::regex_match(immRetVal, re))
+		{
+			std::cout << immRetVal << " matches pattern"  << std::endl;
+			outstr = boost::regex_replace(immRetVal, re, fmt);
+			std::cout << "Input: " << immRetVal << std::endl;
+			std::cout << "Result: " << outstr << std::endl;
+		}
+		else
+		{
+			std::cout << "No match for " << immRetVal << "..." << std::endl;
+			throw(BadImgFileException());
+		}
+
+		return outstr;
+	}
 
 /*	
 	// command center's tables

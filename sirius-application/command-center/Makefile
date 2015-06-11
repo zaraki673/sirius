@@ -2,7 +2,7 @@ CXX = g++
 CXX_FLAGS =
 
 LINK_FLAGS = -lopencv_core \
-                         -lopencv_highgui \
+			 -lopencv_highgui \
                          -lopencv_imgproc \
                          -lopencv_nonfree \
                          -lopencv_flann \
@@ -13,7 +13,8 @@ LINK_FLAGS = -lopencv_core \
                          -lboost_program_options \
                          -lboost_filesystem \
                          -lboost_system \
-                         -lprotobuf \
+			 -lboost_regex \
+			 -lprotobuf \
                          -ltesseract \
 			 -lthrift
 

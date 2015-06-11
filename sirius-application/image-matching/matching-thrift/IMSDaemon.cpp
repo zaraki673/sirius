@@ -27,8 +27,10 @@
 // import the service headers
 #include "ImageMatchingService.h"
 #include "detect.h"
-#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.h"
-#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.h"
+//#include "~/sirius/sirius-application/command-center/gen-cpp/CommandCenter.h"
+//#include "~/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.h"
+#include "CommandCenter.h"
+#include "commandcenter_types.h"
 
 // define the namespace
 using namespace std;
@@ -68,7 +70,7 @@ class ImageMatchingServiceHandler : public ImageMatchingServiceIf {
 };
 
 int main(int argc, char **argv){
-  int port = 9090;
+  int port = 9082;
   //Register with the command center 
   int cmdcenterport = 8081;
   boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
@@ -76,7 +78,7 @@ int main(int argc, char **argv){
   boost::shared_ptr<TProtocol> cmdprotocol(new TBinaryProtocol(cmdtransport));
   CommandCenterClient cmdclient(cmdprotocol);
   cmdtransport->open();
-  cout<<"Registering automatic speech recognition server with command center..."<<endl;
+  cout<<"Registering image matching server with command center..."<<endl;
   MachineData mDataObj;
   mDataObj.name="localhost";
   mDataObj.port=port;
@@ -85,7 +87,7 @@ int main(int argc, char **argv){
 
 	// initial the transport factory
 	boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-	boost::shared_ptr<TServerTransport> serverTransport(new TServerSocket(9090));
+	boost::shared_ptr<TServerTransport> serverTransport(new TServerSocket(9082));
 	// initial the protocal factory
 	boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 	// initial the request handler
