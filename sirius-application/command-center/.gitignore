@@ -9,3 +9,6 @@ ccserver
 # Ignore other files
 *.wav
 *.jpg
+*.html
+*.js
+/js/**

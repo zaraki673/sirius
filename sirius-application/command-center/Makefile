@@ -27,7 +27,8 @@ OBJECTS_CLIENT = gen-cpp/CommandCenter.o gen-cpp/commandcenter_types.o CmdCenter
 OBJECTS_SERVER = ../openephyra-thrift/QAService.o \
 		 ../speech-recognition/kaldi/scripts/kaldi-thrift/gen-cpp/KaldiService.o \
 		../image-matching/matching-thrift/ImageMatchingService.o \
-		gen-cpp/CommandCenter.o gen-cpp/commandcenter_types.o CmdCenterDaemon.o 
+		gen-cpp/CommandCenter.o gen-cpp/commandcenter_types.o CmdCenterDaemon.o \
+		base64.o
 
 all: $(TARGET_SERVER) $(TARGET_CLIENT)
 
@@ -51,6 +52,9 @@ CmdCenterClient.o : CmdCenterClient.cpp
 	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 CmdCenterDaemon.o : CmdCenterDaemon.cpp
+	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
+
+base64.o : base64.cpp
 	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 clean:
