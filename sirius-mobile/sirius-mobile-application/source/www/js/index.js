@@ -38,7 +38,7 @@ var app = {
 
 app.initialize();
 
-var image, audio, encodedData;
+var image, audio, encodedAudioData = "", encodedImageData = "";
 var storage = window.localStorage;
 var mediaTimer = null;
 var media = null;
@@ -65,6 +65,7 @@ function captureImageSuccess(mediaFiles) {
         image = mediaFiles[i];
         $('#image_file').empty();
         $('#image_file').append(image.name);
+        getFS(image, "audio");
     }
 }
 
@@ -78,7 +79,7 @@ function captureAudioSuccess(mediaFiles) {
         $('#audio_file').append(audio.name);
         $('#audio_file').append("<button class='btn2' id='playAudio' style='margin-left:3px'>Play</button>");
         document.getElementById("playAudio").addEventListener("click",playAudio);
-
+        getFS(audio, "audio");
         // $('#audio_file').append("<button class='btn2' id='pauseAudio'>Pause</button>");
         // $('#audio_file').append("<button class='btn2' id='stopAudio'>Stop</button>");
         // <p id='audio_position'></p>
@@ -158,25 +159,39 @@ function getFS(file, type){
 }
 
 function gotFSAudio(fileSystem) {
-    fileSystem.root.getFile(audio.name, null, gotFileEntry, fail);
+    fileSystem.root.getFile(audio.name, null, gotAudioEntry, fail);
 }
 
 function gotFSImage(fileSystem) {
-    fileSystem.root.getFile(image.name, null, gotFileEntry, fail);
+    fileSystem.root.getFile(image.name, null, gotImageEntry, fail);
 }
 
-function gotFileEntry(fileEntry) {
-    fileEntry.file(readDataUrl, fail);
+function gotAudioEntry(fileEntry) {
+    fileEntry.file(readDataUrlAudio, fail);
 }
 
-function readDataUrl(file) {
+function gotImageEntry(fileEntry) {
+    fileEntry.file(readDataUrlImage, fail);
+}
+
+function readDataUrlAudio(file) {
     var reader = new FileReader();
     reader.onloadend = function(evt) {
         console.log("Read as data URL");
         console.log(evt.target.result);
-        encodedData = String(evt.target.result);
-        encodedData = encodedData.replace(encodedData.substr(0, encodedData.search(",") + 1), "");
-        sendFile();
+        encodedAudioData = String(evt.target.result);
+        encodedAudioData = encodedAudioData.replace(encodedAudioData.substr(0, encodedAudioData.search(",") + 1), "");
+    };
+    reader.readAsDataURL(file);
+}
+
+function readDataUrlImage(file) {
+    var reader = new FileReader();
+    reader.onloadend = function(evt) {
+        console.log("Read as data URL");
+        encodedImageData = String(evt.target.result);
+        encodedImageData = encodedImageData.replace(encodedImageData.substr(0, encodedImageData.search(",") + 1), "");
+        console.log(encodedImageData);
     };
     reader.readAsDataURL(file);
 }
@@ -194,34 +209,36 @@ function sendFile(){
         var protocol  = new Thrift.TJSONProtocol(transport);
         var client = new FileTransferSvcClient(protocol);
 
+
         var qType = new QueryType();
-        qType.ASR = true;
-        qType.IMM = false;
+        qType.ASR = !!audio;
+        qType.IMM = !!image;
         qType.QA = true;
 
-        var audioFile = new File();
+        // var audioFile = new File();
         // audioFile.file = encodedData;
         // audioFile.b64format = true;
 
-        var txtFile = new File();
-        var immFile = new File();
+        // var txtFile = new File();
+        // var immFile = new File();
 
         var qData = new QueryData();
-        qData.audioFile = encodedData;
+        qData.audioFile = encodedAudioData;
         qData.textFile = '';
-        qData.imgFile = '';
+        qData.imgFile = encodedImageData;
 
         // var qData = new QueryData();
         // qData.audioFile = audioFile;
         // qData.textFile = txtFile;
         // qData.imgFile = immFile;
 
+        // console.log("sending to client");
         client.send_file(qData, qType, window.device.uuid);
     } catch(err) {
         console.log(err);
-    }
+    }    
 
-    getResponse();
+     getResponse();
 }
 // document.getElementById("thriftMessage").addEventListener("click",getFS);
 
@@ -270,11 +287,11 @@ function getResponse(){
 // document.getElementById("getResponse").addEventListener("click",getResponse);
 
 function askServer() {
-    if(audio) {
+    if(audio || image) {
         var sending = "Sending...";
         $('#response').empty();
         $('#response').append("<p>" + sending + "</p>");
-        getFS(audio, "audio");
+        sendFile();
 
     } else {
         console.log("Nothing recorded!");
