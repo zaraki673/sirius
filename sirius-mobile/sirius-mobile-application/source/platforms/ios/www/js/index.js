@@ -38,16 +38,17 @@ var app = {
 
 app.initialize();
 
-var image, audio;
+var image, audio, encodedData;
 var storage = window.localStorage;
 var mediaTimer = null;
 var media = null;
 
 function onload() {
     document.getElementById("ip").value = storage.getItem("ip");
-    document.getElementById("asr").value = storage.getItem("asr");
-    document.getElementById("imm").value = storage.getItem("imm");
-    document.getElementById("qa").value = storage.getItem("qa");
+    document.getElementById("port").value = storage.getItem("port");
+    // document.getElementById("asr").value = storage.getItem("asr");
+    // document.getElementById("imm").value = storage.getItem("imm");
+    // document.getElementById("qa").value = storage.getItem("qa");
 }
 
 window.addEventListener("load", onload);
@@ -142,105 +143,233 @@ function onError(error) {
 // }
 // document.getElementById("getImage").addEventListener("click",getPhoto;
 
-function thriftMessage(){
-    console.log("Creating client");
-    var addr = 'http://clarity04.eecs.umich.edu:8081';
-    console.log(addr);
-    var transport = new Thrift.Transport(addr);
-    var protocol  = new Thrift.Protocol(transport);
-    var client    = new CommandCenterClient(protocol);
-    client.ping( function() { console.log("pinged server"); } );
-    console.log("Client Created");
-}
-document.getElementById("thriftMessage").addEventListener("click",thriftMessage);
-
-function sendToServer() {
-    
-    if(image){
-        // uploadFile(image);
-        $('#response').empty();
-        $('#response').append("<p>Sending...</p>");
-        type = "image/jpeg";
-        headers = {
-            Connection: "Close",
-            'Content-Type': String(type)
-        };
-        //uploadFile(image, getAddress(getItem('imm')), type, headers);
-    } else {
-        if(audio){
-            $('#response').empty();
-            $('#response').append("<p>Sending...</p>");
-            type = "audio/wav";
-            headers = {
-                Connection: "Close",
-                'Content-Type': String(type + '; rate=16000')
-                // 'Content-Type': String(type)
-            };
-            // if(String(window.device.platform) == "iOS"){
-            //     window.encodeAudio(audio.fullPath, success, fail);
-            // }
-            //uploadFile(audio, getAddress(getItem('asr')), type, headers);
+function getFS(file, type){
+    if(file){
+        if(type == "audio") {
+            console.log("audio file lookup");
+            window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFSAudio, fail);
         } else {
-            //send text to server
-            q = document.getElementById("question").value
-            if(q) {
-                $('#response').empty();
-                $('#response').append("<p>Sending...</p>");
-                queryServer(q);
-            } else {
-                $('#response').empty();
-                $('#response').append("<p>Nothing to send</p>");
-            }
+            console.log("image file lookup");
+            window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFSImage, fail);
         }
+    } else {
+        console.log("No file recorded!");
     }
 }
-document.getElementById("sendToServer").addEventListener("click",sendToServer);
+
+function gotFSAudio(fileSystem) {
+    fileSystem.root.getFile(audio.name, null, gotFileEntry, fail);
+}
+
+function gotFSImage(fileSystem) {
+    fileSystem.root.getFile(image.name, null, gotFileEntry, fail);
+}
+
+function gotFileEntry(fileEntry) {
+    fileEntry.file(readDataUrl, fail);
+}
+
+function readDataUrl(file) {
+    var reader = new FileReader();
+    reader.onloadend = function(evt) {
+        console.log("Read as data URL");
+        console.log(evt.target.result);
+        encodedData = String(evt.target.result);
+        encodedData = encodedData.replace(encodedData.substr(0, encodedData.search(",") + 1), "");
+        sendFile();
+    };
+    reader.readAsDataURL(file);
+}
+
+function fail(evt) {
+    console.log(evt.target.error.code);
+}
+
+function sendFile(){
+    console.log("Sending file");
+    
+    try {
+        var addr = getAddress(getItem('port'), 'fts');
+        var transport = new Thrift.TXHRTransport(addr);
+        var protocol  = new Thrift.TJSONProtocol(transport);
+        var client = new FileTransferSvcClient(protocol);
+
+        var qType = new QueryType();
+        qType.ASR = true;
+        qType.IMM = false;
+        qType.QA = true;
+
+        var audioFile = new File();
+        // audioFile.file = encodedData;
+        // audioFile.b64format = true;
+
+        var txtFile = new File();
+        var immFile = new File();
+
+        var qData = new QueryData();
+        qData.audioFile = encodedData;
+        qData.textFile = '';
+        qData.imgFile = '';
+
+        // var qData = new QueryData();
+        // qData.audioFile = audioFile;
+        // qData.textFile = txtFile;
+        // qData.imgFile = immFile;
+
+        client.send_file(qData, qType, window.device.uuid);
+    } catch(err) {
+        console.log(err);
+    }
+
+    getResponse();
+}
+// document.getElementById("thriftMessage").addEventListener("click",getFS);
+
+// function ping(){
+//     console.log("Pinging server");
+//     var addr = getAddress(8585) + '/fts';
+//     console.log(addr);
+//     var transport = new Thrift.TXHRTransport(addr);
+//     var protocol  = new Thrift.TJSONProtocol(transport);
+//     //var client    = new CommandCenterClient(protocol);
+//     var client = new FileTransferSvcClient(protocol);
+    
+//     var msg = client.ping();
+//     $('#response').empty();
+//     $('#response').append("<p>" + msg + "</p>");
+//     console.log(msg);
+//     //client.ping( function() { console.log("pinged server"); } );
+//     console.log("Client Created");
+// }
+// document.getElementById("sendToServer").addEventListener("click",ping);
+
+function getResponse(){
+    var msg = "Waiting for response";
+    $('#response').empty();
+    $('#response').append("<p>" + msg + "</p>");
+
+    var response = "processing";
+    var addr = getAddress(getItem('port'), 'fts');
+    var transport = new Thrift.TXHRTransport(addr);
+    var protocol  = new Thrift.TJSONProtocol(transport);
+    var client = new FileTransferSvcClient(protocol);
+    try{
+        response = client.get_response(window.device.uuid); 
+        console.log(response);
+    } catch(err) {
+        console.log(err);
+    }
+
+    //poll for response once a second
+    if(response == "processing") {
+        setTimeout(getResponse, 1000);
+    } else {
+        processResponse(response);
+    }
+}
+// document.getElementById("getResponse").addEventListener("click",getResponse);
+
+function askServer() {
+    if(audio) {
+        var sending = "Sending...";
+        $('#response').empty();
+        $('#response').append("<p>" + sending + "</p>");
+        getFS(audio, "audio");
+
+    } else {
+        console.log("Nothing recorded!");
+        navigator.notification.alert('Nothing recorded!', null, 'Oops!');
+    }
+}
+document.getElementById("askServer").addEventListener("click",askServer);
+
+// function sendToServer() {
+    
+//     if(image){
+//         // uploadFile(image);
+//         $('#response').empty();
+//         $('#response').append("<p>Sending...</p>");
+//         type = "image/jpeg";
+//         headers = {
+//             Connection: "Close",
+//             'Content-Type': String(type)
+//         };
+//         uploadFile(image, getAddress(getItem('imm')), type, headers);
+//     } else {
+//         if(audio){
+//             $('#response').empty();
+//             $('#response').append("<p>Sending...</p>");
+//             type = "audio/wav";
+//             headers = {
+//                 Connection: "Close",
+//                 'Content-Type': String(type + '; rate=16000')
+//                 // 'Content-Type': String(type)
+//             };
+//             // if(String(window.device.platform) == "iOS"){
+//             //     window.encodeAudio(audio.fullPath, success, fail);
+//             // }
+//             uploadFile(audio, getAddress(getItem('asr')), type, headers);
+//         } else {
+//             //send text to server
+//             q = document.getElementById("question").value
+//             if(q) {
+//                 $('#response').empty();
+//                 $('#response').append("<p>Sending...</p>");
+//                 queryServer(q);
+//             } else {
+//                 $('#response').empty();
+//                 $('#response').append("<p>Nothing to send</p>");
+//             }
+//         }
+//     }
+// }
+// document.getElementById("sendToServer").addEventListener("click",sendToServer);
 
 function getItem(key) {
     return document.getElementById(key).value;
 }
 
-function getAddress(port) {
-    return 'http://' + getItem('ip') + ':' + port;
+function getAddress(port, destination) {
+    return 'http://' + getItem('ip') + ':' + port + '/' + destination;
 }
 
-function queryServer(query) {
-    q = getAddress(getItem('qa')) + '?query=' + query;
-    $.get(q).done(function( data ) {
-        processResponse(data);
-    });
-}
+// function queryServer(query) {
+//     q = getAddress(getItem('qa')) + '?query=' + query;
+//     $.get(q).done(function( data ) {
+//         processResponse(data);
+//     });
+// }
 
-// Upload files to server
-function uploadFile(mediaFile, addr, type, headers) {
-    var ft = new FileTransfer(),
-        path = mediaFile.fullPath,
-        name = mediaFile.name;
+// // Upload files to server
+// function uploadFile(mediaFile, addr, type, headers) {
+//     var ft = new FileTransfer(),
+//         path = mediaFile.fullPath,
+//         name = mediaFile.name;
 
-    var options = new FileUploadOptions();
-    options.fileKey = 'file';
-    // options.fileName = name.replace(name.substr(0, name.lastIndexOf('/')+1), '/tmp/');
-    options.fileName = name;
-    options.mimeType = type;
-    options.chunkedMode = false;
-    options.headers = headers;
+//     var options = new FileUploadOptions();
+//     options.fileKey = 'file';
+//     // options.fileName = name.replace(name.substr(0, name.lastIndexOf('/')+1), '/tmp/');
+//     options.fileName = name;
+//     options.mimeType = type;
+//     options.chunkedMode = false;
+//     options.headers = headers;
 
-    ft.upload(
-        encodeURI(path),
-        encodeURI(addr),
-        function(result) {
-            console.log('Upload success: ' + result.responseCode);
-            console.log("Response: " + result.response);
-            console.log(result.bytesSent + ' bytes sent');
-            processResponse(result.response);
-        },
-        function(error) {
-            $('#response').empty();
-            $('#response').append("<p>Error uploading file</p>");
-            console.log('Error uploading file ' + path + ': ' + error.code);
-        },
-        options);
-}
+//     ft.upload(
+//         path,
+//         encodeURI(addr),
+//         function(result) {
+//             console.log('Upload success: ' + result.responseCode);
+//             console.log("Response: " + result.response);
+//             console.log(result.bytesSent + ' bytes sent');
+//             processResponse(result.response);
+//         },
+//         function(error) {
+//             $('#response').empty();
+//             $('#response').append("<p>Error uploading file</p>");
+//             console.log('Error uploading file ' + path + ': ' + error.code);
+//         },
+//         options);
+// }
 
 function processResponse(data) {
     $('#response').empty();

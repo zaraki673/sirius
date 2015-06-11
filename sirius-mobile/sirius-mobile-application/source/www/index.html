@@ -43,9 +43,10 @@
         <div class="app">
             <div id="ip_info">
                 <label for="ip">IP: </label><input type="text" id="ip" name="ip" size="15" onchange="updateDefaults(this.id, this.value)" /> <br>
-                <label for="asr">ASR: </label><input type="text" id="asr" name="asr" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
+                <label for="port">Port: </label><input type="text" id="port" name="port" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
+                <!-- <label for="asr">ASR: </label><input type="text" id="asr" name="asr" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
                 <label for="imm">IMM: </label><input type="text" id="imm" name="imm" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
-                <label for="qa">QA: </label><input type="text" id="qa" name="qa" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
+                <label for="qa">QA: </label><input type="text" id="qa" name="qa" size="5" onchange="updateDefaults(this.id, this.value)" /> <br> -->
             </div>
             <br>
             <textarea id="question" rows="3" style="margin: 5px" placeholder="Ask your question"></textarea>
@@ -58,10 +59,18 @@
             <div id="audio_file"></div> 
             <br>
 
-            <button class="btn" id="thriftMessage">Thrift Question</button>
-            <button class="btn" id="sendToServer">Send to Server</button> <br>
+            <button class="btn" id="askServer">Ask Sirius</button>
+            <!-- <button class="btn" id="thriftMessage">Send File</button>
+            <button class="btn" id="sendToServer">Ping</button>
+            <button class="btn" id="getResponse">Get Resp</button>  -->
+            <br>
             <div id="response"></div>
         </div>
+
+        <!-- Testing communication -->
+        <script src="gen-js/FileTransferSvc.js" type="text/javascript"></script>
+        <script src="gen-js/filetransfer_svc_types.js" type="text/javascript"></script>
+        
 
         <script type="text/javascript" src="js/thrift/thrift.js"></script>
         <script type="text/javascript" src="js/thrift/commandcenter_types.js"></script>
