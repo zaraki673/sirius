@@ -189,7 +189,8 @@ public:
 			}
 			else
 			{
-				cout << "ASR requested, but not found" << endl;
+				_return = "ASR requested, but not found";
+				cout << _return << endl;
 				return;
 			}
 		}
@@ -215,7 +216,8 @@ public:
 			}
 			else
 			{
-				cout << "QA requested, but not found" << endl;
+				_return = "QA requested, but not found";
+				cout << _return << endl;
 				return;
 			}
 		}
@@ -240,7 +242,8 @@ public:
 			}
 			else
 			{
-				cout << "IMM requested, but not found" << endl;
+				_return = "IMM requested, but not found";
+				cout << _return << endl;
 				return;
 			}
 		}
