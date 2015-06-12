@@ -280,6 +280,10 @@ function sendFile(){
             navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
             updateResponseDiv("Error");
             return;
+        } else if(err.name == "TIMEOUT_ERR") {
+            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
+            updateResponseDiv("Error");
+            return;
         }
         //otherwise ignore the error
     }    
@@ -306,9 +310,13 @@ function sendFile(){
 // }
 // document.getElementById("sendToServer").addEventListener("click",ping);
 
-function getResponse(){
+var timeoutFunc;
+
+function getResponse() {
     var msg = "Waiting for response...";
+    // var msg = "Waiting for response...    <button class='btnX' id='cancelRequest' style='margin-left:5px'>X</button>";
     updateResponseDiv(msg);
+    // document.getElementById("cancelRequest").addEventListener("click",cancelRequest);
 
     var response = "processing";
     var addr = getAddress(getItem('port'), 'fts');
@@ -324,15 +332,24 @@ function getResponse(){
             navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
             updateResponseDiv("Error");
             return;
+        } else if(err.name == "TIMEOUT_ERR") {
+            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
+            updateResponseDiv("Error");
+            return;
         }
     }
 
     //poll for response once a second
     if(response == "processing") {
-        setTimeout(getResponse, 1000);
+        timeoutFunc = setTimeout(getResponse, 1000);
     } else {
         processResponse(response);
     }
+}
+
+function cancelRequest() {
+    clearTimeout(timeoutFunc);
+    updateResponseDiv("Request Canceled");
 }
 // document.getElementById("getResponse").addEventListener("click",getResponse);
 

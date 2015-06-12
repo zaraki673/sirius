@@ -71,15 +71,18 @@ function clear() {
     clearAudio();
     clearImage();
     clearText();
+    console.log("all media removed");
 }
 
 function clearAudio() {
+    console.log("audio cleared");
     audio = null;
     encodedAudioData = "";
     $('#audio_file').empty();
 }
 
 function clearImage() {
+    console.log("image cleared");
     image = null;
     encodedImageData = "";
     $('#image_file').empty();
@@ -277,6 +280,10 @@ function sendFile(){
             navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
             updateResponseDiv("Error");
             return;
+        } else if(err.name == "TIMEOUT_ERR") {
+            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
+            updateResponseDiv("Error");
+            return;
         }
         //otherwise ignore the error
     }    
@@ -303,9 +310,12 @@ function sendFile(){
 // }
 // document.getElementById("sendToServer").addEventListener("click",ping);
 
-function getResponse(){
-    var msg = "Waiting for response...";
+var timeoutFunc;
+
+function getResponse() {
+    var msg = "Waiting for response...    <button class='btnX' id='cancelRequest' style='margin-left:5px'>X</button>";
     updateResponseDiv(msg);
+    document.getElementById("cancelRequest").addEventListener("click",cancelRequest);
 
     var response = "processing";
     var addr = getAddress(getItem('port'), 'fts');
@@ -321,15 +331,24 @@ function getResponse(){
             navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
             updateResponseDiv("Error");
             return;
+        } else if(err.name == "TIMEOUT_ERR") {
+            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
+            updateResponseDiv("Error");
+            return;
         }
     }
 
     //poll for response once a second
     if(response == "processing") {
-        setTimeout(getResponse, 1000);
+        timeoutFunc = setTimeout(getResponse, 1000);
     } else {
         processResponse(response);
     }
+}
+
+function cancelRequest() {
+    clearTimeout(timeoutFunc);
+    updateResponseDiv("Request Canceled");
 }
 // document.getElementById("getResponse").addEventListener("click",getResponse);
 
@@ -338,8 +357,8 @@ function askServer() {
         updateResponseDiv("Sending...");
         sendFile();
     } else {
-        console.log("Nothing recorded!");
-        navigator.notification.alert('Nothing recorded!', null, 'Oops!');
+        console.log("Nothing to send!");
+        navigator.notification.alert('Nothing to send!', null, 'Oops!');
     }
 }
 document.getElementById("askServer").addEventListener("click",askServer);
