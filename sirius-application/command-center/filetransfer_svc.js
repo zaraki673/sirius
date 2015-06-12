@@ -47,6 +47,10 @@ var ftsHandler = {
 			data,
 			function(err, response) {
 			  console.log('ANSWER = ' + response);
+			  if(!response) {
+			  	console.log("Response is empty");
+			  	response = "null";
+			  }
 			  responses[uuid] = response;
 			  connection.end();
 		});
