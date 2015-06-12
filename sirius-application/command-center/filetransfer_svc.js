@@ -14,7 +14,7 @@ var ftsHandler = {
 		console.log("Client message recieved");
 		//data = data.replace(data.substr(0, data.search(",") + 1), "");
 		// console.log(data);
-		var buffer = new Buffer(data, 'base64');
+		//var buffer = new Buffer(data, 'base64');
 		// console.log(buffer);
 		var connection = thrift.createConnection("localhost", 8081);
 		var client = thrift.createClient(CCDaemon, connection);
