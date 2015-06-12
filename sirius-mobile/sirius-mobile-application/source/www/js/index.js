@@ -38,7 +38,7 @@ var app = {
 
 app.initialize();
 
-var image, audio, encodedAudioData = "", encodedImageData = "";
+var image, audio, encodedAudioData = "", encodedImageData = "", text = "";
 var storage = window.localStorage;
 var mediaTimer = null;
 var media = null;
@@ -57,6 +57,42 @@ function updateDefaults(key, value) {
     storage.setItem(key, value);
 }
 
+function updateText(value) {
+    text = value;
+}
+
+function updateResponseDiv(value) {
+    $('#response').empty();
+    $('#response').append("<p>" + value + "</p>");
+}
+
+function clear() {
+    //variables
+    clearAudio();
+    clearImage();
+    clearText();
+    console.log("all media removed");
+}
+
+function clearAudio() {
+    console.log("audio cleared");
+    audio = null;
+    encodedAudioData = "";
+    $('#audio_file').empty();
+}
+
+function clearImage() {
+    console.log("image cleared");
+    image = null;
+    encodedImageData = "";
+    $('#image_file').empty();
+}
+
+function clearText() {
+    text = "";
+    $('#question').value = "";
+}
+
 // Called when capture operation is finished
 function captureImageSuccess(mediaFiles) {
     var i, len;
@@ -65,6 +101,8 @@ function captureImageSuccess(mediaFiles) {
         image = mediaFiles[i];
         $('#image_file').empty();
         $('#image_file').append(image.name);
+        $('#image_file').append("<button class='btnX' id='clearImage' style='margin-left:5px'>X</button>");
+        document.getElementById("clearImage").addEventListener("click",clearImage);
         getFS(image, "audio");
     }
 }
@@ -74,11 +112,12 @@ function captureAudioSuccess(mediaFiles) {
     for (i = 0, len = mediaFiles.length; i < len; i += 1) {
         //uploadFile(mediaFiles[i]);
         audio = mediaFiles[i];
-        $('#question').value = "";
         $('#audio_file').empty();
         $('#audio_file').append(audio.name);
         $('#audio_file').append("<button class='btn2' id='playAudio' style='margin-left:3px'>Play</button>");
+        $('#audio_file').append("<button class='btnX' id='clearAudio' style='margin-left:5px'>X</button>");
         document.getElementById("playAudio").addEventListener("click",playAudio);
+        document.getElementById("clearAudio").addEventListener("click",clearAudio);
         getFS(audio, "audio");
         // $('#audio_file').append("<button class='btn2' id='pauseAudio'>Pause</button>");
         // $('#audio_file').append("<button class='btn2' id='stopAudio'>Stop</button>");
@@ -224,8 +263,8 @@ function sendFile(){
 
         var qData = new QueryData();
         qData.audioFile = encodedAudioData;
-        qData.textFile = '';
         qData.imgFile = encodedImageData;
+        qData.textFile = text;
 
         // var qData = new QueryData();
         // qData.audioFile = audioFile;
@@ -236,6 +275,13 @@ function sendFile(){
         client.send_file(qData, qType, window.device.uuid);
     } catch(err) {
         console.log(err);
+        //could not connect to server
+        if(err.name == "NETWORK_ERR") {
+            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
+            updateResponseDiv("Error");
+            return;
+        }
+        //otherwise ignore the error
     }    
 
      getResponse();
@@ -261,9 +307,8 @@ function sendFile(){
 // document.getElementById("sendToServer").addEventListener("click",ping);
 
 function getResponse(){
-    var msg = "Waiting for response";
-    $('#response').empty();
-    $('#response').append("<p>" + msg + "</p>");
+    var msg = "Waiting for response...";
+    updateResponseDiv(msg);
 
     var response = "processing";
     var addr = getAddress(getItem('port'), 'fts');
@@ -275,6 +320,11 @@ function getResponse(){
         console.log(response);
     } catch(err) {
         console.log(err);
+        if(err.name == "NETWORK_ERR") {
+            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
+            updateResponseDiv("Error");
+            return;
+        }
     }
 
     //poll for response once a second
@@ -287,15 +337,12 @@ function getResponse(){
 // document.getElementById("getResponse").addEventListener("click",getResponse);
 
 function askServer() {
-    if(audio || image) {
-        var sending = "Sending...";
-        $('#response').empty();
-        $('#response').append("<p>" + sending + "</p>");
+    if(audio || image || text) {
+        updateResponseDiv("Sending...");
         sendFile();
-
     } else {
-        console.log("Nothing recorded!");
-        navigator.notification.alert('Nothing recorded!', null, 'Oops!');
+        console.log("Nothing to send!");
+        navigator.notification.alert('Nothing to send!', null, 'Oops!');
     }
 }
 document.getElementById("askServer").addEventListener("click",askServer);
@@ -389,9 +436,8 @@ function getAddress(port, destination) {
 // }
 
 function processResponse(data) {
-    $('#response').empty();
     if(data) {
-        $('#response').append("<p>" + data + "</p>");
+        updateResponseDiv(data);
         TTS.speak({
             text: String(data),
             locale: 'en-GB',
@@ -402,7 +448,7 @@ function processResponse(data) {
             navigator.notification.alert(reason, null, 'Uh oh!');
         });
     } else {
-        $('#response').append("<p>Response is empty</p>");
+        updateResponseDiv("Response is empty");
     }
 }
 

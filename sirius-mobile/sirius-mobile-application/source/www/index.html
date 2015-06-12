@@ -49,13 +49,14 @@
                 <label for="qa">QA: </label><input type="text" id="qa" name="qa" size="5" onchange="updateDefaults(this.id, this.value)" /> <br> -->
             </div>
             <br>
-            <textarea id="question" rows="3" style="margin: 5px" placeholder="Ask your question"></textarea>
+            <textarea id="question" rows="3" placeholder="Type your question" onchange="updateText(this.value)"></textarea>
+            <p>OR</p>
             <button class="btn" id="captureImage">Capture Image</button>
             <button class="btn" id="captureAudio">Capture Audio</button> 
             <!-- <button class="btn" id="getImage">Choose Image</button> -->
             
-            <div id="image_file"></div>
             <br>
+            <div id="image_file"></div>
             <div id="audio_file"></div> 
             <br>
 
