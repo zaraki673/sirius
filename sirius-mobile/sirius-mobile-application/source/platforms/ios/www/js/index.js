@@ -38,7 +38,7 @@ var app = {
 
 app.initialize();
 
-var image, audio, encodedData;
+var image, audio, encodedAudioData = "", encodedImageData = "", text = "";
 var storage = window.localStorage;
 var mediaTimer = null;
 var media = null;
@@ -57,6 +57,42 @@ function updateDefaults(key, value) {
     storage.setItem(key, value);
 }
 
+function updateText(value) {
+    text = value;
+}
+
+function updateResponseDiv(value) {
+    $('#response').empty();
+    $('#response').append("<p>" + value + "</p>");
+}
+
+function clear() {
+    //variables
+    clearAudio();
+    clearImage();
+    clearText();
+    console.log("all media removed");
+}
+
+function clearAudio() {
+    console.log("audio cleared");
+    audio = null;
+    encodedAudioData = "";
+    $('#audio_file').empty();
+}
+
+function clearImage() {
+    console.log("image cleared");
+    image = null;
+    encodedImageData = "";
+    $('#image_file').empty();
+}
+
+function clearText() {
+    text = "";
+    $('#question').value = "";
+}
+
 // Called when capture operation is finished
 function captureImageSuccess(mediaFiles) {
     var i, len;
@@ -65,6 +101,9 @@ function captureImageSuccess(mediaFiles) {
         image = mediaFiles[i];
         $('#image_file').empty();
         $('#image_file').append(image.name);
+        $('#image_file').append("<button class='btnX' id='clearImage' style='margin-left:5px'>X</button>");
+        document.getElementById("clearImage").addEventListener("click",clearImage);
+        getFS(image, "audio");
     }
 }
 
@@ -73,12 +112,13 @@ function captureAudioSuccess(mediaFiles) {
     for (i = 0, len = mediaFiles.length; i < len; i += 1) {
         //uploadFile(mediaFiles[i]);
         audio = mediaFiles[i];
-        $('#question').value = "";
         $('#audio_file').empty();
         $('#audio_file').append(audio.name);
         $('#audio_file').append("<button class='btn2' id='playAudio' style='margin-left:3px'>Play</button>");
+        $('#audio_file').append("<button class='btnX' id='clearAudio' style='margin-left:5px'>X</button>");
         document.getElementById("playAudio").addEventListener("click",playAudio);
-
+        document.getElementById("clearAudio").addEventListener("click",clearAudio);
+        getFS(audio, "audio");
         // $('#audio_file').append("<button class='btn2' id='pauseAudio'>Pause</button>");
         // $('#audio_file').append("<button class='btn2' id='stopAudio'>Stop</button>");
         // <p id='audio_position'></p>
@@ -158,25 +198,39 @@ function getFS(file, type){
 }
 
 function gotFSAudio(fileSystem) {
-    fileSystem.root.getFile(audio.name, null, gotFileEntry, fail);
+    fileSystem.root.getFile(audio.name, null, gotAudioEntry, fail);
 }
 
 function gotFSImage(fileSystem) {
-    fileSystem.root.getFile(image.name, null, gotFileEntry, fail);
+    fileSystem.root.getFile(image.name, null, gotImageEntry, fail);
 }
 
-function gotFileEntry(fileEntry) {
-    fileEntry.file(readDataUrl, fail);
+function gotAudioEntry(fileEntry) {
+    fileEntry.file(readDataUrlAudio, fail);
 }
 
-function readDataUrl(file) {
+function gotImageEntry(fileEntry) {
+    fileEntry.file(readDataUrlImage, fail);
+}
+
+function readDataUrlAudio(file) {
     var reader = new FileReader();
     reader.onloadend = function(evt) {
         console.log("Read as data URL");
         console.log(evt.target.result);
-        encodedData = String(evt.target.result);
-        encodedData = encodedData.replace(encodedData.substr(0, encodedData.search(",") + 1), "");
-        sendFile();
+        encodedAudioData = String(evt.target.result);
+        encodedAudioData = encodedAudioData.replace(encodedAudioData.substr(0, encodedAudioData.search(",") + 1), "");
+    };
+    reader.readAsDataURL(file);
+}
+
+function readDataUrlImage(file) {
+    var reader = new FileReader();
+    reader.onloadend = function(evt) {
+        console.log("Read as data URL");
+        encodedImageData = String(evt.target.result);
+        encodedImageData = encodedImageData.replace(encodedImageData.substr(0, encodedImageData.search(",") + 1), "");
+        console.log(encodedImageData);
     };
     reader.readAsDataURL(file);
 }
@@ -194,40 +248,53 @@ function sendFile(){
         var protocol  = new Thrift.TJSONProtocol(transport);
         var client = new FileTransferSvcClient(protocol);
 
+
         var qType = new QueryType();
-        qType.ASR = true;
-        qType.IMM = false;
+        qType.ASR = !!audio;
+        qType.IMM = !!image;
         qType.QA = true;
 
-        var audioFile = new File();
+        // var audioFile = new File();
         // audioFile.file = encodedData;
         // audioFile.b64format = true;
 
-        var txtFile = new File();
-        var immFile = new File();
+        // var txtFile = new File();
+        // var immFile = new File();
 
         var qData = new QueryData();
-        qData.audioFile = encodedData;
-        qData.textFile = '';
-        qData.imgFile = '';
+        qData.audioFile = encodedAudioData;
+        qData.imgFile = encodedImageData;
+        qData.textFile = text;
 
         // var qData = new QueryData();
         // qData.audioFile = audioFile;
         // qData.textFile = txtFile;
         // qData.imgFile = immFile;
 
+        // console.log("sending to client");
         client.send_file(qData, qType, window.device.uuid);
     } catch(err) {
         console.log(err);
-    }
+        //could not connect to server
+        if(err.name == "NETWORK_ERR") {
+            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
+            updateResponseDiv("Error");
+            return;
+        } else if(err.name == "TIMEOUT_ERR") {
+            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
+            updateResponseDiv("Error");
+            return;
+        }
+        //otherwise ignore the error
+    }    
 
-    getResponse();
+     getResponse();
 }
 // document.getElementById("thriftMessage").addEventListener("click",getFS);
 
 // function ping(){
 //     console.log("Pinging server");
-//     var addr = getAddress(8585) + '/fts';
+//     var addr = getAddress(getItem('port'), 'fts');
 //     console.log(addr);
 //     var transport = new Thrift.TXHRTransport(addr);
 //     var protocol  = new Thrift.TJSONProtocol(transport);
@@ -243,10 +310,12 @@ function sendFile(){
 // }
 // document.getElementById("sendToServer").addEventListener("click",ping);
 
-function getResponse(){
-    var msg = "Waiting for response";
-    $('#response').empty();
-    $('#response').append("<p>" + msg + "</p>");
+var timeoutFunc;
+
+function getResponse() {
+    var msg = "Waiting for response...    <button class='btnX' id='cancelRequest' style='margin-left:5px'>X</button>";
+    updateResponseDiv(msg);
+    document.getElementById("cancelRequest").addEventListener("click",cancelRequest);
 
     var response = "processing";
     var addr = getAddress(getItem('port'), 'fts');
@@ -258,27 +327,38 @@ function getResponse(){
         console.log(response);
     } catch(err) {
         console.log(err);
+        if(err.name == "NETWORK_ERR") {
+            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
+            updateResponseDiv("Error");
+            return;
+        } else if(err.name == "TIMEOUT_ERR") {
+            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
+            updateResponseDiv("Error");
+            return;
+        }
     }
 
     //poll for response once a second
     if(response == "processing") {
-        setTimeout(getResponse, 1000);
+        timeoutFunc = setTimeout(getResponse, 1000);
     } else {
         processResponse(response);
     }
 }
+
+function cancelRequest() {
+    clearTimeout(timeoutFunc);
+    updateResponseDiv("Request Canceled");
+}
 // document.getElementById("getResponse").addEventListener("click",getResponse);
 
 function askServer() {
-    if(audio) {
-        var sending = "Sending...";
-        $('#response').empty();
-        $('#response').append("<p>" + sending + "</p>");
-        getFS(audio, "audio");
-
+    if(audio || image || text) {
+        updateResponseDiv("Sending...");
+        sendFile();
     } else {
-        console.log("Nothing recorded!");
-        navigator.notification.alert('Nothing recorded!', null, 'Oops!');
+        console.log("Nothing to send!");
+        navigator.notification.alert('Nothing to send!', null, 'Oops!');
     }
 }
 document.getElementById("askServer").addEventListener("click",askServer);
@@ -372,9 +452,8 @@ function getAddress(port, destination) {
 // }
 
 function processResponse(data) {
-    $('#response').empty();
     if(data) {
-        $('#response').append("<p>" + data + "</p>");
+        updateResponseDiv(data);
         TTS.speak({
             text: String(data),
             locale: 'en-GB',
@@ -385,7 +464,7 @@ function processResponse(data) {
             navigator.notification.alert(reason, null, 'Uh oh!');
         });
     } else {
-        $('#response').append("<p>Response is empty</p>");
+        updateResponseDiv("Response is empty");
     }
 }
 

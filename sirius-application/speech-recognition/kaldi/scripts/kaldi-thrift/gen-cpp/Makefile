@@ -7,13 +7,13 @@ LINK_FLAGS = -lthrift \
 	     -lsox
 
 # Needed for finding header files during preprocessing
-#INCLUDES_DIR = /home/tollben/sirius/sirius-application/command-center/gen-cpp
+INCLUDES_DIR = /home/tollben/sirius/sirius-application/command-center/gen-cpp
 
-#CMDOBJECT_SERVER = /home/tollben/sirius/sirius-application/command-center/gen-cpp/CommandCenter.o \
+CMDOBJECT_SERVER = /home/tollben/sirius/sirius-application/command-center/gen-cpp/CommandCenter.o \
 		/home/tollben/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.o 
 
-INCLUDES_DIR = /home/momo/Research/sirius/sirius-application/command-center/gen-cpp
-CMDOBJECT_SERVER = /home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.o \
+#INCLUDES_DIR = /home/momo/Research/sirius/sirius-application/command-center/gen-cpp
+#CMDOBJECT_SERVER = /home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.o \
 		/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.o 
 
 OBJECTS_CLIENT = KaldiService.o Kaldi_Client.o
