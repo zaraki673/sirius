@@ -103,7 +103,7 @@ function captureImageSuccess(mediaFiles) {
         $('#image_file').append(image.name);
         $('#image_file').append("<button class='btnX' id='clearImage' style='margin-left:5px'>X</button>");
         document.getElementById("clearImage").addEventListener("click",clearImage);
-        getFS(image, "audio");
+        getFS(image, "image");
     }
 }
 
@@ -219,7 +219,6 @@ function readDataUrlAudio(file) {
         console.log("Read as data URL");
         console.log(evt.target.result);
         encodedAudioData = String(evt.target.result);
-        encodedAudioData = encodedAudioData.replace(encodedAudioData.substr(0, encodedAudioData.search(",") + 1), "");
     };
     reader.readAsDataURL(file);
 }
@@ -229,7 +228,7 @@ function readDataUrlImage(file) {
     reader.onloadend = function(evt) {
         console.log("Read as data URL");
         encodedImageData = String(evt.target.result);
-        encodedImageData = encodedImageData.replace(encodedImageData.substr(0, encodedImageData.search(",") + 1), "");
+        
         console.log(encodedImageData);
     };
     reader.readAsDataURL(file);
@@ -249,38 +248,37 @@ function sendFile(){
         var client = new FileTransferSvcClient(protocol);
 
 
-        var qType = new QueryType();
-        qType.ASR = !!audio;
-        qType.IMM = !!image;
-        qType.QA = true;
+        // var qType = new QueryType();
+        // qType.ASR = !!audio;
+        // qType.IMM = !!image;
+        // qType.QA = true;
 
-        // var audioFile = new File();
-        // audioFile.file = encodedData;
-        // audioFile.b64format = true;
-
-        // var txtFile = new File();
-        // var immFile = new File();
+        var audioFormat = "", imageFormat = "";
+        if(encodedAudioData) {
+            var substr = encodedAudioData.substr(0, encodedAudioData.indexOf(",") + 1);
+            var audioFormat = substr.substr(substr.indexOf("/") + 1, substr.indexOf(";")  - substr.indexOf("/") - 1);
+            encodedAudioData = encodedAudioData.replace(substr, "");
+        } if(encodedImageData) {
+            var substr = encodedImageData.substr(0, encodedImageData.indexOf(",") + 1);
+            var imageFormat = substr.substr(substr.indexOf("/") + 1, substr.indexOf(";") - substr.indexOf("/") - 1);
+            encodedImageData = encodedImageData.replace(substr, "");
+        }
 
         var qData = new QueryData();
-        qData.audioFile = encodedAudioData;
-        qData.imgFile = encodedImageData;
-        qData.textFile = text;
+        qData.audioData = encodedAudioData;
+        qData.audioFormat = audioFormat;
+        qData.audioB64Encoding = true;
+        qData.imgData = encodedImageData;
+        qData.imgFormat = imageFormat;
+        qData.imgB64Encoding = true;
+        qData.textData = text;
 
-        // var qData = new QueryData();
-        // qData.audioFile = audioFile;
-        // qData.textFile = txtFile;
-        // qData.imgFile = immFile;
-
-        // console.log("sending to client");
-        client.send_file(qData, qType, window.device.uuid);
+        console.log(qData);
+        client.send_file(qData, window.device.uuid);
     } catch(err) {
         console.log(err);
         //could not connect to server
-        if(err.name == "NETWORK_ERR") {
-            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
-            updateResponseDiv("Error");
-            return;
-        } else if(err.name == "TIMEOUT_ERR") {
+        if(err.name == "NETWORK_ERR" || err.name == "TIMEOUT_ERR") {
             navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
             updateResponseDiv("Error");
             return;
@@ -328,15 +326,11 @@ function getResponse() {
         console.log(response);
     } catch(err) {
         console.log(err);
-        if(err.name == "NETWORK_ERR") {
+        if(err.name == "NETWORK_ERR" || err.name == "TIMEOUT_ERR") {
             navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
             updateResponseDiv("Error");
             return;
-        } else if(err.name == "TIMEOUT_ERR") {
-            navigator.notification.alert('There was a problem connecting to the server', null, 'Connection Error');
-            updateResponseDiv("Error");
-            return;
-        }
+        } 
     }
 
     //poll for response once a second

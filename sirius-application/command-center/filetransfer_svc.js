@@ -10,7 +10,7 @@ var ftsHandler = {
 		result(null, "Hello from server");
 	},
 
-	send_file: function(data, qType, uuid) {
+	send_file: function(data, uuid) {
 		console.log("Client message recieved");
 		//data = data.replace(data.substr(0, data.search(",") + 1), "");
 		// console.log(data);
@@ -43,7 +43,6 @@ var ftsHandler = {
 		*/
 
 		client.handleRequest(
-			qType,
 			data,
 			function(err, response) {
 			  console.log('ANSWER = ' + response);
