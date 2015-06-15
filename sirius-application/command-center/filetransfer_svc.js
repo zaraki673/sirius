@@ -14,9 +14,9 @@ var ftsHandler = {
 		console.log("Client message recieved");
 		//data = data.replace(data.substr(0, data.search(",") + 1), "");
 		// console.log(data);
-		//var buffer = new Buffer(data, 'base64');
+		var buffer = new Buffer(data, 'base64');
 		// console.log(buffer);
-		var connection = thrift.createConnection("localhost", 8081);
+		var connection = thrift.createConnection("localhost", cmdcenterport);
 		var client = thrift.createClient(CCDaemon, connection);
 
 		/*var qType = new QueryType();
@@ -80,6 +80,7 @@ var ServerOptions = {
 }
 
 var server = thrift.createWebServer(ServerOptions);
-var port = 8585;
+var port = process.argv[2]; //8585
+var cmdcenterport = process.argv[3]; //8081
 server.listen(port);
 console.log("Http/Thrift Server running on port: " + port);

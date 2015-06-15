@@ -13,3 +13,4 @@ ccserver
 *.js
 /js/**
 /archive/**
+/node_modules/**
