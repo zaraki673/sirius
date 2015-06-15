@@ -242,10 +242,10 @@ function sendFile(){
     console.log("Sending file");
     
     try {
-        // var addr = getAddress(getItem('port'), 'fts');
-        // var transport = new Thrift.TXHRTransport(addr);
-        // var protocol  = new Thrift.TJSONProtocol(transport);
-        // var client = new FileTransferSvcClient(protocol);
+        var addr = getAddress(getItem('port'), 'fts');
+        var transport = new Thrift.TXHRTransport(addr);
+        var protocol  = new Thrift.TJSONProtocol(transport);
+        var client = new FileTransferSvcClient(protocol);
 
 
         // var qType = new QueryType();
@@ -273,9 +273,11 @@ function sendFile(){
         qData.imgB64Encoding = true;
         qData.textData = text;
 
+        var d = new Date();
+        var uuid = window.device.uuid + d.getTime();
+        console.log(d.getTime());
         console.log(qData);
-        console.log("sending to client");
-        // client.send_file(qData, window.device.uuid);
+        client.send_file(qData, uuid);
     } catch(err) {
         console.log(err);
         //could not connect to server
@@ -287,7 +289,7 @@ function sendFile(){
         //otherwise ignore the error
     }    
 
-     getResponse();
+     getResponse(uuid);
 }
 // document.getElementById("thriftMessage").addEventListener("click",getFS);
 
@@ -311,11 +313,11 @@ function sendFile(){
 
 var timeoutFunc;
 
-function getResponse() {
-    var msg = "Waiting for response...";
-    // var msg = "Waiting for response...    <button class='btnX' id='cancelRequest' style='margin-left:5px'>X</button>";
+function getResponse(uuid) {
+    // var msg = "Waiting for response...";
+    var msg = "Waiting for response...    <button class='btnX' id='cancelRequest' style='margin-left:5px'>X</button>";
     updateResponseDiv(msg);
-    // document.getElementById("cancelRequest").addEventListener("click",cancelRequest);
+    document.getElementById("cancelRequest").addEventListener("click",cancelRequest);
 
     var response = "processing";
     var addr = getAddress(getItem('port'), 'fts');
@@ -323,7 +325,7 @@ function getResponse() {
     var protocol  = new Thrift.TJSONProtocol(transport);
     var client = new FileTransferSvcClient(protocol);
     try{
-        response = client.get_response(window.device.uuid); 
+        response = client.get_response(uuid); 
         console.log(response);
     } catch(err) {
         console.log(err);
@@ -336,7 +338,9 @@ function getResponse() {
 
     //poll for response once a second
     if(response == "processing") {
-        timeoutFunc = setTimeout(getResponse, 1000);
+        timeoutFunc = setTimeout(function() { 
+            getResponse(uuid); 
+        }, 1000);
     } else {
         processResponse(response);
     }

@@ -90,14 +90,10 @@ FileTransferSvc_ping_result.prototype.write = function(output) {
 
 FileTransferSvc_send_file_args = function(args) {
   this.data = null;
-  this.qType = null;
   this.uuid = null;
   if (args) {
     if (args.data !== undefined) {
       this.data = args.data;
-    }
-    if (args.qType !== undefined) {
-      this.qType = args.qType;
     }
     if (args.uuid !== undefined) {
       this.uuid = args.uuid;
@@ -127,14 +123,6 @@ FileTransferSvc_send_file_args.prototype.read = function(input) {
       }
       break;
       case 2:
-      if (ftype == Thrift.Type.STRUCT) {
-        this.qType = new QueryType();
-        this.qType.read(input);
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      case 3:
       if (ftype == Thrift.Type.STRING) {
         this.uuid = input.readString().value;
       } else {
@@ -157,13 +145,8 @@ FileTransferSvc_send_file_args.prototype.write = function(output) {
     this.data.write(output);
     output.writeFieldEnd();
   }
-  if (this.qType !== null && this.qType !== undefined) {
-    output.writeFieldBegin('qType', Thrift.Type.STRUCT, 2);
-    this.qType.write(output);
-    output.writeFieldEnd();
-  }
   if (this.uuid !== null && this.uuid !== undefined) {
-    output.writeFieldBegin('uuid', Thrift.Type.STRING, 3);
+    output.writeFieldBegin('uuid', Thrift.Type.STRING, 2);
     output.writeString(this.uuid);
     output.writeFieldEnd();
   }
@@ -360,18 +343,17 @@ FileTransferSvcClient.prototype.recv_ping = function() {
   }
   throw 'ping failed: unknown result';
 };
-FileTransferSvcClient.prototype.send_file = function(data, qType, uuid, callback) {
-  this.send_send_file(data, qType, uuid, callback); 
+FileTransferSvcClient.prototype.send_file = function(data, uuid, callback) {
+  this.send_send_file(data, uuid, callback); 
   if (!callback) {
   this.recv_send_file();
   }
 };
 
-FileTransferSvcClient.prototype.send_send_file = function(data, qType, uuid, callback) {
+FileTransferSvcClient.prototype.send_send_file = function(data, uuid, callback) {
   this.output.writeMessageBegin('send_file', Thrift.MessageType.CALL, this.seqid);
   var args = new FileTransferSvc_send_file_args();
   args.data = data;
-  args.qType = qType;
   args.uuid = uuid;
   args.write(this.output);
   this.output.writeMessageEnd();
