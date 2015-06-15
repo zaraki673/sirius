@@ -12,3 +12,4 @@ ccserver
 *.html
 *.js
 /js/**
+/archive/**
