@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 		string image_file(ostrm_image.str());
 		// TODO: this initialization is stupid, but thrift doesn't
 		// generate more helpful ctors
-		QueryType qTypeObj; //TODO
+		/*QueryType qTypeObj; //TODO
 		qTypeObj.ASR = true;
 		qTypeObj.QA = false;
 		qTypeObj.IMM = false;
@@ -63,30 +63,31 @@ int main(int argc, char **argv) {
 		asrqaimm_qTypeObj.ASR = true;
 		asrqaimm_qTypeObj.QA = true;
 		asrqaimm_qTypeObj.IMM = true;
+		*/
 
 		QueryData capital_italy;
-		capital_italy.audioFile = capital_italy_audio_file;
-		capital_italy.textFile = "";
-		capital_italy.imgFile = "";
+		capital_italy.audioData = capital_italy_audio_file;
+		capital_italy.textData = "";
+		capital_italy.imgData = "";
 
 		QueryData how_tall;
-		how_tall.audioFile = how_tall_audio_file;
-		how_tall.textFile = "";
-		how_tall.imgFile = image_file;
+		how_tall.audioData = how_tall_audio_file;
+		how_tall.textData = "";
+		how_tall.imgData = image_file;
 
 		transport->open();
 		//client.askTextQuestion(answer, question);
 
 		cout << "///// ASR /////" << endl;
-		client.handleRequest(answer, qTypeObj, capital_italy);
+		client.handleRequest(answer, capital_italy);
 		cout << "ANSWER = " << answer << endl;
 
 		cout << "///// ASR-QA /////" << endl;
-		client.handleRequest(answer, asrqa_qTypeObj, capital_italy);
+		client.handleRequest(answer, capital_italy);
 		cout << "ANSWER = " << answer << endl;
 
 		cout << "\n///// ASR-QA-IMM /////" << endl;
-		client.handleRequest(answer, asrqaimm_qTypeObj, how_tall);
+		client.handleRequest(answer, how_tall);
 		cout << "ANSWER = " << answer << endl;
 
 		transport->close();
