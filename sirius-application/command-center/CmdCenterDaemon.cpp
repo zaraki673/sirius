@@ -126,11 +126,12 @@ public:
 		std::string binary_audio = data.audioFile;
 		std::string binary_img = data.imgFile;
 		
-		cout << "Decoding audio..." << endl;
+		/*cout << "Decoding audio..." << endl;
 		binary_audio = base64_decode(data.audioFile);
 		
 		cout << "Decoding img..." << endl;
 		binary_img = base64_decode(data.imgFile);
+		*/
 /*
 		if (data.audioFile.b64format)
 		{
@@ -425,19 +426,18 @@ int main(int argc, char **argv) {
 	// Initialize the command center server.
 	// The server listens for packets transmitted via <transport> in <protocol> format.
 	// The processor handles serialization/deserialization and communication w/ handler.
-	TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
+	//TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
 	//TSimpleServer server(multiplexed_processor, serverTransport, transportFactory, protocolFactory);
 
 
 	// initialize the thread manager and factory
-	/*boost::shared_ptr<ThreadManager> threadManager = ThreadManager::newSimpleThreadManager(THREAD_WORKS);
+	boost::shared_ptr<ThreadManager> threadManager = ThreadManager::newSimpleThreadManager(THREAD_WORKS);
 	boost::shared_ptr<PosixThreadFactory> threadFactory = boost::shared_ptr<PosixThreadFactory>(new PosixThreadFactory());
 	threadManager->threadFactory(threadFactory);
 	threadManager->start();
 
 	// initialize the image matching server
 	TThreadPoolServer server(processor, serverTransport, transportFactory, protocolFactory, threadManager);
-	*/
 	cout << "Starting the command center server on port " << port << "..." << endl;
 	server.serve();
 	cout << "Done." << endl;
