@@ -18,13 +18,14 @@
 #include <fstream>
 #include <sstream>
 #include <sox.h>
+#include <cstdlib> //07-12-15 for arg passing
 
 #include "KaldiService.h"
 #include "subproc.h"
-//#include "CommandCenter.h"
-//#include "commandcenter_types.h"
-#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.h"
-#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.h"
+#include "CommandCenter.h"
+#include "commandcenter_types.h"
+//#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.h"
+//#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
@@ -175,15 +176,33 @@ int main(int argc, char **argv) {
 					"ark:/dev/null",(char*)NULL};
 	
 
-  int port = 9090;
-   //Register with the command center 
+	int port = 9090;
+	//Register with the command center 
 	int cmdcenterport = 8081;
+	if (argv[1])
+	{
+		port = atoi(argv[1]);
+	}
+	else
+	{
+		std::cout << "Using default port for asr..." << std::endl;
+	}
+
+	if (argv[2])
+	{
+		cmdcenterport = atoi(argv[2]);
+	}
+	else
+	{
+		std::cout << "Using default port for cc..." << std::endl;
+	}
+
 	boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
 	boost::shared_ptr<TTransport> cmdtransport(new TBufferedTransport(cmdsocket));
 	boost::shared_ptr<TProtocol> cmdprotocol(new TBinaryProtocol(cmdtransport));
 	CommandCenterClient cmdclient(cmdprotocol);
 	cmdtransport->open();	
-	std::cout<<"Registering automatic speech recognition server with command center..."<<std::endl;
+	std::cout << "Registering automatic speech recognition server with command center..."<<std::endl;
 	MachineData mDataObj;
 	mDataObj.name="localhost";
 	mDataObj.port=port;

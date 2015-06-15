@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./imserver >> server.log
+./imserver $1 $2 >> server.log

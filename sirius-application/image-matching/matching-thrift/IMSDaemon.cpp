@@ -23,6 +23,7 @@
 #include <string>
 #include <fstream>
 #include <sys/time.h>
+#include <cstdlib> // 06-12-15 for taking cmd line args
 
 // import the service headers
 #include "ImageMatchingService.h"
@@ -73,6 +74,24 @@ int main(int argc, char **argv){
   int port = 9082;
   //Register with the command center 
   int cmdcenterport = 8081;
+  if (argv[1])
+  {
+	port = atoi(argv[1]);
+  }
+  else
+  {
+	std::cout << "Using default port for imm..." << std::endl;
+  }
+
+  if (argv[2])
+  {
+	cmdcenterport = atoi(argv[2]);
+  }
+  else
+  {
+	std::cout << "Using default port for cc..." << std::endl;
+  }
+
   boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
   boost::shared_ptr<TTransport> cmdtransport(new TBufferedTransport(cmdsocket));
   boost::shared_ptr<TProtocol> cmdprotocol(new TBinaryProtocol(cmdtransport));
@@ -87,7 +106,7 @@ int main(int argc, char **argv){
 
 	// initial the transport factory
 	boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-	boost::shared_ptr<TServerTransport> serverTransport(new TServerSocket(9082));
+	boost::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
 	// initial the protocal factory
 	boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 	// initial the request handler
