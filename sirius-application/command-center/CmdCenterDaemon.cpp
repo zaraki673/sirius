@@ -83,6 +83,7 @@ public:
 	CommandCenterHandler()
 	{
 		registeredServices = std::multimap<std::string, MachineData>();
+		
 	}
 
 	// (dtor defined in CommandCenter.h)
@@ -116,33 +117,33 @@ public:
 		}*/
 	}
 
-	virtual void handleRequest(std::string& _return, const QueryType& qTypeObj, const QueryData& data)
+	virtual void handleRequest(std::string& _return, const QueryData& data)
 	{
 		cout << "/-----handleRequest()-----/" << endl;
 
 		// TODO: refactor
 		//---- Select the data to be passed to the services ----//
 		// TODO: THIS BREAKS MY COMMAND CENTER CLIENT TESTS
-		std::string binary_audio = data.audioFile;
-		std::string binary_img = data.imgFile;
+		std::string binary_audio = data.audioData;
+		std::string binary_img = data.imgData;
 		
-		/*cout << "Decoding audio..." << endl;
-		binary_audio = base64_decode(data.audioFile);
+		cout << "Decoding audio..." << endl;
+		binary_audio = base64_decode(data.audioData);
 		
 		cout << "Decoding img..." << endl;
-		binary_img = base64_decode(data.imgFile);
-		*/
+		binary_img = base64_decode(data.imgData);
+		
 /*
-		if (data.audioFile.b64format)
+		if (data.audioData.b64format)
 		{
 			cout << "Decoding audio..." << endl;
-			binary_audio = base64_decode(data.audioFile.file);
+			binary_audio = base64_decode(data.audioData.file);
 		}
 
-		if (data.imgFile.b64format)
+		if (data.imgData.b64format)
 		{
 			cout << "Decoding img..." << endl;
-			binary_img = base64_decode(data.imgFile.file);
+			binary_img = base64_decode(data.imgData.file);
 		}
 */
 		// NOTE: hard to break this up, b/c you need to pass the N clients around
@@ -169,7 +170,7 @@ public:
 		boost::shared_ptr<TProtocol> imm_protocol(new TBinaryProtocol(imm_transport));
 		ImageMatchingServiceClient imm_client(imm_protocol);
 
-		if (qTypeObj.ASR)
+		if (data.audioData != "")
 		{
 			it = registeredServices.find("ASR");
 			if (it != registeredServices.end())
@@ -195,8 +196,8 @@ public:
 				return;
 			}
 		}
-		if (qTypeObj.QA)
-		{
+		/*if (data.textData != "")
+		{*/
 			it = registeredServices.find("QA");
 			if (it != registeredServices.end())
 			{
@@ -221,8 +222,8 @@ public:
 				cout << _return << endl;
 				return;
 			}
-		}
-		if (qTypeObj.IMM)
+		//}
+		if (data.imgData != "")
 		{
 			it = registeredServices.find("IMM");
 			if (it != registeredServices.end())
@@ -254,7 +255,9 @@ public:
 		std::string immRetVal = "";
 		std::string question = "";
 		//std::string answer = "";
-		if (qTypeObj.ASR && qTypeObj.QA && qTypeObj.IMM)
+		// TODO: use nlp libs to distinguish between voice cmd
+		// and voice query
+		if ((data.audioData != "") && (data.imgData != ""))
 		{
 			cout << "Starting ASR-IMM-QA pipeline..." << endl;
 			//---Image matching
@@ -286,7 +289,7 @@ public:
 			qa_client.askFactoidThrift(_return, question);
 			qa_transport->close();
 		}
-		else if (qTypeObj.ASR && qTypeObj.QA)
+		else if (data.audioData != "")
 		{
 			cout << "Starting ASR-QA pipeline..." << endl;
 			asr_transport->open();
@@ -297,19 +300,19 @@ public:
 			qa_client.askFactoidThrift(_return, asrRetVal);
 			qa_transport->close();
 		}
-		else if (qTypeObj.ASR)
+		/*else if (data.audioData != "")
 		{
 			asr_transport->open();
 			asr_client.kaldi_asr(_return, binary_audio);
 			asr_transport->close();
-		}
-		else if (qTypeObj.QA)
+		}*/
+		else if (data.textData != "")
 		{
 			qa_transport->open();
-			qa_client.askFactoidThrift(_return, data.textFile);
+			qa_client.askFactoidThrift(_return, data.textData);
 			qa_transport->close();
 		}
-		else if (qTypeObj.IMM)
+		else if (data.imgData != "")
 		{
 			imm_transport->open();
 			imm_client.match_img(_return, binary_img);

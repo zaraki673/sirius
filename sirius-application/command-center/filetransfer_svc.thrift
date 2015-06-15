@@ -1,11 +1,11 @@
 # QueryType is the struct that clients send
 # to inform the command center of what services they need.
-struct QueryType
-{
-	1:bool ASR,
-	2:bool QA,
-	3:bool IMM
-}
+#struct QueryType
+#{
+#	1:bool ASR,
+#	2:bool QA,
+#	3:bool IMM
+#}
 
 # File contains the string info and the string's format
 #struct File
