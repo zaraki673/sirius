@@ -167,7 +167,13 @@ public:
 			cout << "Getting imm client" << endl;
 			//assign imm client
 			// ImmServiceData *imm = NULL;
-			assignService(sd, "IMM");
+			try {
+				assignService(sd, "IMM");
+			} catch(AssignmentFailedException exc) {
+				cout << exc.err << endl;
+				return;
+			}
+			
 			assert(sd);
 			imm = new ImmServiceData(sd);
 			cout << "ImmServiceData object constructed" << endl;
