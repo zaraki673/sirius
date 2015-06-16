@@ -61,10 +61,15 @@ public:
 class ServiceData
 {
 public:
-	ServiceData(std::string hostname, int port)
-	: socket(new TSocket(hostname, port)),
-	  transport(new TBufferedTransport(socket)),
-	  protocol(new TBinaryProtocol(transport)) {}
+	ServiceData(std::string hostname, int port) {
+	  	socket(new TSocket(hostname, port));
+	  	transport(new TBufferedTransport(socket));
+	  	protocol(new TBinaryProtocol(transport));
+	  	assert(socket || transport || protocol);
+	  	assert(socket);
+	  	assert(transport);
+	  	assert(protocol);
+	  }
 	ServiceData(ServiceData *sd) {
 	  	socket = sd->socket;
 	  	transport = sd->transport;
