@@ -69,13 +69,18 @@ public:
 	  	assert(socket);
 	  	assert(transport);
 	  	assert(protocol);
-	  }
+		cerr << "sd constructor 1!!!" << endl;
+	}
 	ServiceData(ServiceData *sd) {
 	  	socket = sd->socket;
 	  	transport = sd->transport;
 	  	protocol = sd->protocol;
-	  	cout << "sd constructor 2" << endl;
-	  }
+	  	assert(socket || transport || protocol);
+	  	assert(socket);
+	  	assert(transport);
+	  	assert(protocol);
+	  	cerr << "sd constructor 2" << endl;
+	}
 	boost::shared_ptr<TTransport> socket;
 	boost::shared_ptr<TTransport> transport;
 	boost::shared_ptr<TProtocol> protocol;
@@ -85,7 +90,12 @@ class ImmServiceData : public ServiceData
 {
 public:
 	ImmServiceData(ServiceData *sd)
-	: ServiceData(sd), client(protocol) {}
+	: ServiceData(sd), client(protocol) {
+	  	assert(socket || transport || protocol);
+	  	assert(socket);
+	  	assert(transport);
+	  	assert(protocol);
+	}
 	ImageMatchingServiceClient client;
 };
 
@@ -158,6 +168,7 @@ public:
 			//assign imm client
 			// ImmServiceData *imm = NULL;
 			assignService(sd, "IMM");
+			assert(sd);
 			imm = new ImmServiceData(sd);
 			cout << "ImmServiceData object constructed" << endl;
 			//imm->client = new ImageMatchingServiceClient(imm->protocol);
