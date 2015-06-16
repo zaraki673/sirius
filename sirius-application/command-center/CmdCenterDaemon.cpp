@@ -58,8 +58,13 @@ public:
 	string err;
 };
 
-class ServiceData {
+class ServiceData
+{
 public:
+	ServiceData(std::string hostname, int port)
+	: socket(new TSocket(hostname, port)),
+	  transport(new TBufferedTransport(socket)),
+	  protocol(new TBinaryProtocol(transport)) {}
 	boost::shared_ptr<TTransport> socket;
 	boost::shared_ptr<TTransport> transport;
 	boost::shared_ptr<TProtocol> protocol;
@@ -69,11 +74,7 @@ class ImmServiceData : public ServiceData
 {
 public:
 	ImmServiceData(std::string hostname, int port)
-	: socket(new TSocket(hostname, port)),
-	  transport(new TBufferedTransport(socket)),
-	  protocol(new TBinaryProtocol(transport)),
-	  client(protocol) {}
-	
+	: ServiceData(hostname, port), client(protocol) {}
 	ImageMatchingServiceClient client;
 };
 
@@ -385,7 +386,7 @@ private:
 
 		return outstr;
 	}
-
+/*
 	void assignService(ServiceData *sd, const std::string type) {
 		//load balancer for service assignment
 		std::multimap<std::string, MachineData>::iterator it;
@@ -401,7 +402,7 @@ private:
 		}
 		
 	}
-
+*/
 };
 
 int main(int argc, char **argv) {
