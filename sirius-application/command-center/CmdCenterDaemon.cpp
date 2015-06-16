@@ -63,8 +63,8 @@ class ServiceData
 public:
 	ServiceData(std::string hostname, int port) {
 	  	socket = boost::shared_ptr<TTransport>(new TSocket(hostname, port));
-	  	transport(new TBufferedTransport(socket));
-	  	protocol(new TBinaryProtocol(transport));
+	  	transport = boost::shared_ptr<TTransport>(new TBufferedTransport(socket));
+	  	protocol = boost::shared_ptr<TTransport>(new TBinaryProtocol(transport));
 	  	assert(socket || transport || protocol);
 	  	assert(socket);
 	  	assert(transport);
