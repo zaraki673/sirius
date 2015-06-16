@@ -59,6 +59,7 @@ public:
 };
 
 class ServiceData {
+public:
 	boost::shared_ptr<TTransport> socket;
 	boost::shared_ptr<TTransport> transport;
 	boost::shared_ptr<TProtocol> protocol;
