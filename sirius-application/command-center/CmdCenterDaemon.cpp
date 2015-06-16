@@ -253,7 +253,7 @@ public:
 			cout << "Starting ASR-IMM-QA pipeline..." << endl;
 			//---Image matching
 			imm->transport->open();
-			imm->client.match_img(immRetVal, binary_img);
+			imm->client->match_img(immRetVal, binary_img);
 			imm->transport->close();
 			cout << "IMG = " << immRetVal << endl;
 			// image filename parsing
@@ -309,7 +309,7 @@ public:
 			imm_client.match_img(_return, binary_img);
 			imm_transport->close();*/
 			imm->transport->open();
-			imm->client.match_img(_return, binary_img);
+			imm->client->match_img(_return, binary_img);
 			imm->transport->close();
 		}
 		else
