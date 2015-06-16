@@ -50,6 +50,14 @@ using namespace qastubs;
 
 class BadImgFileException {};
 
+class AssignmentFailedException{
+public:
+	AssignmentFailedException(std::string msg) {
+		err = msg;
+	}
+	string err;
+};
+
 class ImmServiceData
 {
 public:
@@ -110,31 +118,28 @@ public:
 	{
 		cout << "/-----handleRequest()-----/" << endl;
 
-		// TODO: refactor
 		//---- Select the data to be passed to the services ----//
-		// TODO: THIS BREAKS MY COMMAND CENTER CLIENT TESTS
-		std::string binary_audio = data.audioData;
-		std::string binary_img = data.imgData;
+		std::string binary_audio, binary_img;
 		
-		cout << "Decoding audio..." << endl;
-		binary_audio = base64_decode(data.audioData);
-		
-		cout << "Decoding img..." << endl;
-		binary_img = base64_decode(data.imgData);
-		
-/*
-		if (data.audioData.b64format)
-		{
+		if(data.audioB64Encoding) {
 			cout << "Decoding audio..." << endl;
-			binary_audio = base64_decode(data.audioData.file);
+			binary_audio = base64_decode(data.audioData);	
+		} else {
+			binary_audio = data.audioData;
 		}
 
-		if (data.imgData.b64format)
-		{
+		if(data.imgB64Encoding) {
 			cout << "Decoding img..." << endl;
-			binary_img = base64_decode(data.imgData.file);
+			binary_img = base64_decode(data.imgData);
+		} else {
+			binary_img = data.imgData;
 		}
-*/
+
+		if(data.audioData != "") {
+			//assign asr client
+
+		}
+
 		// NOTE: hard to break this up, b/c you need to pass the N clients around
 		// I suppose you could use a struct
 		//----Select services based on the client's query----//
@@ -384,19 +389,45 @@ private:
 		return outstr;
 	}
 
-	/*void *imm_worker(void *arg)
-	{
-		//---Image matching
-		std::string immRetVal = "";
-		imm_transport->open();
-		imm_client.match_img(immRetVal, binary_img);
-		imm_transport->close();
-		cout << "IMG = " << immRetVal << endl;
-		// image filename parsing //TODO: exception handling
-		immRetVal = parseImgFile(immRetVal);
-		void *ret = 
-		return 
-	}*/
+	std::void assignService(ServiceData &sd, const std::string type) {
+		//load balancer for service assignment
+		it = registeredServices.find(type);
+		if (it != registeredServices.end()) {
+			boost::shared_ptr<TTransport> tmp_socket(
+				new TSocket((*it).second.name, (*it).second.port)
+			);
+			boost::shared_ptr<TTransport> tmp_transport(new TBufferedTransport(tmp_socket));
+			boost::shared_ptr<TProtocol> tmp_protocol(new TBinaryProtocol(tmp_transport));
+
+			sd.socket = tmp_socket;
+			sd.transport = tmp_transport;
+			sd.protocol = tmp_protocol;
+
+			if(type == "ASR") {
+				KaldiServiceClient tmp_client(tmp_protocol);
+				sd.client = tmp_client;
+			} else if (type == "IMM") {
+				ImageMatchingServiceClient tmp_client(tmp_protocol);
+				sd.client = tmp_client;
+			} else if (type == "QA") {
+				QAServiceClient tmp_client(qa_protocol);
+				sd.client = tmp_client;
+			} else {
+				string msg = type + " unknown. Unable to complete request.";
+				cout << msg << endl;
+				throw(AssignmentFailedException(msg));
+			}
+			
+			cout << "Selected " << (*it).second.name << ":" << (*it).second.port
+			     << " for " << type << " server" << endl;
+		} else {
+			string msg = type + " requested, but not found";
+			cout << msg << endl;
+			throw(AssignmentFailedException(type + " requested, but not found"));
+		}
+		
+	}
+
 };
 
 int main(int argc, char **argv) {
