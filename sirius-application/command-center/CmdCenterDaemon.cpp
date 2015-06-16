@@ -143,7 +143,7 @@ public:
 
 		if(data.imgData != "") {
 			//assign imm client
-			ImmServiceData *imm = nullptr;
+			ImmServiceData *imm = NULL;
 			assignService(imm, "IMM");
 			ImageMatchingServiceClient tmp_client(imm->protocol);
 			imm->client = tmp_client;
@@ -386,7 +386,7 @@ private:
 
 		return outstr;
 	}
-/*
+
 	void assignService(ServiceData *sd, const std::string type) {
 		//load balancer for service assignment
 		std::multimap<std::string, MachineData>::iterator it;
@@ -402,7 +402,7 @@ private:
 		}
 		
 	}
-*/
+
 };
 
 int main(int argc, char **argv) {
