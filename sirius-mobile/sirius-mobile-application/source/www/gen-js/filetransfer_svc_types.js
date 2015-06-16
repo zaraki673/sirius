@@ -87,85 +87,35 @@ QueryType.prototype.write = function(output) {
   return;
 };
 
-File = function(args) {
-  this.file = '';
-  this.b64format = false;
-  if (args) {
-    if (args.file !== undefined) {
-      this.file = args.file;
-    }
-    if (args.b64format !== undefined) {
-      this.b64format = args.b64format;
-    }
-  }
-};
-File.prototype = {};
-File.prototype.read = function(input) {
-  input.readStructBegin();
-  while (true)
-  {
-    var ret = input.readFieldBegin();
-    var fname = ret.fname;
-    var ftype = ret.ftype;
-    var fid = ret.fid;
-    if (ftype == Thrift.Type.STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 1:
-      if (ftype == Thrift.Type.STRING) {
-        this.file = input.readString().value;
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      case 2:
-      if (ftype == Thrift.Type.BOOL) {
-        this.b64format = input.readBool().value;
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      default:
-        input.skip(ftype);
-    }
-    input.readFieldEnd();
-  }
-  input.readStructEnd();
-  return;
-};
-
-File.prototype.write = function(output) {
-  output.writeStructBegin('File');
-  if (this.file !== null && this.file !== undefined) {
-    output.writeFieldBegin('file', Thrift.Type.STRING, 1);
-    output.writeString(this.file);
-    output.writeFieldEnd();
-  }
-  if (this.b64format !== null && this.b64format !== undefined) {
-    output.writeFieldBegin('b64format', Thrift.Type.BOOL, 2);
-    output.writeBool(this.b64format);
-    output.writeFieldEnd();
-  }
-  output.writeFieldStop();
-  output.writeStructEnd();
-  return;
-};
-
 QueryData = function(args) {
-  this.audioFile = null;
-  this.textFile = null;
-  this.imgFile = null;
+  this.audioData = '';
+  this.audioFormat = '';
+  this.audioB64Encoding = false;
+  this.imgData = '';
+  this.imgFormat = '';
+  this.imgB64Encoding = false;
+  this.textData = '';
   if (args) {
-    if (args.audioFile !== undefined) {
-      this.audioFile = args.audioFile;
+    if (args.audioData !== undefined) {
+      this.audioData = args.audioData;
     }
-    if (args.textFile !== undefined) {
-      this.textFile = args.textFile;
+    if (args.audioFormat !== undefined) {
+      this.audioFormat = args.audioFormat;
     }
-    if (args.imgFile !== undefined) {
-      this.imgFile = args.imgFile;
+    if (args.audioB64Encoding !== undefined) {
+      this.audioB64Encoding = args.audioB64Encoding;
+    }
+    if (args.imgData !== undefined) {
+      this.imgData = args.imgData;
+    }
+    if (args.imgFormat !== undefined) {
+      this.imgFormat = args.imgFormat;
+    }
+    if (args.imgB64Encoding !== undefined) {
+      this.imgB64Encoding = args.imgB64Encoding;
+    }
+    if (args.textData !== undefined) {
+      this.textData = args.textData;
     }
   }
 };
@@ -185,21 +135,49 @@ QueryData.prototype.read = function(input) {
     {
       case 1:
       if (ftype == Thrift.Type.STRING) {
-        this.audioFile = input.readString().value;
+        this.audioData = input.readString().value;
       } else {
         input.skip(ftype);
       }
       break;
       case 2:
       if (ftype == Thrift.Type.STRING) {
-        this.textFile = input.readString().value;
+        this.audioFormat = input.readString().value;
       } else {
         input.skip(ftype);
       }
       break;
       case 3:
+      if (ftype == Thrift.Type.BOOL) {
+        this.audioB64Encoding = input.readBool().value;
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 4:
       if (ftype == Thrift.Type.STRING) {
-        this.imgFile = input.readString().value;
+        this.imgData = input.readString().value;
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 5:
+      if (ftype == Thrift.Type.STRING) {
+        this.imgFormat = input.readString().value;
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 6:
+      if (ftype == Thrift.Type.BOOL) {
+        this.imgB64Encoding = input.readBool().value;
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 7:
+      if (ftype == Thrift.Type.STRING) {
+        this.textData = input.readString().value;
       } else {
         input.skip(ftype);
       }
@@ -215,19 +193,39 @@ QueryData.prototype.read = function(input) {
 
 QueryData.prototype.write = function(output) {
   output.writeStructBegin('QueryData');
-  if (this.audioFile !== null && this.audioFile !== undefined) {
-    output.writeFieldBegin('audioFile', Thrift.Type.STRING, 1);
-    output.writeString(this.audioFile);
+  if (this.audioData !== null && this.audioData !== undefined) {
+    output.writeFieldBegin('audioData', Thrift.Type.STRING, 1);
+    output.writeString(this.audioData);
     output.writeFieldEnd();
   }
-  if (this.textFile !== null && this.textFile !== undefined) {
-    output.writeFieldBegin('textFile', Thrift.Type.STRING, 2);
-    output.writeString(this.textFile);
+  if (this.audioFormat !== null && this.audioFormat !== undefined) {
+    output.writeFieldBegin('audioFormat', Thrift.Type.STRING, 2);
+    output.writeString(this.audioFormat);
     output.writeFieldEnd();
   }
-  if (this.imgFile !== null && this.imgFile !== undefined) {
-    output.writeFieldBegin('imgFile', Thrift.Type.STRING, 3);
-    output.writeString(this.imgFile);
+  if (this.audioB64Encoding !== null && this.audioB64Encoding !== undefined) {
+    output.writeFieldBegin('audioB64Encoding', Thrift.Type.BOOL, 3);
+    output.writeBool(this.audioB64Encoding);
+    output.writeFieldEnd();
+  }
+  if (this.imgData !== null && this.imgData !== undefined) {
+    output.writeFieldBegin('imgData', Thrift.Type.STRING, 4);
+    output.writeString(this.imgData);
+    output.writeFieldEnd();
+  }
+  if (this.imgFormat !== null && this.imgFormat !== undefined) {
+    output.writeFieldBegin('imgFormat', Thrift.Type.STRING, 5);
+    output.writeString(this.imgFormat);
+    output.writeFieldEnd();
+  }
+  if (this.imgB64Encoding !== null && this.imgB64Encoding !== undefined) {
+    output.writeFieldBegin('imgB64Encoding', Thrift.Type.BOOL, 6);
+    output.writeBool(this.imgB64Encoding);
+    output.writeFieldEnd();
+  }
+  if (this.textData !== null && this.textData !== undefined) {
+    output.writeFieldBegin('textData', Thrift.Type.STRING, 7);
+    output.writeString(this.textData);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
