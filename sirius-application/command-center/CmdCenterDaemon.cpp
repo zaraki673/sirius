@@ -48,33 +48,22 @@ using namespace apache::thrift::server;
 using namespace cmdcenterstubs;
 using namespace qastubs;
 
-/*class MachineData
+class BadImgFileException {};
+
+class ImmServiceData
 {
 public:
-	MachineData(const std::string& _machineName, const int32_t _port)
-		: machineName(_machineName), port(_port) {}
-	std::string getMachineName() { return machineName; }
-	int32_t getPort() { return port; }
+	ImmServiceData()
+	: socket(new TSocket("localhost", 8080)),
+	  transport(new TBufferedTransport(socket)),
+	  protocol(new TBinaryProtocol(transport)),
+	  client(protocol) {}
 private:
-	std::string machineName;
-	int32_t port;
+	boost::shared_ptr<TTransport> socket;
+	boost::shared_ptr<TTransport> transport;
+	boost::shared_ptr<TProtocol> protocol;
+	ImageMatchingServiceClient client;
 };
-
-struct Service
-{
-	std::string machine_name;
-	int32_t port;
-	std::string type;
-	Service(){};
-	Service(std::string machine_name_in, int32_t port_in, std::string type_in){
-		machine_name = machine_name_in;
-		port = port_in;
-		type = type_in;
-	}
-};
-*/
-
-class BadImgFileException {};
 
 class CommandCenterHandler : public CommandCenterIf
 {
@@ -164,11 +153,12 @@ public:
 		boost::shared_ptr<TTransport> qa_transport(new TBufferedTransport(qa_socket));
 		boost::shared_ptr<TProtocol> qa_protocol(new TBinaryProtocol(qa_transport));
 		QAServiceClient qa_client(qa_protocol);
-		
+
 		boost::shared_ptr<TTransport> imm_socket(new TSocket("localhost", 8080));
 		boost::shared_ptr<TTransport> imm_transport(new TBufferedTransport(imm_socket));
 		boost::shared_ptr<TProtocol> imm_protocol(new TBinaryProtocol(imm_transport));
 		ImageMatchingServiceClient imm_client(imm_protocol);
+		ImmServiceData imm;
 
 		if (data.audioData != "")
 		{
@@ -394,13 +384,19 @@ private:
 		return outstr;
 	}
 
-/*	
-	// command center's tables
-	Service qa;
-	Service imm;
-	Service asr;
-*/
-	
+	/*void *imm_worker(void *arg)
+	{
+		//---Image matching
+		std::string immRetVal = "";
+		imm_transport->open();
+		imm_client.match_img(immRetVal, binary_img);
+		imm_transport->close();
+		cout << "IMG = " << immRetVal << endl;
+		// image filename parsing //TODO: exception handling
+		immRetVal = parseImgFile(immRetVal);
+		void *ret = 
+		return 
+	}*/
 };
 
 int main(int argc, char **argv) {
