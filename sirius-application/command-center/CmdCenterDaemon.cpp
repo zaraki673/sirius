@@ -53,12 +53,11 @@ class BadImgFileException {};
 class ImmServiceData
 {
 public:
-	ImmServiceData()
-	: socket(new TSocket("localhost", 8080)),
+	ImmServiceData(std::string hostname, int port)
+	: socket(new TSocket(hostname, port)),
 	  transport(new TBufferedTransport(socket)),
 	  protocol(new TBinaryProtocol(transport)),
 	  client(protocol) {}
-private:
 	boost::shared_ptr<TTransport> socket;
 	boost::shared_ptr<TTransport> transport;
 	boost::shared_ptr<TProtocol> protocol;
@@ -153,12 +152,13 @@ public:
 		boost::shared_ptr<TTransport> qa_transport(new TBufferedTransport(qa_socket));
 		boost::shared_ptr<TProtocol> qa_protocol(new TBinaryProtocol(qa_transport));
 		QAServiceClient qa_client(qa_protocol);
-
+/*
 		boost::shared_ptr<TTransport> imm_socket(new TSocket("localhost", 8080));
 		boost::shared_ptr<TTransport> imm_transport(new TBufferedTransport(imm_socket));
 		boost::shared_ptr<TProtocol> imm_protocol(new TBinaryProtocol(imm_transport));
 		ImageMatchingServiceClient imm_client(imm_protocol);
-		ImmServiceData imm;
+*/
+		ImmServiceData *imm = NULL;
 
 		if (data.audioData != "")
 		{
@@ -218,6 +218,7 @@ public:
 			it = registeredServices.find("IMM");
 			if (it != registeredServices.end())
 			{
+				/*
 				boost::shared_ptr<TTransport> tmp_socket(
 					new TSocket((*it).second.name, (*it).second.port)
 				);
@@ -229,6 +230,8 @@ public:
 				imm_transport = tmp_transport;
 				imm_protocol = tmp_protocol;
 				imm_client = tmp_client;
+				*/
+				imm = new ImmServiceData((*it).second.name, (*it).second.port);
 				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 				     << " for IMM server" << endl;
 			}
@@ -251,9 +254,14 @@ public:
 		{
 			cout << "Starting ASR-IMM-QA pipeline..." << endl;
 			//---Image matching
+			/*
 			imm_transport->open();
 			imm_client.match_img(immRetVal, binary_img);
 			imm_transport->close();
+			*/
+			imm->transport->open();
+			imm->client.match_img(immRetVal, binary_img);
+			imm->transport->close();
 			cout << "IMG = " << immRetVal << endl;
 			// image filename parsing
 			try
@@ -304,9 +312,12 @@ public:
 		}
 		else if (data.imgData != "")
 		{
-			imm_transport->open();
+			/*imm_transport->open();
 			imm_client.match_img(_return, binary_img);
-			imm_transport->close();
+			imm_transport->close();*/
+			imm->transport->open();
+			imm->client.match_img(_return, binary_img);
+			imm->transport->close();
 		}
 		else
 		{
