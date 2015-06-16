@@ -420,7 +420,7 @@ private:
 		return outstr;
 	}
 
-	void assignService(ServiceData *sd, const std::string type) {
+	void assignService(ServiceData *&sd, const std::string type) {
 		//load balancer for service assignment
 		std::multimap<std::string, MachineData>::iterator it;
 		it = registeredServices.find(type);
