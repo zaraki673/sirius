@@ -395,9 +395,9 @@ private:
 		it = registeredServices.find(type);
 		if (it != registeredServices.end()) {
 			cout << "Constructing new service data pointer" << endl;
-			sd = new ServiceData((*it).second.name, (*it).second.port);
 			cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 			     << " for " << type << " server" << endl;
+			sd = new ServiceData((*it).second.name, (*it).second.port);
 		} else {
 			string msg = type + " requested, but not found";
 			cout << msg << endl;
