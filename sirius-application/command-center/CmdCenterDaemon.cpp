@@ -65,11 +65,11 @@ public:
 	: socket(new TSocket(hostname, port)),
 	  transport(new TBufferedTransport(socket)),
 	  protocol(new TBinaryProtocol(transport)) {}
-	ServiceData(ServiceData *sd) 
-	: socket(sd->socket),
-	  transport(sd->transport),
-	  protocol(sd->protocol) {
+	ServiceData(ServiceData *sd) {
 	  	cout << "sd constructor 2" << endl;
+	  	socket = sd->socket;
+	  	transport = sd->transport;
+	  	protocol = sd->protocol;
 	  }
 	boost::shared_ptr<TTransport> socket;
 	boost::shared_ptr<TTransport> transport;
