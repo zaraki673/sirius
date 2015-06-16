@@ -151,6 +151,7 @@ public:
 			//assign imm client
 			// ImmServiceData *imm = NULL;
 			assignService(sd, "IMM");
+			imm = new ImmServiceData(sd);
 			//imm->client = new ImageMatchingServiceClient(imm->protocol);
 			// ImageMatchingServiceClient tmp_client(imm->protocol);
 			// imm->client = tmp_client;
@@ -399,10 +400,9 @@ private:
 		std::multimap<std::string, MachineData>::iterator it;
 		it = registeredServices.find(type);
 		if (it != registeredServices.end()) {
-			cout << "Constructing new service data pointer" << endl;
+			sd = new ServiceData(it->second.name, it->second.port);
 			cout << "Selected " << it->second.name << ":" << it->second.port
 			     << " for " << type << " server" << endl;
-			sd = new ServiceData(it->second.name, it->second.port);
 		} else {
 			string msg = type + " requested, but not found";
 			cout << msg << endl;
