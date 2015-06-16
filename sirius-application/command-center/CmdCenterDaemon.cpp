@@ -75,7 +75,7 @@ class ImmServiceData : public ServiceData
 public:
 	ImmServiceData(std::string hostname, int port)
 	: ServiceData(hostname, port), client(protocol) {}
-	ImageMatchingServiceClient client;
+	ImageMatchingServiceClient* client;
 };
 
 class CommandCenterHandler : public CommandCenterIf
@@ -145,10 +145,9 @@ public:
 			//assign imm client
 			// ImmServiceData *imm = NULL;
 			assignService(imm, "IMM");
-			ImageMatchingServiceClient tmp_client(imm->protocol);
-			imm->client = tmp_client;
-
-			
+			imm->client = new ImageMatchingServiceClient(imm->protocol);
+			// ImageMatchingServiceClient tmp_client(imm->protocol);
+			// imm->client = tmp_client;
 		}
 
 		// NOTE: hard to break this up, b/c you need to pass the N clients around
