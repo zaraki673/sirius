@@ -147,11 +147,12 @@ public:
 		ImmServiceData *imm = NULL;
 		if(data.imgData != "") {
 			ServiceData *sd = NULL;
-			cout << "Getting imm client";
+			cout << "Getting imm client" << endl;
 			//assign imm client
 			// ImmServiceData *imm = NULL;
 			assignService(sd, "IMM");
 			imm = new ImmServiceData(sd);
+			cout << "ImmServiceData object constructed" << endl;
 			//imm->client = new ImageMatchingServiceClient(imm->protocol);
 			// ImageMatchingServiceClient tmp_client(imm->protocol);
 			// imm->client = tmp_client;
