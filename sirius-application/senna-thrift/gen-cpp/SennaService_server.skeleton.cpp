@@ -20,7 +20,7 @@ class SennaServiceHandler : virtual public SennaServiceIf {
     // Your initialization goes here
   }
 
-  void senna_all(std::string& _return, const std::string& inputs) {
+  void senna_all(std::string& _return, const TonicInput& tInput) {
     // Your implementation goes here
     printf("senna_all\n");
   }

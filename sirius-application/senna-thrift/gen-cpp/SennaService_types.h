@@ -19,6 +19,99 @@
 
 
 
+class TonicInput;
+
+typedef struct _TonicInput__isset {
+  _TonicInput__isset() : task(true), network(true), weights(true), input(true), gpu(true), djinn(true), hostname(true), portno(true), socketfd(true) {}
+  bool task :1;
+  bool network :1;
+  bool weights :1;
+  bool input :1;
+  bool gpu :1;
+  bool djinn :1;
+  bool hostname :1;
+  bool portno :1;
+  bool socketfd :1;
+} _TonicInput__isset;
+
+class TonicInput {
+ public:
+
+  static const char* ascii_fingerprint; // = "431A1A1A4517921E66ABB424549DAB3B";
+  static const uint8_t binary_fingerprint[16]; // = {0x43,0x1A,0x1A,0x1A,0x45,0x17,0x92,0x1E,0x66,0xAB,0xB4,0x24,0x54,0x9D,0xAB,0x3B};
+
+  TonicInput(const TonicInput&);
+  TonicInput& operator=(const TonicInput&);
+  TonicInput() : task("pos"), network("pos.prototxt"), weights("pos.caffemodel"), input("input/small-input.txt"), gpu(false), djinn(false), hostname("localhost"), portno(8080), socketfd(0) {
+  }
+
+  virtual ~TonicInput() throw();
+  std::string task;
+  std::string network;
+  std::string weights;
+  std::string input;
+  bool gpu;
+  bool djinn;
+  std::string hostname;
+  int32_t portno;
+  int32_t socketfd;
+
+  _TonicInput__isset __isset;
+
+  void __set_task(const std::string& val);
+
+  void __set_network(const std::string& val);
+
+  void __set_weights(const std::string& val);
+
+  void __set_input(const std::string& val);
+
+  void __set_gpu(const bool val);
+
+  void __set_djinn(const bool val);
+
+  void __set_hostname(const std::string& val);
+
+  void __set_portno(const int32_t val);
+
+  void __set_socketfd(const int32_t val);
+
+  bool operator == (const TonicInput & rhs) const
+  {
+    if (!(task == rhs.task))
+      return false;
+    if (!(network == rhs.network))
+      return false;
+    if (!(weights == rhs.weights))
+      return false;
+    if (!(input == rhs.input))
+      return false;
+    if (!(gpu == rhs.gpu))
+      return false;
+    if (!(djinn == rhs.djinn))
+      return false;
+    if (!(hostname == rhs.hostname))
+      return false;
+    if (!(portno == rhs.portno))
+      return false;
+    if (!(socketfd == rhs.socketfd))
+      return false;
+    return true;
+  }
+  bool operator != (const TonicInput &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const TonicInput & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  friend std::ostream& operator<<(std::ostream& out, const TonicInput& obj);
+};
+
+void swap(TonicInput &a, TonicInput &b);
+
 
 
 #endif

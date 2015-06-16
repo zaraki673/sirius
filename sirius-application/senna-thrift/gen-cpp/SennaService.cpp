@@ -34,9 +34,9 @@ uint32_t SennaService_senna_all_args::read(::apache::thrift::protocol::TProtocol
     switch (fid)
     {
       case 1:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->inputs);
-          this->__isset.inputs = true;
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->tInput.read(iprot);
+          this->__isset.tInput = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -58,8 +58,8 @@ uint32_t SennaService_senna_all_args::write(::apache::thrift::protocol::TProtoco
   oprot->incrementRecursionDepth();
   xfer += oprot->writeStructBegin("SennaService_senna_all_args");
 
-  xfer += oprot->writeFieldBegin("inputs", ::apache::thrift::protocol::T_STRING, 1);
-  xfer += oprot->writeString(this->inputs);
+  xfer += oprot->writeFieldBegin("tInput", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->tInput.write(oprot);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -78,8 +78,8 @@ uint32_t SennaService_senna_all_pargs::write(::apache::thrift::protocol::TProtoc
   oprot->incrementRecursionDepth();
   xfer += oprot->writeStructBegin("SennaService_senna_all_pargs");
 
-  xfer += oprot->writeFieldBegin("inputs", ::apache::thrift::protocol::T_STRING, 1);
-  xfer += oprot->writeString((*(this->inputs)));
+  xfer += oprot->writeFieldBegin("tInput", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += (*(this->tInput)).write(oprot);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -194,19 +194,19 @@ uint32_t SennaService_senna_all_presult::read(::apache::thrift::protocol::TProto
   return xfer;
 }
 
-void SennaServiceClient::senna_all(std::string& _return, const std::string& inputs)
+void SennaServiceClient::senna_all(std::string& _return, const TonicInput& tInput)
 {
-  send_senna_all(inputs);
+  send_senna_all(tInput);
   recv_senna_all(_return);
 }
 
-void SennaServiceClient::send_senna_all(const std::string& inputs)
+void SennaServiceClient::send_senna_all(const TonicInput& tInput)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("senna_all", ::apache::thrift::protocol::T_CALL, cseqid);
 
   SennaService_senna_all_pargs args;
-  args.inputs = &inputs;
+  args.tInput = &tInput;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -294,7 +294,7 @@ void SennaServiceProcessor::process_senna_all(int32_t seqid, ::apache::thrift::p
 
   SennaService_senna_all_result result;
   try {
-    iface_->senna_all(result.success, args.inputs);
+    iface_->senna_all(result.success, args.tInput);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {

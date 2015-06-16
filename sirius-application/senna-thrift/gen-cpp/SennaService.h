@@ -15,7 +15,7 @@
 class SennaServiceIf {
  public:
   virtual ~SennaServiceIf() {}
-  virtual void senna_all(std::string& _return, const std::string& inputs) = 0;
+  virtual void senna_all(std::string& _return, const TonicInput& tInput) = 0;
 };
 
 class SennaServiceIfFactory {
@@ -45,37 +45,37 @@ class SennaServiceIfSingletonFactory : virtual public SennaServiceIfFactory {
 class SennaServiceNull : virtual public SennaServiceIf {
  public:
   virtual ~SennaServiceNull() {}
-  void senna_all(std::string& /* _return */, const std::string& /* inputs */) {
+  void senna_all(std::string& /* _return */, const TonicInput& /* tInput */) {
     return;
   }
 };
 
 typedef struct _SennaService_senna_all_args__isset {
-  _SennaService_senna_all_args__isset() : inputs(false) {}
-  bool inputs :1;
+  _SennaService_senna_all_args__isset() : tInput(false) {}
+  bool tInput :1;
 } _SennaService_senna_all_args__isset;
 
 class SennaService_senna_all_args {
  public:
 
-  static const char* ascii_fingerprint; // = "EFB929595D312AC8F305D5A794CFEDA1";
-  static const uint8_t binary_fingerprint[16]; // = {0xEF,0xB9,0x29,0x59,0x5D,0x31,0x2A,0xC8,0xF3,0x05,0xD5,0xA7,0x94,0xCF,0xED,0xA1};
+  static const char* ascii_fingerprint; // = "98331E5B77B4CEBCC75DDF40943D0C76";
+  static const uint8_t binary_fingerprint[16]; // = {0x98,0x33,0x1E,0x5B,0x77,0xB4,0xCE,0xBC,0xC7,0x5D,0xDF,0x40,0x94,0x3D,0x0C,0x76};
 
   SennaService_senna_all_args(const SennaService_senna_all_args&);
   SennaService_senna_all_args& operator=(const SennaService_senna_all_args&);
-  SennaService_senna_all_args() : inputs() {
+  SennaService_senna_all_args() {
   }
 
   virtual ~SennaService_senna_all_args() throw();
-  std::string inputs;
+  TonicInput tInput;
 
   _SennaService_senna_all_args__isset __isset;
 
-  void __set_inputs(const std::string& val);
+  void __set_tInput(const TonicInput& val);
 
   bool operator == (const SennaService_senna_all_args & rhs) const
   {
-    if (!(inputs == rhs.inputs))
+    if (!(tInput == rhs.tInput))
       return false;
     return true;
   }
@@ -95,12 +95,12 @@ class SennaService_senna_all_args {
 class SennaService_senna_all_pargs {
  public:
 
-  static const char* ascii_fingerprint; // = "EFB929595D312AC8F305D5A794CFEDA1";
-  static const uint8_t binary_fingerprint[16]; // = {0xEF,0xB9,0x29,0x59,0x5D,0x31,0x2A,0xC8,0xF3,0x05,0xD5,0xA7,0x94,0xCF,0xED,0xA1};
+  static const char* ascii_fingerprint; // = "98331E5B77B4CEBCC75DDF40943D0C76";
+  static const uint8_t binary_fingerprint[16]; // = {0x98,0x33,0x1E,0x5B,0x77,0xB4,0xCE,0xBC,0xC7,0x5D,0xDF,0x40,0x94,0x3D,0x0C,0x76};
 
 
   virtual ~SennaService_senna_all_pargs() throw();
-  const std::string* inputs;
+  const TonicInput* tInput;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -195,8 +195,8 @@ class SennaServiceClient : virtual public SennaServiceIf {
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  void senna_all(std::string& _return, const std::string& inputs);
-  void send_senna_all(const std::string& inputs);
+  void senna_all(std::string& _return, const TonicInput& tInput);
+  void send_senna_all(const TonicInput& tInput);
   void recv_senna_all(std::string& _return);
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
@@ -246,13 +246,13 @@ class SennaServiceMultiface : virtual public SennaServiceIf {
     ifaces_.push_back(iface);
   }
  public:
-  void senna_all(std::string& _return, const std::string& inputs) {
+  void senna_all(std::string& _return, const TonicInput& tInput) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->senna_all(_return, inputs);
+      ifaces_[i]->senna_all(_return, tInput);
     }
-    ifaces_[i]->senna_all(_return, inputs);
+    ifaces_[i]->senna_all(_return, tInput);
     return;
   }
 

@@ -14,3 +14,253 @@
 
 
 
+TonicInput::~TonicInput() throw() {
+}
+
+
+void TonicInput::__set_task(const std::string& val) {
+  this->task = val;
+}
+
+void TonicInput::__set_network(const std::string& val) {
+  this->network = val;
+}
+
+void TonicInput::__set_weights(const std::string& val) {
+  this->weights = val;
+}
+
+void TonicInput::__set_input(const std::string& val) {
+  this->input = val;
+}
+
+void TonicInput::__set_gpu(const bool val) {
+  this->gpu = val;
+}
+
+void TonicInput::__set_djinn(const bool val) {
+  this->djinn = val;
+}
+
+void TonicInput::__set_hostname(const std::string& val) {
+  this->hostname = val;
+}
+
+void TonicInput::__set_portno(const int32_t val) {
+  this->portno = val;
+}
+
+void TonicInput::__set_socketfd(const int32_t val) {
+  this->socketfd = val;
+}
+
+const char* TonicInput::ascii_fingerprint = "431A1A1A4517921E66ABB424549DAB3B";
+const uint8_t TonicInput::binary_fingerprint[16] = {0x43,0x1A,0x1A,0x1A,0x45,0x17,0x92,0x1E,0x66,0xAB,0xB4,0x24,0x54,0x9D,0xAB,0x3B};
+
+uint32_t TonicInput::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->task);
+          this->__isset.task = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->network);
+          this->__isset.network = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->weights);
+          this->__isset.weights = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 4:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->input);
+          this->__isset.input = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 5:
+        if (ftype == ::apache::thrift::protocol::T_BOOL) {
+          xfer += iprot->readBool(this->gpu);
+          this->__isset.gpu = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 6:
+        if (ftype == ::apache::thrift::protocol::T_BOOL) {
+          xfer += iprot->readBool(this->djinn);
+          this->__isset.djinn = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 7:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->hostname);
+          this->__isset.hostname = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 8:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->portno);
+          this->__isset.portno = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 9:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->socketfd);
+          this->__isset.socketfd = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t TonicInput::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  oprot->incrementRecursionDepth();
+  xfer += oprot->writeStructBegin("TonicInput");
+
+  xfer += oprot->writeFieldBegin("task", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->task);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("network", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString(this->network);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("weights", ::apache::thrift::protocol::T_STRING, 3);
+  xfer += oprot->writeString(this->weights);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("input", ::apache::thrift::protocol::T_STRING, 4);
+  xfer += oprot->writeString(this->input);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("gpu", ::apache::thrift::protocol::T_BOOL, 5);
+  xfer += oprot->writeBool(this->gpu);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("djinn", ::apache::thrift::protocol::T_BOOL, 6);
+  xfer += oprot->writeBool(this->djinn);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("hostname", ::apache::thrift::protocol::T_STRING, 7);
+  xfer += oprot->writeString(this->hostname);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("portno", ::apache::thrift::protocol::T_I32, 8);
+  xfer += oprot->writeI32(this->portno);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("socketfd", ::apache::thrift::protocol::T_I32, 9);
+  xfer += oprot->writeI32(this->socketfd);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  oprot->decrementRecursionDepth();
+  return xfer;
+}
+
+void swap(TonicInput &a, TonicInput &b) {
+  using ::std::swap;
+  swap(a.task, b.task);
+  swap(a.network, b.network);
+  swap(a.weights, b.weights);
+  swap(a.input, b.input);
+  swap(a.gpu, b.gpu);
+  swap(a.djinn, b.djinn);
+  swap(a.hostname, b.hostname);
+  swap(a.portno, b.portno);
+  swap(a.socketfd, b.socketfd);
+  swap(a.__isset, b.__isset);
+}
+
+TonicInput::TonicInput(const TonicInput& other0) {
+  task = other0.task;
+  network = other0.network;
+  weights = other0.weights;
+  input = other0.input;
+  gpu = other0.gpu;
+  djinn = other0.djinn;
+  hostname = other0.hostname;
+  portno = other0.portno;
+  socketfd = other0.socketfd;
+  __isset = other0.__isset;
+}
+TonicInput& TonicInput::operator=(const TonicInput& other1) {
+  task = other1.task;
+  network = other1.network;
+  weights = other1.weights;
+  input = other1.input;
+  gpu = other1.gpu;
+  djinn = other1.djinn;
+  hostname = other1.hostname;
+  portno = other1.portno;
+  socketfd = other1.socketfd;
+  __isset = other1.__isset;
+  return *this;
+}
+std::ostream& operator<<(std::ostream& out, const TonicInput& obj) {
+  using apache::thrift::to_string;
+  out << "TonicInput(";
+  out << "task=" << to_string(obj.task);
+  out << ", " << "network=" << to_string(obj.network);
+  out << ", " << "weights=" << to_string(obj.weights);
+  out << ", " << "input=" << to_string(obj.input);
+  out << ", " << "gpu=" << to_string(obj.gpu);
+  out << ", " << "djinn=" << to_string(obj.djinn);
+  out << ", " << "hostname=" << to_string(obj.hostname);
+  out << ", " << "portno=" << to_string(obj.portno);
+  out << ", " << "socketfd=" << to_string(obj.socketfd);
+  out << ")";
+  return out;
+}
+
+
