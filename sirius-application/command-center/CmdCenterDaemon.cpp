@@ -140,9 +140,13 @@ public:
 			binary_img = data.imgData;
 		}
 
-		if(data.audioData != "") {
-			//assign asr client
 
+		if(data.imgData != "") {
+			//assign imm client
+			ImmServiceData *imm = NULL;
+			assignService(imm, "IMM");
+			ImageMatchingServiceClient tmp_client(imm->protocol);
+			imm->client = tmp_client;
 		}
 
 		// NOTE: hard to break this up, b/c you need to pass the N clients around
@@ -219,22 +223,22 @@ public:
 				return;
 			}
 		//}
-		if (data.imgData != "")
-		{
-			it = registeredServices.find("IMM");
-			if (it != registeredServices.end())
-			{
-				imm = new ImmServiceData((*it).second.name, (*it).second.port);
-				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
-				     << " for IMM server" << endl;
-			}
-			else
-			{
-				_return = "IMM requested, but not found";
-				cout << _return << endl;
-				return;
-			}
-		}
+		// if (data.imgData != "")
+		// {
+		// 	it = registeredServices.find("IMM");
+		// 	if (it != registeredServices.end())
+		// 	{
+		// 		imm = new ImmServiceData((*it).second.name, (*it).second.port);
+		// 		cout << "Selected " << (*it).second.name << ":" << (*it).second.port
+		// 		     << " for IMM server" << endl;
+		// 	}
+		// 	else
+		// 	{
+		// 		_return = "IMM requested, but not found";
+		// 		cout << _return << endl;
+		// 		return;
+		// 	}
+		// }
 
 		//----Run pipeline----//
 		std::string asrRetVal = "";
@@ -397,21 +401,6 @@ private:
 			sd->socket = tmp_socket;
 			sd->transport = tmp_transport;
 			sd->protocol = tmp_protocol;
-
-			if(type == "ASR") {
-				KaldiServiceClient tmp_client(tmp_protocol);
-				sd->client = tmp_client;
-			} else if (type == "IMM") {
-				ImageMatchingServiceClient tmp_client(tmp_protocol);
-				sd->client = tmp_client;
-			} else if (type == "QA") {
-				QAServiceClient tmp_client(qa_protocol);
-				sd->client = tmp_client;
-			} else {
-				string msg = type + " unknown. Unable to complete request.";
-				cout << msg << endl;
-				throw(AssignmentFailedException(msg));
-			}
 			
 			cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 			     << " for " << type << " server" << endl;
