@@ -65,6 +65,10 @@ public:
 	: socket(new TSocket(hostname, port)),
 	  transport(new TBufferedTransport(socket)),
 	  protocol(new TBinaryProtocol(transport)) {}
+	ServiceData(ServiceData *sd)
+	: socket(sd->socket),
+	  transport(sd->transport),
+	  protocol(sd->protocol) {}
 	boost::shared_ptr<TTransport> socket;
 	boost::shared_ptr<TTransport> transport;
 	boost::shared_ptr<TProtocol> protocol;
@@ -73,9 +77,9 @@ public:
 class ImmServiceData : public ServiceData
 {
 public:
-	// ImmServiceData(std::string hostname, int port)
-	// : ServiceData(hostname, port), client(protocol) {}
-	ImageMatchingServiceClient* client;
+	ImmServiceData(ServiceData *sd)
+	: ServiceData(sd), client(protocol) {}
+	ImageMatchingServiceClient client;
 };
 
 class CommandCenterHandler : public CommandCenterIf
@@ -255,7 +259,7 @@ public:
 			cout << "Starting ASR-IMM-QA pipeline..." << endl;
 			//---Image matching
 			imm->transport->open();
-			imm->client->match_img(immRetVal, binary_img);
+			imm->client.match_img(immRetVal, binary_img);
 			imm->transport->close();
 			cout << "IMG = " << immRetVal << endl;
 			// image filename parsing
@@ -311,7 +315,7 @@ public:
 			imm_client.match_img(_return, binary_img);
 			imm_transport->close();*/
 			imm->transport->open();
-			imm->client->match_img(_return, binary_img);
+			imm->client.match_img(_return, binary_img);
 			imm->transport->close();
 		}
 		else
