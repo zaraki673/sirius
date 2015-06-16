@@ -73,8 +73,8 @@ public:
 class ImmServiceData : public ServiceData
 {
 public:
-	ImmServiceData(std::string hostname, int port)
-	: ServiceData(hostname, port), client(protocol) {}
+	// ImmServiceData(std::string hostname, int port)
+	// : ServiceData(hostname, port), client(protocol) {}
 	ImageMatchingServiceClient* client;
 };
 
