@@ -58,7 +58,9 @@ public:
 	string err;
 };
 
-class ImmServiceData
+class ServiceData {};
+
+class ImmServiceData : public ServiceData
 {
 public:
 	ImmServiceData(std::string hostname, int port)
@@ -157,12 +159,7 @@ public:
 		boost::shared_ptr<TTransport> qa_transport(new TBufferedTransport(qa_socket));
 		boost::shared_ptr<TProtocol> qa_protocol(new TBinaryProtocol(qa_transport));
 		QAServiceClient qa_client(qa_protocol);
-/*
-		boost::shared_ptr<TTransport> imm_socket(new TSocket("localhost", 8080));
-		boost::shared_ptr<TTransport> imm_transport(new TBufferedTransport(imm_socket));
-		boost::shared_ptr<TProtocol> imm_protocol(new TBinaryProtocol(imm_transport));
-		ImageMatchingServiceClient imm_client(imm_protocol);
-*/
+
 		ImmServiceData *imm = NULL;
 
 		if (data.audioData != "")
@@ -223,19 +220,6 @@ public:
 			it = registeredServices.find("IMM");
 			if (it != registeredServices.end())
 			{
-				/*
-				boost::shared_ptr<TTransport> tmp_socket(
-					new TSocket((*it).second.name, (*it).second.port)
-				);
-				boost::shared_ptr<TTransport> tmp_transport(new TBufferedTransport(tmp_socket));
-				boost::shared_ptr<TProtocol> tmp_protocol(new TBinaryProtocol(tmp_transport));
-				ImageMatchingServiceClient tmp_client(tmp_protocol);
-
-				imm_socket = tmp_socket;
-				imm_transport = tmp_transport;
-				imm_protocol = tmp_protocol;
-				imm_client = tmp_client;
-				*/
 				imm = new ImmServiceData((*it).second.name, (*it).second.port);
 				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 				     << " for IMM server" << endl;
@@ -259,11 +243,6 @@ public:
 		{
 			cout << "Starting ASR-IMM-QA pipeline..." << endl;
 			//---Image matching
-			/*
-			imm_transport->open();
-			imm_client.match_img(immRetVal, binary_img);
-			imm_transport->close();
-			*/
 			imm->transport->open();
 			imm->client.match_img(immRetVal, binary_img);
 			imm->transport->close();
@@ -400,8 +379,9 @@ private:
 		return outstr;
 	}
 
-	std::void assignService(ServiceData &sd, const std::string type) {
+	void assignService(ServiceData *sd, const std::string type) {
 		//load balancer for service assignment
+		std::multimap<std::string, MachineData>::iterator it;
 		it = registeredServices.find(type);
 		if (it != registeredServices.end()) {
 			boost::shared_ptr<TTransport> tmp_socket(
@@ -410,19 +390,19 @@ private:
 			boost::shared_ptr<TTransport> tmp_transport(new TBufferedTransport(tmp_socket));
 			boost::shared_ptr<TProtocol> tmp_protocol(new TBinaryProtocol(tmp_transport));
 
-			sd.socket = tmp_socket;
-			sd.transport = tmp_transport;
-			sd.protocol = tmp_protocol;
+			sd->socket = tmp_socket;
+			sd->transport = tmp_transport;
+			sd->protocol = tmp_protocol;
 
 			if(type == "ASR") {
 				KaldiServiceClient tmp_client(tmp_protocol);
-				sd.client = tmp_client;
+				sd->client = tmp_client;
 			} else if (type == "IMM") {
 				ImageMatchingServiceClient tmp_client(tmp_protocol);
-				sd.client = tmp_client;
+				sd->client = tmp_client;
 			} else if (type == "QA") {
 				QAServiceClient tmp_client(qa_protocol);
-				sd.client = tmp_client;
+				sd->client = tmp_client;
 			} else {
 				string msg = type + " unknown. Unable to complete request.";
 				cout << msg << endl;
