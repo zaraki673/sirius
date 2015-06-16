@@ -140,13 +140,15 @@ public:
 			binary_img = data.imgData;
 		}
 
-
+		ImmServiceData *imm = NULL;
 		if(data.imgData != "") {
 			//assign imm client
-			ImmServiceData *imm = NULL;
+			// ImmServiceData *imm = NULL;
 			assignService(imm, "IMM");
 			ImageMatchingServiceClient tmp_client(imm->protocol);
 			imm->client = tmp_client;
+
+			
 		}
 
 		// NOTE: hard to break this up, b/c you need to pass the N clients around
@@ -168,7 +170,7 @@ public:
 		boost::shared_ptr<TProtocol> qa_protocol(new TBinaryProtocol(qa_transport));
 		QAServiceClient qa_client(qa_protocol);
 
-		ImmServiceData *imm = NULL;
+		
 
 		if (data.audioData != "")
 		{
