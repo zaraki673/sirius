@@ -142,7 +142,7 @@ public:
 
 		if(data.imgData != "") {
 			//assign imm client
-			ImmServiceData *imm = NULL;
+			ImmServiceData *imm = nullptr;
 			assignService(imm, "IMM");
 			ImageMatchingServiceClient tmp_client(imm->protocol);
 			imm->client = tmp_client;
@@ -391,16 +391,7 @@ private:
 		std::multimap<std::string, MachineData>::iterator it;
 		it = registeredServices.find(type);
 		if (it != registeredServices.end()) {
-			boost::shared_ptr<TTransport> tmp_socket(
-				new TSocket((*it).second.name, (*it).second.port)
-			);
-			boost::shared_ptr<TTransport> tmp_transport(new TBufferedTransport(tmp_socket));
-			boost::shared_ptr<TProtocol> tmp_protocol(new TBinaryProtocol(tmp_transport));
-
-			sd->socket = tmp_socket;
-			sd->transport = tmp_transport;
-			sd->protocol = tmp_protocol;
-			
+			sd = new ServiceData((*it).second.name, (*it).second.port);
 			cout << "Selected " << (*it).second.name << ":" << (*it).second.port
 			     << " for " << type << " server" << endl;
 		} else {
