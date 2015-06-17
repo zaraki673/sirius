@@ -49,6 +49,13 @@
 // when using pthreads. See stackoverflow, cannot-convert-voidmyclassvoid-to...
 void *immWorker(void *arg);
 
+void heartbeatManager(){
+	cout << "heartbeat manager started" << endl;
+	boost::posix_time::seconds workTime(3);
+	boost::this_thread::sleep(workTime);
+	cout << "heartbeat manager finished" << endl;
+}
+
 class CommandCenterHandler : public CommandCenterIf
 {
 public:
@@ -330,13 +337,6 @@ private:
 			cout << msg << endl;
 			throw(AssignmentFailedException(type + " requested, but not found"));
 		}
-	}
-
-	void heartbeatManager(){
-		cout << "heartbeat manager started" << endl;
-		boost::posix_time::seconds workTime(3);
-		boost::this_thread::sleep(workTime);
-		cout << "heartbeat manager finished" << endl;
 	}
 
 };
