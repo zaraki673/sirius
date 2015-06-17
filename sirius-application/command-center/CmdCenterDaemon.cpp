@@ -61,49 +61,6 @@ public:
 	{
 		cout << "/-----handleRequest()-----/" << endl;
 
-		//---- Create clients ----//
-		ServiceData *sd = NULL;
-		AsrServiceData *asr = NULL;
-		ImmServiceData *imm = NULL;
-		QaServiceData *qa = NULL;
-		//---- Kaldi speech recognition client
-		if (data.audioData != "") {
-			cout << "Getting asr client...\t";
-			try {
-				assignService(sd, "ASR");
-			} catch (AssignmentFailedException exc) {
-				cout << exc.err << endl;
-				return;
-			}
-			asr = new AsrServiceData(sd);
-			cout << "AsrServiceData object constructed" << endl;
-		}
-		//---- Image matching client
-		if (data.imgData != "") {
-			cout << "Getting imm client...\t";
-			try {
-				assignService(sd, "IMM");
-			} catch (AssignmentFailedException exc) {
-				cout << exc.err << endl;
-				return;
-			}
-			imm = new ImmServiceData(sd);
-			cout << "ImmServiceData object constructed" << endl;
-		}
-		//---- Open Ephyra QA client
-		// TODO For now, this is always generated, because the command center
-		// cannot yet determine whether the audio data is a voice command
-		// (which doesn't require QA) or a voice query (which does require QA).
-		cout << "Getting qa client...\t";
-		try {
-			assignService(sd, "QA");
-		} catch (AssignmentFailedException exc) {
-			cout << exc.err << endl;
-			return;
-		}
-		qa = new QaServiceData(sd);
-		cout << "QaServiceData object constructed" << endl;
-
 		//---- Transform data into a form the services can use ----//
 		std::string binary_audio, binary_img;
 		if(data.audioB64Encoding) {
@@ -119,14 +76,54 @@ public:
 			binary_img = data.imgData;
 		}
 
+		//---- Create clients ----//
+		// ServiceData *sd = NULL;
+		AsrServiceData *asr = NULL;
+		ImmServiceData *imm = NULL;
+		QaServiceData *qa = NULL;
+		//---- Kaldi speech recognition client
+		if (data.audioData != "") {
+			cout << "Getting asr client...\t";
+			try {
+				asr = assignService("ASR");
+			} catch (AssignmentFailedException exc) {
+				cout << exc.err << endl;
+				return;
+			}
+			// asr = new AsrServiceData(sd);
+			cout << "AsrServiceData object constructed" << endl;
+		}
+		//---- Image matching client
+		if (data.imgData != "") {
+			cout << "Getting imm client...\t";
+			try {
+				imm = assignService("IMM");
+			} catch (AssignmentFailedException exc) {
+				cout << exc.err << endl;
+				return;
+			}
+			// imm = new ImmServiceData(sd);
+			cout << "ImmServiceData object constructed" << endl;
+		}
+		//---- Open Ephyra QA client
+		// TODO For now, this is always generated, because the command center
+		// cannot yet determine whether the audio data is a voice command
+		// (which doesn't require QA) or a voice query (which does require QA).
+		cout << "Getting qa client...\t";
+		try {
+			qa = assignService("QA");
+		} catch (AssignmentFailedException exc) {
+			cout << exc.err << endl;
+			return;
+		}
+		// qa = new QaServiceData(sd);
+		cout << "QaServiceData object constructed" << endl;
+
 		//---- Set audio and imm fields in service data objects
 		// if they were constructed
-		if (asr)
-		{
+		if (asr) {
 			asr->audio = binary_audio;
-		}
-		if (imm)
-		{
+		} if (imm) {
 			imm->img = binary_img;
 		}
 
@@ -276,30 +273,32 @@ private:
 	// std::multimap<std::string, MachineData> registeredServices;
 	// boost::thread heartbeatThread;
 
-	void assignService(ServiceData *&sd, const std::string type) {
+	ServiceData* assignService(const std::string type) {
 		//load balancer for service assignment
-		std::multimap<std::string, MachineData>::iterator it;
+		std::multimap<std::string, ServiceData*>::iterator it;
 		it = registeredServices.find(type);
 		if (it != registeredServices.end()) {
-			sd = new ServiceData(it->second.name, it->second.port);
-			cout << "Selected " << it->second.name << ":" << it->second.port
-			     << " for " << type << " server" << endl;
+			//sd = new ServiceData(it->second.name, it->second.port);
+			// cout << "Selected " << it->second.name << ":" << it->second.port
+			//      << " for " << type << " server" << endl;
+			return it->second;
 		} else {
 			string msg = type + " requested, but not found";
 			cout << msg << endl;
 			throw(AssignmentFailedException(type + " requested, but not found"));
+			return NULL:
 		}
 	}
 
 	void heartbeatManager(){
 		cout << "heartbeat manager started" << endl;
-		while(registeredServices.size() > 0) {
+		// while(registeredServices.size() > 0) {
 			
 
-			//sleep
-			boost::posix_time::seconds sleepTime(3);
-			boost::this_thread::sleep(sleepTime);
-		}
+		// 	//sleep
+		// 	boost::posix_time::seconds sleepTime(3);
+		// 	boost::this_thread::sleep(sleepTime);
+		// }
 		
 		cout << "heartbeat manager finished" << endl;
 	}
