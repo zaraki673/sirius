@@ -294,7 +294,7 @@ private:
 						asr->transport->open();
 						asr->client.ping();
 						asr->transport->close();
-					} else if(type = "IMM") {
+					} else if(type == "IMM") {
 						ImmServiceData *imm = new ImmServiceData(it->second);
 						imm->transport->open();
 						imm->client.ping();
