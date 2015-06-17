@@ -1,5 +1,52 @@
 #ifndef CmdCenterDaemon_H
 #define CmdCenterDaemon_H
+// C++ thrift headers 
+#include <thrift/concurrency/ThreadManager.h>
+#include <thrift/concurrency/PosixThreadFactory.h>
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/server/TSimpleServer.h>
+#include <thrift/server/TThreadPoolServer.h>
+#include <thrift/server/TThreadedServer.h>
+#include <thrift/transport/TServerSocket.h>
+#include <thrift/transport/TTransportUtils.h>
+#include <thrift/TToString.h>
+#include <thrift/processor/TMultiplexedProcessor.h>
+
+// Additional C++ headers for querying registered services
+#include <thrift/transport/TSocket.h>
+
+// Useful C++ headers
+#include <iostream>
+#include <stdexcept>
+#include <sstream>
+#include <cstdlib>
+
+// Thrift-generated stubs for RPC handling
+#include "gen-cpp/CommandCenter.h"
+#include "gen-cpp/commandcenter_types.h"
+
+// Thrift-generated stubs for communicating with registered
+// services
+#include "../openephyra-thrift/gen-cpp/QAService.h"
+#include "../speech-recognition/kaldi/scripts/kaldi-thrift/gen-cpp/KaldiService.h"
+#include "../image-matching/matching-thrift/ImageMatchingService.h"
+
+// Boost libraries
+#include <boost/regex.hpp>
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+// #include <boost/date_time.hpp>
+
+// Extras
+#include "base64.h"
+
+// Threading
+#include <pthread.h>
+
+// define the number of threads in pool
+#define THREAD_WORKS 16
+
 
 using namespace std;
 using namespace apache::thrift;
