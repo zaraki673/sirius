@@ -49,21 +49,6 @@ int main(int argc, char **argv) {
 		string image_file(ostrm_image.str());
 		// TODO: this initialization is stupid, but thrift doesn't
 		// generate more helpful ctors
-		/*QueryType qTypeObj; //TODO
-		qTypeObj.ASR = true;
-		qTypeObj.QA = false;
-		qTypeObj.IMM = false;
-
-		QueryType asrqa_qTypeObj;
-		asrqa_qTypeObj.ASR = true;
-		asrqa_qTypeObj.QA = true;
-		asrqa_qTypeObj.IMM = false;
-
-		QueryType asrqaimm_qTypeObj;
-		asrqaimm_qTypeObj.ASR = true;
-		asrqaimm_qTypeObj.QA = true;
-		asrqaimm_qTypeObj.IMM = true;
-		*/
 
 		QueryData capital_italy;
 		capital_italy.audioData = capital_italy_audio_file;
@@ -78,9 +63,9 @@ int main(int argc, char **argv) {
 		transport->open();
 		//client.askTextQuestion(answer, question);
 
-		cout << "///// ASR /////" << endl;
+		/*cout << "///// ASR /////" << endl;
 		client.handleRequest(answer, capital_italy);
-		cout << "ANSWER = " << answer << endl;
+		cout << "ANSWER = " << answer << endl;*/
 
 		cout << "///// ASR-QA /////" << endl;
 		client.handleRequest(answer, capital_italy);
