@@ -7,9 +7,9 @@
 
 extern bool debug;
 
-int *SENNA_POS_forward(SENNA_POS *pos, const int *sentence_words,
+void SENNA_POS_forward_basic(SENNA_POS *pos, const int *sentence_words,
                        const int *sentence_caps, const int *sentence_suff,
-                       TonicSuiteApp app) {
+                       TonicSuiteApp& app) {
   pos->input_state = SENNA_realloc(
       pos->input_state, sizeof(float),
       (app.pl.num + pos->window_size - 1) *
@@ -51,7 +51,32 @@ int *SENNA_POS_forward(SENNA_POS *pos, const int *sentence_words,
                (pos->ll_word_size + pos->ll_caps_size + pos->ll_suff_size) *
                sizeof(float));
   }
+}
 
+
+int* SENNA_POS_forward_noDjiNN(SENNA_POS *pos, const int *sentence_words,
+                       const int *sentence_caps, const int *sentence_suff,
+                       TonicSuiteApp& app){
+    float loss;
+    vector<Blob<float> *> in_blobs = app.net->input_blobs();
+    in_blobs[0]->set_cpu_data((float *)app.pl.data);
+    vector<Blob<float> *> out_blobs = app.net->ForwardPrefilled(&loss);
+    memcpy((pos->output_state), out_blobs[0]->cpu_data(),
+           app.pl.num * (pos->output_state_size) * sizeof(float));
+
+    pos->labels = SENNA_realloc(pos->labels, sizeof(int), app.pl.num);
+
+   SENNA_nn_viterbi(pos->labels, pos->viterbi_score_init,
+                   pos->viterbi_score_trans, pos->output_state,
+                   pos->output_state_size, app.pl.num);
+
+    return pos->labels;   
+}
+
+/*
+int *SENNA_POS_forward(SENNA_POS *pos, const int *sentence_words,
+                       const int *sentence_caps, const int *sentence_suff,
+                       TonicSuiteApp app){
   if (app.djinn) {
     SOCKET_send(app.socketfd, (char *)app.pl.data,
                 app.pl.num * app.pl.size * sizeof(float), debug);
@@ -76,6 +101,8 @@ int *SENNA_POS_forward(SENNA_POS *pos, const int *sentence_words,
 
   return pos->labels;
 }
+*/
+
 
 SENNA_POS *SENNA_POS_new(const char *path, const char *subpath) {
   SENNA_POS *pos = SENNA_malloc(sizeof(SENNA_POS), 1);

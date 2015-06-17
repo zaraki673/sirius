@@ -41,9 +41,19 @@ typedef struct SENNA_POS_ {
 } SENNA_POS;
 
 SENNA_POS *SENNA_POS_new(const char *path, const char *subpath);
-int *SENNA_POS_forward(SENNA_POS *pos, const int *sentence_words,
+
+/*int *SENNA_POS_forward(SENNA_POS *pos, const int *sentence_words,
                        const int *sentence_caps, const int *sentence_suff,
-                       TonicSuiteApp app);
+                       TonicSuiteApp app);*/
+
+void SENNA_POS_forward_basic(SENNA_POS *pos, const int *sentence_words,
+                       const int *sentence_caps, const int *sentence_suff,
+                       TonicSuiteApp& app);
+
+int* SENNA_POS_forward_noDjiNN(SENNA_POS *pos, const int *sentence_words,
+                       const int *sentence_caps, const int *sentence_suff,
+                       TonicSuiteApp& app);
+
 void SENNA_POS_free(SENNA_POS *pos);
 
 #endif

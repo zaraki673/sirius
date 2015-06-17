@@ -137,6 +137,27 @@ class SennaServiceHandler : virtual public SennaServiceIf {
     app.pl.num = tokens->n;
 
     if (app.pl.num == 0) LOG(FATAL) << app.input << " empty or no tokens found.";
+ 
+    if (app.task == "pos"){
+	if (app.djinn){
+		SENNA_POS_forward_basic(pos, tokens->word_idx, tokens->caps_idx,
+                                   tokens->suff_idx, app);
+		(char *)(pos->output_state) = request_handler(app.pl.req_name, (char *)app.			pl.data);
+		 
+		 pos->labels = SENNA_realloc(pos->labels, sizeof(int), app.pl.num);
+  		SENNA_nn_viterbi(pos->labels, pos->viterbi_score_init,
+                   pos->viterbi_score_trans, pos->output_state,
+                   pos->output_state_size, app.pl.num);
+
+	}else{
+		reshape(app.net, app.pl.num * app.pl.size);
+		SENNA_POS_forward_basic(pos, tokens->word_idx, tokens->caps_idx,
+                                   tokens->suff_idx, app);
+		pos_labels = SENNA_POS_forward_noDjiNN(pos, tokens->word_idx, tokens->caps_idx,
+                                   tokens->suff_idx, app);
+	}
+    
+    }	
 
 
 
@@ -248,8 +269,9 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 	// In all subsequent forward passes, the trained model resides on the
 	// device (GPU)
 	bool warmup = true;
- 
-	while (1) {
+ 	
+	//break up the while-loop
+	//while (1) {
 		LOG(INFO) << "Reading from socket.";
 		//socket_send
 		//type cast: float* in, void* data
@@ -269,17 +291,17 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 
     		LOG(INFO) << "Writing to socket.";
 		//out is sth that need to be sent back 
-    		SOCKET_send(socknum, (char*)out, out_elts * sizeof(float), debug);
+    		//SOCKET_send(socknum, (char*)out, out_elts * sizeof(float), debug);
    		 //socket_receive
-      }	
+      //}	
 
 	// Exit the thread
 	LOG(INFO) << "Socket closed by the client.";
 
-	free(in);
-	free(out);
+	//free(in);
+	//free(out);
 
-	return (void*)0;
+	return (char*)out;
   }
   
 
