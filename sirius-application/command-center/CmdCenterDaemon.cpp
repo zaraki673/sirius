@@ -51,11 +51,6 @@ using namespace apache::thrift::server;
 using namespace cmdcenterstubs;
 using namespace qastubs;
 
-//---- Functions designed for multithreading with pthreads ----//
-// NOTE: These functions CANNOT be declared as members of a class
-// when using pthreads. See stackoverflow, cannot-convert-voidmyclassvoid-to...
-void *immWorker(void *arg);
-
 class BadImgFileException {};
 
 class AssignmentFailedException{
@@ -65,6 +60,15 @@ public:
 	}
 	string err;
 };
+
+//---- Functions designed for multithreading with pthreads ----//
+// NOTE: These functions CANNOT be declared as members of a class
+// when using pthreads. See stackoverflow, cannot-convert-voidmyclassvoid-to...
+void *immWorker(void *arg);
+void *asrWorker(void *arg);
+
+//---- Utilities ----//
+std::string parseImgFile(const std::string& immRetVal);
 
 class ServiceData
 {
@@ -119,6 +123,10 @@ class ResponseData
 public:
 	ResponseData(std::string _response)
 	: response(_response) {}
+	std::string getResponse()
+	{
+		return response;
+	}
 private:
 	// could be audio transcript, answer, or matched img name
 	std::string response;
@@ -235,51 +243,57 @@ public:
 		// and voice query
 		if ((data.audioData != "") && (data.imgData != ""))
 		{
-			cout << "Starting ASR-IMM-QA pipeline..." << endl;
+//			cout << "Starting ASR-IMM-QA pipeline..." << endl;
 			//---- Run asr and image matching in parallel
-			//---Image matching
-			imm->transport->open();
-			imm->client.match_img(immRetVal, binary_img);
-			imm->transport->close();
-			cout << "IMG = " << immRetVal << endl;
-			// image filename parsing
-			try
-			{
-				immRetVal = parseImgFile(immRetVal);
-			}
-			catch (BadImgFileException)
-			{
-				cout << "Cmd Center: BadImgFileException" << endl;
-				throw;
-			}
+//			//---Image matching
+//			imm->transport->open();
+//			imm->client.match_img(immRetVal, binary_img);
+//			imm->transport->close();
+//			cout << "IMG = " << immRetVal << endl;
+//			// image filename parsing
+//			try
+//			{
+//				immRetVal = parseImgFile(immRetVal);
+//			}
+//			catch (BadImgFileException)
+//			{
+//				cout << "Cmd Center: BadImgFileException" << endl;
+//				throw;
+//			}
 
 			///////////////////////////////////////////////////////////
 			// NOTE: declaring a void **s and passing that to pthread_join
 			// doesn't work.
 			cout << "Now trying the threading imm method" << endl;
-			pthread_t thr;
+			pthread_t thr[2];
 			int rc;
-			void *status = NULL;
-			//void **s = NULL;
-			if ((rc = pthread_create(&thr, NULL, immWorker, (void *) imm)))
+			void *asrstatus = NULL;
+			void *immstatus = NULL;
+			if ((rc = pthread_create(&thr[0], NULL, asrWorker, (void *) asr)))
 			{
 				cerr << "error: pthread_create: " << rc << endl;
 			}
-			pthread_join(thr, &status);
-			//s = &status;
-			assert(status);
-			//assert(s);
+			if ((rc = pthread_create(&thr[1], NULL, immWorker, (void *) imm)))
+			{
+				cerr << "error: pthread_create: " << rc << endl;
+			}
+			pthread_join(thr[0], &asrstatus);
+			pthread_join(thr[1], &immstatus);
+			assert(immstatus && asrstatus);
 			cout << "SUCCESS!" << endl;
 
 			///////////////////////////////////////////////////////////
 
-			//---Speech recognition
-			asr->transport->open();
-			asr->client.kaldi_asr(asrRetVal, binary_audio);
-			asr->transport->close();
+//			//---Speech recognition
+//			asr->transport->open();
+//			asr->client.kaldi_asr(asrRetVal, binary_audio);
+//			asr->transport->close();
 			
 			//---Question answer
-			question = asrRetVal + " " + immRetVal;
+			ResponseData *asrresp = (ResponseData *) asrstatus;
+			ResponseData *immresp = (ResponseData *) immstatus;
+			assert(asrresp && immresp);
+			question = asrresp->getResponse() + " " + immresp->getResponse();
 			cout << "Your new question is: " << question << endl;
 			qa->transport->open();
 			qa->client.askFactoidThrift(_return, question);
@@ -365,31 +379,6 @@ private:
 	// select available servers easily, for a given key.
 	std::multimap<std::string, MachineData> registeredServices;
 
-	std::string parseImgFile(const std::string& immRetVal)
-	{
-		// Everything must be escaped twice
-		const char *regexPattern = "\\A(/?)([\\w\\-]+/)*([\\w\\-]+)(\\.jpg)\\z";
-		std::cout << "Passing the following pattern to regex engine: "
-			<< regexPattern << std::endl;
-		boost::regex re(regexPattern);
-		std::string fmt("$3");
-		std::string outstr = immRetVal;
-		if (boost::regex_match(immRetVal, re))
-		{
-			std::cout << immRetVal << " matches pattern"  << std::endl;
-			outstr = boost::regex_replace(immRetVal, re, fmt);
-			std::cout << "Input: " << immRetVal << std::endl;
-			std::cout << "Result: " << outstr << std::endl;
-		}
-		else
-		{
-			std::cout << "No match for " << immRetVal << "..." << std::endl;
-			throw(BadImgFileException());
-		}
-
-		return outstr;
-	}
-
 	void assignService(ServiceData *&sd, const std::string type) {
 		//load balancer for service assignment
 		std::multimap<std::string, MachineData>::iterator it;
@@ -459,6 +448,16 @@ void *immWorker(void *arg)
 	imm->client.match_img(immRetVal, imm->img);
 	imm->transport->close();
 	cout << "imm worker thread... IMG = " << immRetVal << endl;
+	// image filename parsing
+	try
+	{
+		immRetVal = parseImgFile(immRetVal);
+	}
+	catch (BadImgFileException)
+	{
+		cout << "Cmd Center: BadImgFileException" << endl;
+		pthread_exit(NULL);
+	}
 
 	// Package response
 	ResponseData *resp = new ResponseData(immRetVal);
@@ -468,3 +467,44 @@ void *immWorker(void *arg)
 	//return ret;
 	pthread_exit(ret);
 }
+
+void *asrWorker(void *arg)
+{
+	std::string asrRetVal = "";
+	AsrServiceData *asr = (AsrServiceData *) arg;
+	asr->transport->open();
+	asr->client.kaldi_asr(asrRetVal, asr->audio);
+	asr->transport->close();
+	cout << "asr worker thread... ASR = " << asrRetVal << endl;
+
+	ResponseData *resp = new ResponseData(asrRetVal);
+	void *ret = (void *) resp;
+	pthread_exit(ret);
+}
+
+std::string parseImgFile(const std::string& immRetVal)
+{
+	// Everything must be escaped twice
+	const char *regexPattern = "\\A(/?)([\\w\\-]+/)*([\\w\\-]+)(\\.jpg)\\z";
+	std::cout << "Passing the following pattern to regex engine: "
+		<< regexPattern << std::endl;
+	boost::regex re(regexPattern);
+	std::string fmt("$3");
+	std::string outstr = immRetVal;
+	if (boost::regex_match(immRetVal, re))
+	{
+		std::cout << immRetVal << " matches pattern"  << std::endl;
+		outstr = boost::regex_replace(immRetVal, re, fmt);
+		std::cout << "Input: " << immRetVal << std::endl;
+		std::cout << "Result: " << outstr << std::endl;
+	}
+	else
+	{
+		std::cout << "No match for " << immRetVal << "..." << std::endl;
+		throw(BadImgFileException());
+	}
+
+	return outstr;
+}
+
+
