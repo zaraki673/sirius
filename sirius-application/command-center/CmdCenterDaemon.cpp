@@ -335,8 +335,8 @@ private:
 
 	void heartbeatManager(){
 		cout << "heartbeat manager started" << endl;
-		boost::posix_time::seconds workTime(3);
-		boost::this_thread::sleep(workTime);
+		// boost::posix_time::seconds workTime(3);
+		// boost::this_thread::sleep(workTime);
 		cout << "heartbeat manager finished" << endl;
 	}
 
