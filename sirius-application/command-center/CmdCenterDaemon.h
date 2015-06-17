@@ -73,6 +73,7 @@ class ResponseData
 public:
 	ResponseData(std::string _response)
 	: response(_response) {}
+	std::string getResponse() { return response; }
 private:
 	// could be audio transcript, answer, or matched img name
 	std::string response;

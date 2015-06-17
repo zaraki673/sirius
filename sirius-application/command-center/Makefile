@@ -14,6 +14,7 @@ LINK_FLAGS = -lopencv_core \
                          -lboost_filesystem \
                          -lboost_system \
 			 -lboost_regex \
+			 -lboost_thread \
 			 -lprotobuf \
                          -ltesseract \
 			 -lthrift \
