@@ -31,6 +31,8 @@
 
 // Boost libraries
 #include <boost/regex.hpp>
+#include <boost/thread.hpp>
+#include <boost/date_time.hpp>
 
 // Extras
 #include "base64.h"
@@ -54,6 +56,7 @@ public:
 	CommandCenterHandler()
 	{
 		registeredServices = std::multimap<std::string, MachineData>();
+		boost::thread heartbeatThread(heartbeatManager);
 		
 	}
 
@@ -327,6 +330,13 @@ private:
 			cout << msg << endl;
 			throw(AssignmentFailedException(type + " requested, but not found"));
 		}
+	}
+
+	void heartbeatManager(){
+		cout << "heartbeat manager started" << endl;
+		boost::posix_time::seconds workTime(3);
+		boost::this_thread::sleep(workTime);
+		cout << "heartbeat manager finished" << endl;
 	}
 
 };
