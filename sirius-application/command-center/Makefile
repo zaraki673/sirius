@@ -16,7 +16,8 @@ LINK_FLAGS = -lopencv_core \
 			 -lboost_regex \
 			 -lprotobuf \
                          -ltesseract \
-			 -lthrift
+			 -lthrift \
+			 -pthread
 
 TARGET_CLIENT = ccclient
 TARGET_SERVER = ccserver

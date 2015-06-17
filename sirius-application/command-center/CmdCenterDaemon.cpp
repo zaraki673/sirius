@@ -35,6 +35,9 @@
 // Extras
 #include "base64.h"
 
+// Threading
+#include <pthread.h>
+
 // define the number of threads in pool
 #define THREAD_WORKS 16
 
@@ -48,6 +51,10 @@ using namespace apache::thrift::server;
 using namespace cmdcenterstubs;
 using namespace qastubs;
 
+//---- Functions designed for multithreading with pthreads ----//
+// NOTE: These functions CANNOT be declared as members of a class
+// when using pthreads. See stackoverflow, cannot-convert-voidmyclassvoid-to...
+void *immWorker(void *arg);
 
 class BadImgFileException {};
 
@@ -77,12 +84,17 @@ public:
 	boost::shared_ptr<TProtocol> protocol;
 };
 
+// NOTE: why am I not using get() and set()? ~Ben
+// set() allows you to encapsulate assignment validity checks
+// within the class. However, it's difficult to determine whether
+// audio/img data is well-formed from within the command center.
 class AsrServiceData : public ServiceData
 {
 public:
 	AsrServiceData(ServiceData *sd)
-	: ServiceData(sd), client(protocol) {}
+	: ServiceData(sd), client(protocol), audio("") {}
 	KaldiServiceClient client;
+	std::string audio;
 };
 
 class QaServiceData : public ServiceData
@@ -97,8 +109,19 @@ class ImmServiceData : public ServiceData
 {
 public:
 	ImmServiceData(ServiceData *sd)
-	: ServiceData(sd), client(protocol) {}
+	: ServiceData(sd), client(protocol), img("") {}
 	ImageMatchingServiceClient client;
+	std::string img;
+};
+
+class ResponseData
+{
+public:
+	ResponseData(std::string _response)
+	: response(_response) {}
+private:
+	// could be audio transcript, answer, or matched img name
+	std::string response;
 };
 
 class CommandCenterHandler : public CommandCenterIf
@@ -136,29 +159,11 @@ public:
 	{
 		cout << "/-----handleRequest()-----/" << endl;
 
-		//---- Transform data into a form the services can use ----//
-		std::string binary_audio, binary_img;
-		
-		if(data.audioB64Encoding) {
-			cout << "Decoding audio..." << endl;
-			binary_audio = base64_decode(data.audioData);	
-		} else {
-			binary_audio = data.audioData;
-		}
-
-		if(data.imgB64Encoding) {
-			cout << "Decoding img..." << endl;
-			binary_img = base64_decode(data.imgData);
-		} else {
-			binary_img = data.imgData;
-		}
-
 		//---- Create clients ----//
 		ServiceData *sd = NULL;
 		AsrServiceData *asr = NULL;
 		ImmServiceData *imm = NULL;
 		QaServiceData *qa = NULL;
-
 		//---- Kaldi speech recognition client
 		if (data.audioData != "") {
 			cout << "Getting asr client...\t";
@@ -171,7 +176,6 @@ public:
 			asr = new AsrServiceData(sd);
 			cout << "AsrServiceData object constructed" << endl;
 		}
-
 		//---- Image matching client
 		if (data.imgData != "") {
 			cout << "Getting imm client...\t";
@@ -184,7 +188,6 @@ public:
 			imm = new ImmServiceData(sd);
 			cout << "ImmServiceData object constructed" << endl;
 		}
-
 		//---- Open Ephyra QA client
 		// TODO For now, this is always generated, because the command center
 		// cannot yet determine whether the audio data is a voice command
@@ -199,6 +202,31 @@ public:
 		qa = new QaServiceData(sd);
 		cout << "QaServiceData object constructed" << endl;
 
+		//---- Transform data into a form the services can use ----//
+		std::string binary_audio, binary_img;
+		if(data.audioB64Encoding) {
+			cout << "Decoding audio..." << endl;
+			binary_audio = base64_decode(data.audioData);	
+		} else {
+			binary_audio = data.audioData;
+		}
+		if(data.imgB64Encoding) {
+			cout << "Decoding img..." << endl;
+			binary_img = base64_decode(data.imgData);
+		} else {
+			binary_img = data.imgData;
+		}
+		//---- Set audio and imm fields in service data objects
+		// if they were constructed
+		if (asr)
+		{
+			asr->audio = binary_audio;
+		}
+		if (imm)
+		{
+			imm->img = binary_img;
+		}
+
 		//---- Run pipeline ----//
 		std::string asrRetVal = "";
 		std::string immRetVal = "";
@@ -208,6 +236,7 @@ public:
 		if ((data.audioData != "") && (data.imgData != ""))
 		{
 			cout << "Starting ASR-IMM-QA pipeline..." << endl;
+			//---- Run asr and image matching in parallel
 			//---Image matching
 			imm->transport->open();
 			imm->client.match_img(immRetVal, binary_img);
@@ -223,6 +252,26 @@ public:
 				cout << "Cmd Center: BadImgFileException" << endl;
 				throw;
 			}
+
+			///////////////////////////////////////////////////////////
+			// NOTE: declaring a void **s and passing that to pthread_join
+			// doesn't work.
+			cout << "Now trying the threading imm method" << endl;
+			pthread_t thr;
+			int rc;
+			void *status = NULL;
+			//void **s = NULL;
+			if ((rc = pthread_create(&thr, NULL, immWorker, (void *) imm)))
+			{
+				cerr << "error: pthread_create: " << rc << endl;
+			}
+			pthread_join(thr, &status);
+			//s = &status;
+			assert(status);
+			//assert(s);
+			cout << "SUCCESS!" << endl;
+
+			///////////////////////////////////////////////////////////
 
 			//---Speech recognition
 			asr->transport->open();
@@ -354,7 +403,6 @@ private:
 			cout << msg << endl;
 			throw(AssignmentFailedException(type + " requested, but not found"));
 		}
-		
 	}
 
 };
@@ -400,4 +448,23 @@ int main(int argc, char **argv) {
 	server.serve();
 	cout << "Done." << endl;
 	return 0;
+}
+
+//---- Functions designed for multithreading with pthreads ----//
+void *immWorker(void *arg)
+{
+	std::string immRetVal = "";
+	ImmServiceData *imm = (ImmServiceData *) arg;
+	imm->transport->open();
+	imm->client.match_img(immRetVal, imm->img);
+	imm->transport->close();
+	cout << "imm worker thread... IMG = " << immRetVal << endl;
+
+	// Package response
+	ResponseData *resp = new ResponseData(immRetVal);
+	void *ret = (void *) resp;
+	// NOTE: there doesn't appear to be functional difference between
+	// return() and pthread_exit() in this case.
+	//return ret;
+	pthread_exit(ret);
 }
