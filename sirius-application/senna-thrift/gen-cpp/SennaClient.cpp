@@ -27,6 +27,7 @@ nclude <iostream>
 #include <thrift/transport/TTransportUtils.h>
 
 #include "../gen-cpp/SennaService.h"
+#include "../gen-cpp/SennaService_types.h"
 
 using namespace std;
 using namespace apache::thrift;
@@ -91,13 +92,13 @@ int main(int argc, char *argv[]) {
 
     client.senna_all(tInput);
     
-    try {
-      client.calculate(1, work);
+    /*try {
+     // client.calculate(1, work);
       cout << "Whoa? We can divide by zero!" << endl;
     } catch (InvalidOperation& io) {
       cout << "InvalidOperation: " << io.why << endl;
       // or using generated operator<<: cout << io << endl;
-    }
+    }*/
 
     transport->close();
   } catch (TException& tx) {

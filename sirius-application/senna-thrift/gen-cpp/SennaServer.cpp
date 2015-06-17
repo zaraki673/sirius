@@ -104,7 +104,7 @@ class SennaServiceHandler : virtual public SennaServiceIf {
   }
 
  protected:
-  TonicSuitApp app;
+  TonicSuiteApp app;
 
   void setTonicApp(const& TonicInput& tInput){
 	app.task = tInput.task;
