@@ -103,14 +103,41 @@ class SennaServiceHandler : virtual public SennaServiceIf {
      }
 
      //modify before the line "read the input file"
-	
-     printf("senna_all\n");
+    
+        // read input file
+    ifstream file(app.input.c_str());
+    string str;
+    string text;
+    while (getline(file, str)) text += str;	
+      
+    //tokenize
+    SENNA_Tokens *tokens = SENNA_Tokenizer_tokenize(tokenizer, text.c_str());
+    app.pl.num = tokens->n;
+
+    if (app.pl.num == 0) LOG(FATAL) << app.input << " empty or no tokens found.";
+
+
+
+    for (int i = 0; i < tokens->n; i++) {
+      printf("%15s", tokens->words[i]);
+      if (app.task == "pos")
+        printf("\t%10s", SENNA_Hash_key(pos_hash, pos_labels[i]));
+      else if (app.task == "chk")
+        printf("\t%10s", SENNA_Hash_key(chk_hash, chk_labels[i]));
+      else if (app.task == "ner")
+        printf("\t%10s", SENNA_Hash_key(ner_hash, ner_labels[i]));
+      printf("\n");
+    }
+    //end of sentence
+
+      printf("senna_all\n");
   }
 
  protected:
   TonicSuiteApp app;
 
   //initializes the TonicSuiteApp which just stores inputs
+  //don't think we'll need to use this 
   void setTonicApp(const& TonicInput& tInput){
 	app.task = tInput.task;
 	app.network = tInput.network;
@@ -140,7 +167,7 @@ class SennaServiceHandler : virtual public SennaServiceIf {
   }  
 
   //Member data
-  
+
   //parameters
   char *opt_path;
   int opt_usrtokens;
@@ -174,7 +201,43 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 
 };
 
+//function for pasing command line
+po::variables_map parse_opts(int ac, char** av) {
+  // Declare the supported options.
+  po::options_description desc("Allowed options");
+  desc.add_options()("help,h", "Produce help message")(
+      "common,c", po::value<string>()->default_value("../common/"),
+      "Directory with configs and weights")(
+      "portno,p", po::value<int>()->default_value(8080),
+      "Port to open DjiNN on")
+
+      ("nets,n", po::value<string>()->default_value("nets.txt"),
+       "File with list of network configs (.prototxt/line)")(
+          "weights,w", po::value<string>()->default_value("weights/"),
+          "Directory containing weights (in common)")
+
+          ("gpu,g", po::value<bool>()->default_value(false), "Use GPU?")(
+              "debug,v", po::value<bool>()->default_value(false),
+              "Turn on all debug")("threadcnt,t",
+                                   po::value<int>()->default_value(-1),
+                                   "Number of threads to spawn before exiting "
+                                   "the server. (-1 loop forever)");
+
+  po::variables_map vm;
+  po::store(po::parse_command_line(ac, av, desc), vm);
+  po::notify(vm);
+
+  if (vm.count("help")) {
+    cout << desc << "\n";
+    exit(1);
+  }
+  return vm;
+}
+
 int main(int argc, char **argv) {
+  //parse command line for arguments
+  po::variables_map vm = parse_opts(argc, argv);
+
   int port = 9090;
   shared_ptr<SennaServiceHandler> handler(new SennaServiceHandler());
   shared_ptr<TProcessor> processor(new SennaServiceProcessor(handler));
