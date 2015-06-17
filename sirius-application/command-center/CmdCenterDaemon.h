@@ -29,7 +29,7 @@
 // services
 #include "../openephyra-thrift/gen-cpp/QAService.h"
 #include "../speech-recognition/kaldi/scripts/kaldi-thrift/gen-cpp/KaldiService.h"
-#include "../image-matching/matching-thrift/gen-cpp/ImageMatchingService.h"
+#include "../image-matching/matching-thrift/ImageMatchingService.h"
 
 // Boost libraries
 #include <boost/regex.hpp>
