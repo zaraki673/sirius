@@ -310,6 +310,16 @@ private:
 				} catch(...) {
 					//remove from list
 					registeredServices.erase(it);
+					cout << "There are now " << registeredServices.size() << " registered services" << endl;
+					cout << "LIST OF REGISTERED SERVICES:" << endl;
+					std::multimap<std::string, ServiceData*>::iterator it;
+					// std::multimap<std::string, MachineData>::iterator it;
+					for (it = registeredServices.begin(); it != registeredServices.end(); ++it)
+					{
+						cout << "\t" << it->first << endl;
+						     // << it->second->name << ":"
+						     // << (*it).second.port << endl;
+					}
 					break;
 				}
 			}
