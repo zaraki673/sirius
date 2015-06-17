@@ -42,9 +42,6 @@
 // define the number of threads in pool
 #define THREAD_WORKS 16
 
-
-
-
 //---- Functions designed for multithreading with pthreads ----//
 // NOTE: These functions CANNOT be declared as members of a class
 // when using pthreads. See stackoverflow, cannot-convert-voidmyclassvoid-to...
