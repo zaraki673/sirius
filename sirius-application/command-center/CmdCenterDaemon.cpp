@@ -171,6 +171,7 @@ public:
 				assignService(sd, "IMM");
 			} catch(AssignmentFailedException exc) {
 				cout << exc.err << endl;
+				_return = exc.err;
 				return;
 			}
 			
