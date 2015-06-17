@@ -49,13 +49,6 @@
 // when using pthreads. See stackoverflow, cannot-convert-voidmyclassvoid-to...
 void *immWorker(void *arg);
 
-void heartbeatManager(){
-	cout << "heartbeat manager started" << endl;
-	boost::posix_time::seconds workTime(3);
-	boost::this_thread::sleep(workTime);
-	cout << "heartbeat manager finished" << endl;
-}
-
 class CommandCenterHandler : public CommandCenterIf
 {
 public:
@@ -63,7 +56,7 @@ public:
 	CommandCenterHandler()
 	{
 		registeredServices = std::multimap<std::string, MachineData>();
-		boost::thread heartbeatThread(heartbeatManager);
+		boost::thread heartbeatThread(CommandCenterHandler::heartbeatManager);
 		
 	}
 
@@ -298,6 +291,7 @@ private:
 	// TODO: this is a poor model, because it doesn't allow you to
 	// select available servers easily, for a given key.
 	std::multimap<std::string, MachineData> registeredServices;
+	// boost::thread heartbeatThread;
 
 	std::string parseImgFile(const std::string& immRetVal)
 	{
@@ -337,6 +331,13 @@ private:
 			cout << msg << endl;
 			throw(AssignmentFailedException(type + " requested, but not found"));
 		}
+	}
+
+	void heartbeatManager(){
+		cout << "heartbeat manager started" << endl;
+		boost::posix_time::seconds workTime(3);
+		boost::this_thread::sleep(workTime);
+		cout << "heartbeat manager finished" << endl;
 	}
 
 };
