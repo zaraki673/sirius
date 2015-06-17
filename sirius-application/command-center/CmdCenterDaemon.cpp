@@ -43,14 +43,7 @@
 #define THREAD_WORKS 16
 
 
-using namespace std;
-using namespace apache::thrift;
-using namespace apache::thrift::concurrency;
-using namespace apache::thrift::protocol;
-using namespace apache::thrift::transport;
-using namespace apache::thrift::server;
-using namespace cmdcenterstubs;
-using namespace qastubs;
+
 
 //---- Functions designed for multithreading with pthreads ----//
 // NOTE: These functions CANNOT be declared as members of a class
