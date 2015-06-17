@@ -56,7 +56,7 @@ public:
 	CommandCenterHandler()
 	{
 		registeredServices = std::multimap<std::string, MachineData>();
-		boost::thread heartbeatThread(CommandCenterHandler::heartbeatManager);
+		boost::thread *heartbeatThread = new boost::thread(boost::bind(&CommandCenterHandler::heartbeatManager, this));
 		
 	}
 
