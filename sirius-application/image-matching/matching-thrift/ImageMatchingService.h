@@ -16,6 +16,7 @@ class ImageMatchingServiceIf {
  public:
   virtual ~ImageMatchingServiceIf() {}
   virtual void match_img(std::string& _return, const std::string& img_query) = 0;
+  virtual void ping() = 0;
 };
 
 class ImageMatchingServiceIfFactory {
@@ -46,6 +47,9 @@ class ImageMatchingServiceNull : virtual public ImageMatchingServiceIf {
  public:
   virtual ~ImageMatchingServiceNull() {}
   void match_img(std::string& /* _return */, const std::string& /* img_query */) {
+    return;
+  }
+  void ping() {
     return;
   }
 };
@@ -170,6 +174,96 @@ class ImageMatchingService_match_img_presult {
   friend std::ostream& operator<<(std::ostream& out, const ImageMatchingService_match_img_presult& obj);
 };
 
+
+class ImageMatchingService_ping_args {
+ public:
+
+  static const char* ascii_fingerprint; // = "99914B932BD37A50B983C5E7C90AE93B";
+  static const uint8_t binary_fingerprint[16]; // = {0x99,0x91,0x4B,0x93,0x2B,0xD3,0x7A,0x50,0xB9,0x83,0xC5,0xE7,0xC9,0x0A,0xE9,0x3B};
+
+  ImageMatchingService_ping_args(const ImageMatchingService_ping_args&);
+  ImageMatchingService_ping_args& operator=(const ImageMatchingService_ping_args&);
+  ImageMatchingService_ping_args() {
+  }
+
+  virtual ~ImageMatchingService_ping_args() throw();
+
+  bool operator == (const ImageMatchingService_ping_args & /* rhs */) const
+  {
+    return true;
+  }
+  bool operator != (const ImageMatchingService_ping_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const ImageMatchingService_ping_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  friend std::ostream& operator<<(std::ostream& out, const ImageMatchingService_ping_args& obj);
+};
+
+
+class ImageMatchingService_ping_pargs {
+ public:
+
+  static const char* ascii_fingerprint; // = "99914B932BD37A50B983C5E7C90AE93B";
+  static const uint8_t binary_fingerprint[16]; // = {0x99,0x91,0x4B,0x93,0x2B,0xD3,0x7A,0x50,0xB9,0x83,0xC5,0xE7,0xC9,0x0A,0xE9,0x3B};
+
+
+  virtual ~ImageMatchingService_ping_pargs() throw();
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  friend std::ostream& operator<<(std::ostream& out, const ImageMatchingService_ping_pargs& obj);
+};
+
+
+class ImageMatchingService_ping_result {
+ public:
+
+  static const char* ascii_fingerprint; // = "99914B932BD37A50B983C5E7C90AE93B";
+  static const uint8_t binary_fingerprint[16]; // = {0x99,0x91,0x4B,0x93,0x2B,0xD3,0x7A,0x50,0xB9,0x83,0xC5,0xE7,0xC9,0x0A,0xE9,0x3B};
+
+  ImageMatchingService_ping_result(const ImageMatchingService_ping_result&);
+  ImageMatchingService_ping_result& operator=(const ImageMatchingService_ping_result&);
+  ImageMatchingService_ping_result() {
+  }
+
+  virtual ~ImageMatchingService_ping_result() throw();
+
+  bool operator == (const ImageMatchingService_ping_result & /* rhs */) const
+  {
+    return true;
+  }
+  bool operator != (const ImageMatchingService_ping_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const ImageMatchingService_ping_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  friend std::ostream& operator<<(std::ostream& out, const ImageMatchingService_ping_result& obj);
+};
+
+
+class ImageMatchingService_ping_presult {
+ public:
+
+  static const char* ascii_fingerprint; // = "99914B932BD37A50B983C5E7C90AE93B";
+  static const uint8_t binary_fingerprint[16]; // = {0x99,0x91,0x4B,0x93,0x2B,0xD3,0x7A,0x50,0xB9,0x83,0xC5,0xE7,0xC9,0x0A,0xE9,0x3B};
+
+
+  virtual ~ImageMatchingService_ping_presult() throw();
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+  friend std::ostream& operator<<(std::ostream& out, const ImageMatchingService_ping_presult& obj);
+};
+
 class ImageMatchingServiceClient : virtual public ImageMatchingServiceIf {
  public:
   ImageMatchingServiceClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) {
@@ -198,6 +292,9 @@ class ImageMatchingServiceClient : virtual public ImageMatchingServiceIf {
   void match_img(std::string& _return, const std::string& img_query);
   void send_match_img(const std::string& img_query);
   void recv_match_img(std::string& _return);
+  void ping();
+  void send_ping();
+  void recv_ping();
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -214,10 +311,12 @@ class ImageMatchingServiceProcessor : public ::apache::thrift::TDispatchProcesso
   typedef std::map<std::string, ProcessFunction> ProcessMap;
   ProcessMap processMap_;
   void process_match_img(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_ping(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
   ImageMatchingServiceProcessor(boost::shared_ptr<ImageMatchingServiceIf> iface) :
     iface_(iface) {
     processMap_["match_img"] = &ImageMatchingServiceProcessor::process_match_img;
+    processMap_["ping"] = &ImageMatchingServiceProcessor::process_ping;
   }
 
   virtual ~ImageMatchingServiceProcessor() {}
@@ -254,6 +353,15 @@ class ImageMatchingServiceMultiface : virtual public ImageMatchingServiceIf {
     }
     ifaces_[i]->match_img(_return, img_query);
     return;
+  }
+
+  void ping() {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->ping();
+    }
+    ifaces_[i]->ping();
   }
 
 };
