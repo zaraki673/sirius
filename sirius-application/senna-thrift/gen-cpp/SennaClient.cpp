@@ -1,4 +1,8 @@
-nclude <iostream>
+/*
+Derived from nlp-client.cpp from Tonic
+*/
+
+#include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -1,4 +1,8 @@
-nclude "SennaService.h"
+/*
+Derived from main.cpp in DjiNN
+*/
+
+#include "SennaService.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
@@ -39,7 +43,7 @@ using boost::shared_ptr;
 class SennaServiceHandler : virtual public SennaServiceIf {
  public:
   SennaServiceHandler() {
-       // Your initialization goes here
+       // Let the server take care of initialization
       opt_path = NULL;
       opt_usrtokens = 0;
 
@@ -106,6 +110,7 @@ class SennaServiceHandler : virtual public SennaServiceIf {
  protected:
   TonicSuiteApp app;
 
+  //initializes the TonicSuiteApp which just stores inputs
   void setTonicApp(const& TonicInput& tInput){
 	app.task = tInput.task;
 	app.network = tInput.network;
@@ -117,6 +122,7 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 	app.portno = 8080;
 	//app.socketfd
 
+  //initializes the DNN
 	if (app.djinn) {
 	  app.hostname = tInput.hostname;
     	  app.portno = tInput.portno;
@@ -133,6 +139,8 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 	strcpy(app.pl.req_name, app.task.c_str());
   }  
 
+  //Member data
+  
   //parameters
   char *opt_path;
   int opt_usrtokens;
