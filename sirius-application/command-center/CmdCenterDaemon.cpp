@@ -15,7 +15,8 @@ public:
 	// ctor: initialize command center's tables
 	CommandCenterHandler()
 	{
-		registeredServices = std::multimap<std::string, MachineData>();
+		registeredServices = std::multimap<std::string, ServiceData*>();
+		// registeredServices = std::multimap<std::string, MachineData>();
 		boost::thread *heartbeatThread = new boost::thread(boost::bind(&CommandCenterHandler::heartbeatManager, this));
 		
 	}
@@ -28,16 +29,31 @@ public:
 		cout << "received request from " << mDataObj.name
 		     << ":" << mDataObj.port << ", serviceType = " << serviceType
 		     << endl;
-		registeredServices.insert( std::pair<std::string, MachineData>(serviceType, mDataObj) );
+
+
+		ServiceData *sd = new ServiceData(mDataObj.name, mDataObj.port);
+		if(serviceType == "ASR") {
+			registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new AsrServiceData(sd)) );
+		} else if(serviceType == "IMM") {
+			registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new ImmServiceData(sd)) );
+		} else if(serviceType == "QA") {
+			registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new QaServiceData(sd)) );
+		} else {
+			cout << serviceType << " service type not recognize" << endl;
+			return;
+		}
+		
+		// registeredServices.insert( std::pair<std::string, MachineData>(serviceType, mDataObj) );
 	
 		cout << "There are now " << registeredServices.size() << " registered services" << endl;
 		cout << "LIST OF REGISTERED SERVICES:" << endl;
-		std::multimap<std::string, MachineData>::iterator it;
+		std::multimap<std::string, ServiceData*>::iterator it;
+		// std::multimap<std::string, MachineData>::iterator it;
 		for (it = registeredServices.begin(); it != registeredServices.end(); ++it)
 		{
-			cout << "\t" << (*it).first << "\t"
-			     << (*it).second.name << ":"
-			     << (*it).second.port << endl;
+			cout << "\t" << it->first << endl;
+			     // << it->second->name << ":"
+			     // << (*it).second.port << endl;
 		}
 	}
 
@@ -256,7 +272,8 @@ private:
 	// the command center via the registerService() method
 	// TODO: this is a poor model, because it doesn't allow you to
 	// select available servers easily, for a given key.
-	std::multimap<std::string, MachineData> registeredServices;
+	std::multimap<std::string, ServiceData*> registeredServices;
+	// std::multimap<std::string, MachineData> registeredServices;
 	// boost::thread heartbeatThread;
 
 	void assignService(ServiceData *&sd, const std::string type) {
@@ -276,8 +293,14 @@ private:
 
 	void heartbeatManager(){
 		cout << "heartbeat manager started" << endl;
-		// boost::posix_time::seconds workTime(3);
-		// boost::this_thread::sleep(workTime);
+		while(registeredServices.size() > 0) {
+			
+
+			//sleep
+			boost::posix_time::seconds sleepTime(3);
+			boost::this_thread::sleep(sleepTime);
+		}
+		
 		cout << "heartbeat manager finished" << endl;
 	}
 
