@@ -34,6 +34,10 @@
 
 // Extras
 #include "base64.h"
+#include "CmdCenterDaemon.h"
+
+// Threading
+#include <pthread.h>
 
 // define the number of threads in pool
 #define THREAD_WORKS 16
@@ -48,56 +52,10 @@ using namespace apache::thrift::server;
 using namespace cmdcenterstubs;
 using namespace qastubs;
 
-class BadImgFileException {};
-
-class AssignmentFailedException{
-public:
-	AssignmentFailedException(std::string msg) {
-		err = msg;
-	}
-	string err;
-};
-
-class ServiceData
-{
-public:
-	ServiceData(std::string hostname, int port) {
-	  	socket = boost::shared_ptr<TTransport>(new TSocket(hostname, port));
-	  	transport = boost::shared_ptr<TTransport>(new TBufferedTransport(socket));
-	  	protocol = boost::shared_ptr<TProtocol>(new TBinaryProtocol(transport));
-	  	assert(socket || transport || protocol);
-	  	assert(socket);
-	  	assert(transport);
-	  	assert(protocol);
-		cerr << "sd constructor 1!!!" << endl;
-	}
-	ServiceData(ServiceData *sd) {
-	  	socket = sd->socket;
-	  	transport = sd->transport;
-	  	protocol = sd->protocol;
-	  	assert(socket || transport || protocol);
-	  	assert(socket);
-	  	assert(transport);
-	  	assert(protocol);
-	  	cerr << "sd constructor 2" << endl;
-	}
-	boost::shared_ptr<TTransport> socket;
-	boost::shared_ptr<TTransport> transport;
-	boost::shared_ptr<TProtocol> protocol;
-};
-
-class ImmServiceData : public ServiceData
-{
-public:
-	ImmServiceData(ServiceData *sd)
-	: ServiceData(sd), client(protocol) {
-	  	assert(socket || transport || protocol);
-	  	assert(socket);
-	  	assert(transport);
-	  	assert(protocol);
-	}
-	ImageMatchingServiceClient client;
-};
+//---- Functions designed for multithreading with pthreads ----//
+// NOTE: These functions CANNOT be declared as members of a class
+// when using pthreads. See stackoverflow, cannot-convert-voidmyclassvoid-to...
+void *immWorker(void *arg);
 
 class CommandCenterHandler : public CommandCenterIf
 {
@@ -119,7 +77,6 @@ public:
 		     << endl;
 		registeredServices.insert( std::pair<std::string, MachineData>(serviceType, mDataObj) );
 	
-		// DEBUG information (testing only)
 		cout << "There are now " << registeredServices.size() << " registered services" << endl;
 		cout << "LIST OF REGISTERED SERVICES:" << endl;
 		std::multimap<std::string, MachineData>::iterator it;
@@ -129,31 +86,63 @@ public:
 			     << (*it).second.name << ":"
 			     << (*it).second.port << endl;
 		}
-		// END_DEBUG
-		/*cout << "received request from " << machine_name << ":" << port << ", serviceType = " << type << endl;
-		if(type == "QA"){
-			qa = Service(machine_name, port, type);
-		} else if(type == "IMM"){
-			imm = Service(machine_name, port, type);
-		} else if(type == "ASR"){
-			asr = Service(machine_name, port, type);
-		}*/
 	}
 
 	virtual void handleRequest(std::string& _return, const QueryData& data)
 	{
 		cout << "/-----handleRequest()-----/" << endl;
 
-		//---- Select the data to be passed to the services ----//
+		//---- Create clients ----//
+		ServiceData *sd = NULL;
+		AsrServiceData *asr = NULL;
+		ImmServiceData *imm = NULL;
+		QaServiceData *qa = NULL;
+		//---- Kaldi speech recognition client
+		if (data.audioData != "") {
+			cout << "Getting asr client...\t";
+			try {
+				assignService(sd, "ASR");
+			} catch (AssignmentFailedException exc) {
+				cout << exc.err << endl;
+				return;
+			}
+			asr = new AsrServiceData(sd);
+			cout << "AsrServiceData object constructed" << endl;
+		}
+		//---- Image matching client
+		if (data.imgData != "") {
+			cout << "Getting imm client...\t";
+			try {
+				assignService(sd, "IMM");
+			} catch (AssignmentFailedException exc) {
+				cout << exc.err << endl;
+				return;
+			}
+			imm = new ImmServiceData(sd);
+			cout << "ImmServiceData object constructed" << endl;
+		}
+		//---- Open Ephyra QA client
+		// TODO For now, this is always generated, because the command center
+		// cannot yet determine whether the audio data is a voice command
+		// (which doesn't require QA) or a voice query (which does require QA).
+		cout << "Getting qa client...\t";
+		try {
+			assignService(sd, "QA");
+		} catch (AssignmentFailedException exc) {
+			cout << exc.err << endl;
+			return;
+		}
+		qa = new QaServiceData(sd);
+		cout << "QaServiceData object constructed" << endl;
+
+		//---- Transform data into a form the services can use ----//
 		std::string binary_audio, binary_img;
-		
 		if(data.audioB64Encoding) {
 			cout << "Decoding audio..." << endl;
 			binary_audio = base64_decode(data.audioData);	
 		} else {
 			binary_audio = data.audioData;
 		}
-
 		if(data.imgB64Encoding) {
 			cout << "Decoding img..." << endl;
 			binary_img = base64_decode(data.imgData);
@@ -161,129 +150,27 @@ public:
 			binary_img = data.imgData;
 		}
 
-		ImmServiceData *imm = NULL;
-		if(data.imgData != "") {
-			ServiceData *sd = NULL;
-			cout << "Getting imm client" << endl;
-			//assign imm client
-			// ImmServiceData *imm = NULL;
-			try {
-				assignService(sd, "IMM");
-			} catch(AssignmentFailedException exc) {
-				cout << exc.err << endl;
-				_return = exc.err;
-				return;
-			}
-			
-			assert(sd);
-			imm = new ImmServiceData(sd);
-			cout << "ImmServiceData object constructed" << endl;
-			//imm->client = new ImageMatchingServiceClient(imm->protocol);
-			// ImageMatchingServiceClient tmp_client(imm->protocol);
-			// imm->client = tmp_client;
-		}
-
-		// NOTE: hard to break this up, b/c you need to pass the N clients around
-		// I suppose you could use a struct
-		//----Select services based on the client's query----//
-		std::multimap<std::string, MachineData>::iterator it;
-		
-		// TODO: figure out how to resolve scoping to make clients visible
-		// Must instantiate all clients in this way.
-		// NOTE: TSocket values below are irrelevant; the clients to be used
-		// will have their values overwritten, and the rest will be ignored
-		boost::shared_ptr<TTransport> asr_socket(new TSocket("localhost", 8080));
-		boost::shared_ptr<TTransport> asr_transport(new TBufferedTransport(asr_socket));
-		boost::shared_ptr<TProtocol> asr_protocol(new TBinaryProtocol(asr_transport));
-		KaldiServiceClient asr_client(asr_protocol);
-
-		boost::shared_ptr<TTransport> qa_socket(new TSocket("localhost", 8080));
-		boost::shared_ptr<TTransport> qa_transport(new TBufferedTransport(qa_socket));
-		boost::shared_ptr<TProtocol> qa_protocol(new TBinaryProtocol(qa_transport));
-		QAServiceClient qa_client(qa_protocol);
-
-		
-
-		if (data.audioData != "")
+		//---- Set audio and imm fields in service data objects
+		// if they were constructed
+		if (asr)
 		{
-			it = registeredServices.find("ASR");
-			if (it != registeredServices.end())
-			{
-				boost::shared_ptr<TTransport> tmp_socket(
-					new TSocket((*it).second.name, (*it).second.port)
-				);
-				boost::shared_ptr<TTransport> tmp_transport(new TBufferedTransport(tmp_socket));
-				boost::shared_ptr<TProtocol> tmp_protocol(new TBinaryProtocol(tmp_transport));
-				KaldiServiceClient tmp_client(tmp_protocol);
-			
-				asr_socket = tmp_socket;
-				asr_transport = tmp_transport;
-				asr_protocol = tmp_protocol;	
-				asr_client = tmp_client;
-				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
-				     << " for ASR server" << endl;
-			}
-			else
-			{
-				_return = "ASR requested, but not found";
-				cout << _return << endl;
-				return;
-			}
+			asr->audio = binary_audio;
 		}
-		/*if (data.textData != "")
-		{*/
-			it = registeredServices.find("QA");
-			if (it != registeredServices.end())
-			{
-				boost::shared_ptr<TTransport> tmp_socket(
-					new TSocket((*it).second.name, (*it).second.port)
-				);
-				boost::shared_ptr<TTransport> tmp_transport(new TBufferedTransport(tmp_socket));
-				boost::shared_ptr<TProtocol> tmp_protocol(new TBinaryProtocol(tmp_transport));
-				QAServiceClient tmp_client(tmp_protocol);
+		if (imm)
+		{
+			imm->img = binary_img;
+		}
 
-				qa_socket = tmp_socket;
-				qa_transport = tmp_transport;
-				qa_protocol = tmp_protocol;
-				qa_client = tmp_client;
-				cout << "Selected " << (*it).second.name << ":" << (*it).second.port
-				     << " for QA server" << endl;
-
-			}
-			else
-			{
-				_return = "QA requested, but not found";
-				cout << _return << endl;
-				return;
-			}
-		//}
-		// if (data.imgData != "")
-		// {
-		// 	it = registeredServices.find("IMM");
-		// 	if (it != registeredServices.end())
-		// 	{
-		// 		imm = new ImmServiceData((*it).second.name, (*it).second.port);
-		// 		cout << "Selected " << (*it).second.name << ":" << (*it).second.port
-		// 		     << " for IMM server" << endl;
-		// 	}
-		// 	else
-		// 	{
-		// 		_return = "IMM requested, but not found";
-		// 		cout << _return << endl;
-		// 		return;
-		// 	}
-		// }
-
-		//----Run pipeline----//
+		//---- Run pipeline ----//
 		std::string asrRetVal = "";
 		std::string immRetVal = "";
 		std::string question = "";
-		//std::string answer = "";
 		// TODO: use nlp libs to distinguish between voice cmd
 		// and voice query
 		if ((data.audioData != "") && (data.imgData != ""))
 		{
 			cout << "Starting ASR-IMM-QA pipeline..." << endl;
+			//---- Run asr and image matching in parallel
 			//---Image matching
 			imm->transport->open();
 			imm->client.match_img(immRetVal, binary_img);
@@ -300,29 +187,48 @@ public:
 				throw;
 			}
 
+			///////////////////////////////////////////////////////////
+			// NOTE: declaring a void **s and passing that to pthread_join
+			// doesn't work.
+			cout << "Now trying the threading imm method" << endl;
+			pthread_t thr;
+			int rc;
+			void *status = NULL;
+			//void **s = NULL;
+			if ((rc = pthread_create(&thr, NULL, immWorker, (void *) imm)))
+			{
+				cerr << "error: pthread_create: " << rc << endl;
+			}
+			pthread_join(thr, &status);
+			//s = &status;
+			assert(status);
+			//assert(s);
+			cout << "SUCCESS!" << endl;
+
+			///////////////////////////////////////////////////////////
+
 			//---Speech recognition
-			asr_transport->open();
-			asr_client.kaldi_asr(asrRetVal, binary_audio);
-			asr_transport->close();
-			
+			asr->transport->open();
+			asr->client.kaldi_asr(asrRetVal, binary_audio);
+			asr->transport->close();
 			
 			//---Question answer
 			question = asrRetVal + " " + immRetVal;
 			cout << "Your new question is: " << question << endl;
-			qa_transport->open();
-			qa_client.askFactoidThrift(_return, question);
-			qa_transport->close();
+			qa->transport->open();
+			qa->client.askFactoidThrift(_return, question);
+			qa->transport->close();
 		}
 		else if (data.audioData != "")
 		{
 			cout << "Starting ASR-QA pipeline..." << endl;
-			asr_transport->open();
-			asr_client.kaldi_asr(asrRetVal, binary_audio);
-			asr_transport->close();
+			asr->transport->open();
+			asr->client.kaldi_asr(asrRetVal, binary_audio);
+			asr->transport->close();
 	
-			qa_transport->open();
-			qa_client.askFactoidThrift(_return, asrRetVal);
-			qa_transport->close();
+			qa->transport->open();
+			qa->client.askFactoidThrift(_return, asrRetVal);
+			qa->transport->close();
 		}
 		/*else if (data.audioData != "")
 		{
@@ -332,15 +238,12 @@ public:
 		}*/
 		else if (data.textData != "")
 		{
-			qa_transport->open();
-			qa_client.askFactoidThrift(_return, data.textData);
-			qa_transport->close();
+			qa->transport->open();
+			qa->client.askFactoidThrift(_return, data.textData);
+			qa->transport->close();
 		}
 		else if (data.imgData != "")
 		{
-			/*imm_transport->open();
-			imm_client.match_img(_return, binary_img);
-			imm_transport->close();*/
 			imm->transport->open();
 			imm->client.match_img(_return, binary_img);
 			imm->transport->close();
@@ -434,7 +337,6 @@ private:
 			cout << msg << endl;
 			throw(AssignmentFailedException(type + " requested, but not found"));
 		}
-		
 	}
 
 };
@@ -468,7 +370,6 @@ int main(int argc, char **argv) {
 	//TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
 	//TSimpleServer server(multiplexed_processor, serverTransport, transportFactory, protocolFactory);
 
-
 	// initialize the thread manager and factory
 	boost::shared_ptr<ThreadManager> threadManager = ThreadManager::newSimpleThreadManager(THREAD_WORKS);
 	boost::shared_ptr<PosixThreadFactory> threadFactory = boost::shared_ptr<PosixThreadFactory>(new PosixThreadFactory());
@@ -481,4 +382,23 @@ int main(int argc, char **argv) {
 	server.serve();
 	cout << "Done." << endl;
 	return 0;
+}
+
+//---- Functions designed for multithreading with pthreads ----//
+void *immWorker(void *arg)
+{
+	std::string immRetVal = "";
+	ImmServiceData *imm = (ImmServiceData *) arg;
+	imm->transport->open();
+	imm->client.match_img(immRetVal, imm->img);
+	imm->transport->close();
+	cout << "imm worker thread... IMG = " << immRetVal << endl;
+
+	// Package response
+	ResponseData *resp = new ResponseData(immRetVal);
+	void *ret = (void *) resp;
+	// NOTE: there doesn't appear to be functional difference between
+	// return() and pthread_exit() in this case.
+	//return ret;
+	pthread_exit(ret);
 }
