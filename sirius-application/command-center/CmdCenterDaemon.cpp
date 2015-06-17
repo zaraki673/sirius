@@ -32,16 +32,7 @@ public:
 
 
 		ServiceData *sd = new ServiceData(mDataObj.name, mDataObj.port);
-		if(serviceType == "ASR") {
-			registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new AsrServiceData(sd)) );
-		} else if(serviceType == "IMM") {
-			registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new ImmServiceData(sd)) );
-		} else if(serviceType == "QA") {
-			registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new QaServiceData(sd)) );
-		} else {
-			cout << serviceType << " service type not recognize" << endl;
-			return;
-		}
+		registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new AsrServiceData(sd)) );
 		
 		// registeredServices.insert( std::pair<std::string, MachineData>(serviceType, mDataObj) );
 	
@@ -85,7 +76,7 @@ public:
 		if (data.audioData != "") {
 			cout << "Getting asr client...\t";
 			try {
-				asr = assignService("ASR");
+				asr = new AsrServiceData(assignService("ASR"));
 			} catch (AssignmentFailedException exc) {
 				cout << exc.err << endl;
 				return;
@@ -97,7 +88,7 @@ public:
 		if (data.imgData != "") {
 			cout << "Getting imm client...\t";
 			try {
-				imm = assignService("IMM");
+				imm = new ImmServiceData(assignService("IMM"));
 			} catch (AssignmentFailedException exc) {
 				cout << exc.err << endl;
 				return;
@@ -111,7 +102,7 @@ public:
 		// (which doesn't require QA) or a voice query (which does require QA).
 		cout << "Getting qa client...\t";
 		try {
-			qa = assignService("QA");
+			qa = new QaServiceData(assignService("QA"));
 		} catch (AssignmentFailedException exc) {
 			cout << exc.err << endl;
 			return;
@@ -286,7 +277,7 @@ private:
 			string msg = type + " requested, but not found";
 			cout << msg << endl;
 			throw(AssignmentFailedException(type + " requested, but not found"));
-			return NULL:
+			return NULL;
 		}
 	}
 
