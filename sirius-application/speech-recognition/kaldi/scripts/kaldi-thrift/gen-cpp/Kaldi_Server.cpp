@@ -60,6 +60,7 @@ class KaldiServiceHandler : virtual public KaldiServiceIf {
 	
   void kaldi_asr(std::string& _return, const std::string& audio_file);
 	void sox();
+	void ping();
 
 };
 
@@ -155,6 +156,10 @@ class KaldiServiceHandler : virtual public KaldiServiceIf {
   	sox_close(out);
   	sox_close(in);
   	sox_quit();
+}
+
+void KaldiServiceHandler::ping(){
+	cout << "pinged" << endl;
 }
 
 

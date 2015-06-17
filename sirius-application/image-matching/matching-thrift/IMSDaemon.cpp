@@ -64,6 +64,10 @@ class ImageMatchingServiceHandler : public ImageMatchingServiceIf {
 			imagefile.close();
 			response = exec_match(image_path, this->matcher, &(this->trainImgs));
 		}
+
+		void ping() {
+			cout << "pinged" << endl;
+		}
 	private:
 		struct timeval tp;
 		DescriptorMatcher *matcher;
