@@ -68,6 +68,20 @@ po::variables_map parse_opts(int ac, char **av) {
   return vm;
 }
 
+TonicSuiteApp setTonicApp(po::variables_map &vm, TonicSuiteApp &app){
+
+  app.task = vm["task"].as<string>();
+  app.network = 
+      vm["common"].as<string>() + "configs/" + vm["network"].as<string>();
+  app.weights = 
+       vm["common"].as<string>() + "weights/" + vm["weights"].as<string>();
+  app.input = vm["input"].as<string>();
+  app.gpu = vm["gpu"].as<bool>();
+  app.djinn = vm["djinn"].as<bool>(); // DjiNN service or local?
+  app.hostname = vm["hostname"].as<string>();
+  app.portno = vm["portno"].as<int>();
+  return app;
+}
 
 //SennaClient.cpp
 int main(int argc, char *argv[]) {
@@ -78,18 +92,7 @@ int main(int argc, char *argv[]) {
   boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
   SennaServiceClient client(protocol);
 
-  TonicInput tInput(); 
-  //debug = vm["debug"].as<bool>();
-  tInput.task = vm["task"].as<string>();
-  tInput.network =
-      vm["common"].as<string>() + "configs/" + vm["network"].as<string>();
-  tInput.weights =
-      vm["common"].as<string>() + "weights/" + vm["weights"].as<string>();
-  tInput.input = vm["input"].as<string>();
-
-  // DjiNN service or local?
-  tInput.djinn = vm["djinn"].as<bool>();
-  tInput.gpu = vm["gpu"].as<bool>();
+  TonicSuiteApp app = setTonicApp(vm, app);
 
   try {
     transport->open();
