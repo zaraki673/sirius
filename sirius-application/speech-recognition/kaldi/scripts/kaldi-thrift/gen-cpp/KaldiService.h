@@ -16,6 +16,7 @@ class KaldiServiceIf {
  public:
   virtual ~KaldiServiceIf() {}
   virtual void kaldi_asr(std::string& _return, const std::string& audio_file) = 0;
+  virtual void ping() = 0;
 };
 
 class KaldiServiceIfFactory {
@@ -46,6 +47,9 @@ class KaldiServiceNull : virtual public KaldiServiceIf {
  public:
   virtual ~KaldiServiceNull() {}
   void kaldi_asr(std::string& /* _return */, const std::string& /* audio_file */) {
+    return;
+  }
+  void ping() {
     return;
   }
 };
@@ -170,6 +174,96 @@ class KaldiService_kaldi_asr_presult {
   friend std::ostream& operator<<(std::ostream& out, const KaldiService_kaldi_asr_presult& obj);
 };
 
+
+class KaldiService_ping_args {
+ public:
+
+  static const char* ascii_fingerprint; // = "99914B932BD37A50B983C5E7C90AE93B";
+  static const uint8_t binary_fingerprint[16]; // = {0x99,0x91,0x4B,0x93,0x2B,0xD3,0x7A,0x50,0xB9,0x83,0xC5,0xE7,0xC9,0x0A,0xE9,0x3B};
+
+  KaldiService_ping_args(const KaldiService_ping_args&);
+  KaldiService_ping_args& operator=(const KaldiService_ping_args&);
+  KaldiService_ping_args() {
+  }
+
+  virtual ~KaldiService_ping_args() throw();
+
+  bool operator == (const KaldiService_ping_args & /* rhs */) const
+  {
+    return true;
+  }
+  bool operator != (const KaldiService_ping_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const KaldiService_ping_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  friend std::ostream& operator<<(std::ostream& out, const KaldiService_ping_args& obj);
+};
+
+
+class KaldiService_ping_pargs {
+ public:
+
+  static const char* ascii_fingerprint; // = "99914B932BD37A50B983C5E7C90AE93B";
+  static const uint8_t binary_fingerprint[16]; // = {0x99,0x91,0x4B,0x93,0x2B,0xD3,0x7A,0x50,0xB9,0x83,0xC5,0xE7,0xC9,0x0A,0xE9,0x3B};
+
+
+  virtual ~KaldiService_ping_pargs() throw();
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  friend std::ostream& operator<<(std::ostream& out, const KaldiService_ping_pargs& obj);
+};
+
+
+class KaldiService_ping_result {
+ public:
+
+  static const char* ascii_fingerprint; // = "99914B932BD37A50B983C5E7C90AE93B";
+  static const uint8_t binary_fingerprint[16]; // = {0x99,0x91,0x4B,0x93,0x2B,0xD3,0x7A,0x50,0xB9,0x83,0xC5,0xE7,0xC9,0x0A,0xE9,0x3B};
+
+  KaldiService_ping_result(const KaldiService_ping_result&);
+  KaldiService_ping_result& operator=(const KaldiService_ping_result&);
+  KaldiService_ping_result() {
+  }
+
+  virtual ~KaldiService_ping_result() throw();
+
+  bool operator == (const KaldiService_ping_result & /* rhs */) const
+  {
+    return true;
+  }
+  bool operator != (const KaldiService_ping_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const KaldiService_ping_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+  friend std::ostream& operator<<(std::ostream& out, const KaldiService_ping_result& obj);
+};
+
+
+class KaldiService_ping_presult {
+ public:
+
+  static const char* ascii_fingerprint; // = "99914B932BD37A50B983C5E7C90AE93B";
+  static const uint8_t binary_fingerprint[16]; // = {0x99,0x91,0x4B,0x93,0x2B,0xD3,0x7A,0x50,0xB9,0x83,0xC5,0xE7,0xC9,0x0A,0xE9,0x3B};
+
+
+  virtual ~KaldiService_ping_presult() throw();
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+  friend std::ostream& operator<<(std::ostream& out, const KaldiService_ping_presult& obj);
+};
+
 class KaldiServiceClient : virtual public KaldiServiceIf {
  public:
   KaldiServiceClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) {
@@ -198,6 +292,9 @@ class KaldiServiceClient : virtual public KaldiServiceIf {
   void kaldi_asr(std::string& _return, const std::string& audio_file);
   void send_kaldi_asr(const std::string& audio_file);
   void recv_kaldi_asr(std::string& _return);
+  void ping();
+  void send_ping();
+  void recv_ping();
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -214,10 +311,12 @@ class KaldiServiceProcessor : public ::apache::thrift::TDispatchProcessor {
   typedef std::map<std::string, ProcessFunction> ProcessMap;
   ProcessMap processMap_;
   void process_kaldi_asr(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_ping(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
   KaldiServiceProcessor(boost::shared_ptr<KaldiServiceIf> iface) :
     iface_(iface) {
     processMap_["kaldi_asr"] = &KaldiServiceProcessor::process_kaldi_asr;
+    processMap_["ping"] = &KaldiServiceProcessor::process_ping;
   }
 
   virtual ~KaldiServiceProcessor() {}
@@ -254,6 +353,15 @@ class KaldiServiceMultiface : virtual public KaldiServiceIf {
     }
     ifaces_[i]->kaldi_asr(_return, audio_file);
     return;
+  }
+
+  void ping() {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->ping();
+    }
+    ifaces_[i]->ping();
   }
 
 };

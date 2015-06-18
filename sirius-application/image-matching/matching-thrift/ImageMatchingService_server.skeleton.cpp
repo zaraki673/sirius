@@ -25,6 +25,11 @@ class ImageMatchingServiceHandler : virtual public ImageMatchingServiceIf {
     printf("match_img\n");
   }
 
+  void ping() {
+    // Your implementation goes here
+    printf("ping\n");
+  }
+
 };
 
 int main(int argc, char **argv) {

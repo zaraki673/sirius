@@ -252,5 +252,9 @@ public class QAServiceHandler implements QAService.Iface {
 		System.out.println("Java handler says: your answer is " + answer);
 		return answer;
 	}
+
+	public void ping(){
+		System.out.println("pinged");
+	}
 }
 
