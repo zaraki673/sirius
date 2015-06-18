@@ -207,7 +207,7 @@ int main(int argc, char **argv) {
 	TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
 
 	std::cout << "Starting the automatic speech recognition server on port " << port << "..." << std::endl;
-	boost::thread serverThread = new boost::thread(boost::bind(&TSimpleServer::serve, &server));
+	boost::thread *serverThread = new boost::thread(boost::bind(&TSimpleServer::serve, &server));
 
 	//register service
 	boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
@@ -223,7 +223,7 @@ int main(int argc, char **argv) {
 	cmdtransport->close();
  
  	//end when server thread ends
- 	serverThread.join();
+ 	serverThread->join();
 	
 	// server.serve();
 	return 0;
