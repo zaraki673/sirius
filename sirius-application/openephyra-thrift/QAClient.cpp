@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <vector>
 #include <string>
+#include <cstdlib>
 
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
@@ -24,7 +25,8 @@ void clientAskList(qastubs::QAServiceClient& client, std::string question);
 
 int main(int argc, char** argv)
 {
-        boost::shared_ptr<TTransport> socket(new TSocket("localhost", 9090));
+	// Expects input in the form ./qaclient <question> <port>
+        boost::shared_ptr<TTransport> socket(new TSocket("localhost", atoi(argv[2])));
         boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
         boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
         qastubs::QAServiceClient client(protocol);

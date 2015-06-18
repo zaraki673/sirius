@@ -13,7 +13,8 @@ export CLASSPATH=~/thrift-0.9.2/lib/java/build/libthrift-0.9.2.jar:~/thrift-0.9.
 # Add my classes to class path
 # NOTE: these class paths are only necessary when running the program
 export CLASSPATH=$CLASSPATH:~/sirius/sirius-application/question-answer/openephyra-thrift:~/sirius/sirius-application/question-answer/openephyra-thrift/gen-java
-
+# export CLASSPATH=$CLASSPATH:.:gen-java ##ERROR: cannot find or load main class QADaemon
+# (This fails, because I move up a directory!)
 # Add command center to class path
 export CLASSPATH=$CLASSPATH:~/sirius/sirius-application/command-center/gen-java
 
@@ -29,7 +30,7 @@ export INDRI_INDEX=`pwd`/wiki_indri_index/
 #fi
 
 # arg0 = qa server port ; arg1 = cmd center port
-java -Djava.library.path=lib/search/ -server -Xms1024m -Xmx2048m QADaemon 9081 8081
+java -Djava.library.path=lib/search/ -server -Xms1024m -Xmx2048m QADaemon $1 $2 #9090
 
 #java QADaemon
 #java -agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n QADaemon
