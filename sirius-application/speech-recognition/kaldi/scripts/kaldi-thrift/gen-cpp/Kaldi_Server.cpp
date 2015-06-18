@@ -158,7 +158,7 @@ void KaldiServiceHandler::sox() {
 }
 
 void KaldiServiceHandler::ping(){
-	cout << "pinged" << endl;
+	std::cout << "pinged" << std::endl;
 }
 
 
@@ -215,7 +215,7 @@ int main(int argc, char **argv) {
 
 	TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
  
-	std::cout<<"Starting the automatic speech recognition server on port "<<port<<"..."<<std::endl;
+	std::cout << "Starting the automatic speech recognition server on port " << port << "..." << std::endl;
 	server.serve();
 	return 0;
 }
