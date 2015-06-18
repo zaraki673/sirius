@@ -1,10 +1,16 @@
 # Makefile for generating the kaldi-thrift service
 CXX = g++
-FLAGS = --std=c++11
+FLAGS = --std=c++11 -I/usr/local/boost_1_58_0
 TARGET_CLIENT = client
 TARGET_SERVER = server
-LINK_FLAGS = -lthrift \
-	     -lsox
+LINK_FLAGS = -L/usr/local/boost_1_58_0/stage/lib \
+	     -lthrift \
+	     -lsox \
+	     -lboost_program_options \
+             -lboost_filesystem \
+             -lboost_system \
+             -lboost_thread \
+             -lboost_regex 
 
 # Needed for finding header files during preprocessing
 INCLUDES_DIR = /home/tollben/sirius/sirius-application/command-center/gen-cpp

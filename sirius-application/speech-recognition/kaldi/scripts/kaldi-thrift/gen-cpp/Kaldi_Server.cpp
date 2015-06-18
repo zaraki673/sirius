@@ -19,6 +19,8 @@
 #include <sstream>
 #include <sox.h>
 #include <cstdlib> //07-12-15 for arg passing
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
 
 #include "KaldiService.h"
 #include "subproc.h"
@@ -195,18 +197,7 @@ int main(int argc, char **argv) {
 		std::cout << "Using default port for cc..." << std::endl;
 	}
 
-	boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
-	boost::shared_ptr<TTransport> cmdtransport(new TBufferedTransport(cmdsocket));
-	boost::shared_ptr<TProtocol> cmdprotocol(new TBinaryProtocol(cmdtransport));
-	CommandCenterClient cmdclient(cmdprotocol);
-	cmdtransport->open();	
-	std::cout << "Registering automatic speech recognition server with command center..."<<std::endl;
-	MachineData mDataObj;
-	mDataObj.name="localhost";
-	mDataObj.port=port;
-	cmdclient.registerService("ASR", mDataObj);
-	cmdtransport->close();
-	
+	//start server
 	shared_ptr<KaldiServiceHandler> handler(new KaldiServiceHandler(argvc));
 	shared_ptr<TProcessor> processor(new KaldiServiceProcessor(handler));
 	shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
@@ -214,9 +205,27 @@ int main(int argc, char **argv) {
 	shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
 	TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
- 
+
 	std::cout << "Starting the automatic speech recognition server on port " << port << "..." << std::endl;
-	server.serve();
+	boost::thread *serverThread = new boost::thread(boost::bind(&TSimpleServer::serve, &server));
+
+	//register service
+	boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
+	boost::shared_ptr<TTransport> cmdtransport(new TBufferedTransport(cmdsocket));
+	boost::shared_ptr<TProtocol> cmdprotocol(new TBinaryProtocol(cmdtransport));
+	CommandCenterClient cmdclient(cmdprotocol);
+	cmdtransport->open();	
+	std::cout << "Registering automatic speech recognition server with command center..." << std::endl;
+	MachineData mDataObj;
+	mDataObj.name="localhost";
+	mDataObj.port=port;
+	cmdclient.registerService("ASR", mDataObj);
+	cmdtransport->close();
+ 
+ 	//end when server thread ends
+ 	serverThread->join();
+	
+	// server.serve();
 	return 0;
 }
 
