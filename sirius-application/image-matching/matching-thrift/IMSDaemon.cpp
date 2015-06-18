@@ -25,6 +25,10 @@
 #include <sys/time.h>
 #include <cstdlib> // 06-12-15 for taking cmd line args
 
+//boost threading libraries
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
+
 // import the service headers
 #include "ImageMatchingService.h"
 #include "detect.h"
@@ -75,38 +79,20 @@ class ImageMatchingServiceHandler : public ImageMatchingServiceIf {
 };
 
 int main(int argc, char **argv){
-  int port = 9082;
-  //Register with the command center 
-  int cmdcenterport = 8081;
-  if (argv[1])
-  {
+	int port = 9082;
+	//Register with the command center 
+	int cmdcenterport = 8081;
+	if (argv[1]) {
 	port = atoi(argv[1]);
-  }
-  else
-  {
+	} else {
 	std::cout << "Using default port for imm..." << std::endl;
-  }
+	}
 
-  if (argv[2])
-  {
+	if (argv[2]) {
 	cmdcenterport = atoi(argv[2]);
-  }
-  else
-  {
+	} else {
 	std::cout << "Using default port for cc..." << std::endl;
-  }
-
-  boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
-  boost::shared_ptr<TTransport> cmdtransport(new TBufferedTransport(cmdsocket));
-  boost::shared_ptr<TProtocol> cmdprotocol(new TBinaryProtocol(cmdtransport));
-  CommandCenterClient cmdclient(cmdprotocol);
-  cmdtransport->open();
-  cout<<"Registering image matching server with command center..."<<endl;
-  MachineData mDataObj;
-  mDataObj.name="localhost";
-  mDataObj.port=port;
-  cmdclient.registerService("IMM", mDataObj);
-  cmdtransport->close();
+	}
 
 	// initial the transport factory
 	boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
@@ -122,12 +108,31 @@ int main(int argc, char **argv){
 	boost::shared_ptr<PosixThreadFactory> threadFactory = boost::shared_ptr<PosixThreadFactory>(new PosixThreadFactory());
 	threadManager->threadFactory(threadFactory);
 	threadManager->start();
-	
+
 	// initial the image matching server
 	TThreadPoolServer server(processor, serverTransport, transportFactory, protocolFactory, threadManager);
 
 	cout << "Starting the image matching server..." << endl;
-	server.serve();
+	boost::thread *serverThread = new boost::thread(boost::bind(&TThreadPoolServer::serve, &server));
+
+
+	//register with command center
+	boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
+	boost::shared_ptr<TTransport> cmdtransport(new TBufferedTransport(cmdsocket));
+	boost::shared_ptr<TProtocol> cmdprotocol(new TBinaryProtocol(cmdtransport));
+	CommandCenterClient cmdclient(cmdprotocol);
+	cmdtransport->open();
+	cout<<"Registering image matching server with command center..."<<endl;
+	MachineData mDataObj;
+	mDataObj.name="localhost";
+	mDataObj.port=port;
+	cmdclient.registerService("IMM", mDataObj);
+	cmdtransport->close();
+
+
+
+	serverThread->join();
+	// server.serve();
 	cout << "Done..." << endl;
 	return 0;
 }
