@@ -16,7 +16,6 @@ LINK_FLAGS = -L/usr/local/boost_1_58_0/stage/lib \
                          -lboost_system \
 			 -lboost_thread \
 			 -lboost_regex \
-			 -lboost_thread \
 			 -lprotobuf \
                          -ltesseract \
 			 -lthrift \
