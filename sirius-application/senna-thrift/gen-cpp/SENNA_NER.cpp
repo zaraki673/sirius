@@ -4,10 +4,10 @@
 #include "socket.h"
 #include <sys/time.h>
 
-int *SENNA_NER_forward(SENNA_NER *ner, const int *sentence_words,
+void SENNA_NER_forward_basic(SENNA_NER *ner, const int *sentence_words,
                        const int *sentence_caps, const int *sentence_gazl,
                        const int *sentence_gazm, const int *sentence_gazo,
-                       const int *sentence_gazp, TonicSuiteApp app) {
+                       const int *sentence_gazp, TonicSuiteApp& app) {
   int input_size = ner->ll_word_size + ner->ll_caps_size + ner->ll_gazl_size +
                    ner->ll_gazm_size + ner->ll_gazo_size + ner->ll_gazp_size;
 
@@ -54,7 +54,30 @@ int *SENNA_NER_forward(SENNA_NER *ner, const int *sentence_words,
            (char *)(ner->input_state + idx * input_size),
            ner->window_size * input_size * sizeof(float));
   }
+}
 
+
+int* SENNA_NER_forward_noDjiNN(SENNA_NER *ner, const int *sentence_words,
+                       const int *sentence_caps, const int *sentence_gazl,
+                       const int *sentence_gazm, const int *sentence_gazo,
+                       const int *sentence_gazp, TonicSuiteApp& app){
+    float loss;
+    vector<Blob<float> *> in_blobs = app.net->input_blobs();
+    in_blobs[0]->set_cpu_data((float *)app.pl.data);
+    vector<Blob<float> *> out_blobs = app.net->ForwardPrefilled(&loss);
+    memcpy((ner->output_state), out_blobs[0]->cpu_data(),
+           app.pl.num * (ner->output_state_size) * sizeof(float));
+
+      ner->labels = SENNA_realloc(ner->labels, sizeof(int), app.pl.num);
+     SENNA_nn_viterbi(ner->labels, ner->viterbi_score_init,
+                   ner->viterbi_score_trans, ner->output_state,
+                   ner->output_state_size, app.pl.num);
+
+  return ner->labels;
+}
+
+
+/*
   if (app.djinn) {
     SOCKET_send(app.socketfd, app.pl.data,
                 app.pl.num * (ner->window_size * input_size * sizeof(float)),
@@ -78,7 +101,9 @@ int *SENNA_NER_forward(SENNA_NER *ner, const int *sentence_words,
                    ner->output_state_size, app.pl.num);
 
   return ner->labels;
-}
+}*/
+
+  
 
 SENNA_NER *SENNA_NER_new(const char *path, const char *subpath) {
   SENNA_NER *ner = SENNA_malloc(sizeof(SENNA_NER), 1);

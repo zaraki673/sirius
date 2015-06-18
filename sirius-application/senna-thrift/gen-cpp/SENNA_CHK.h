@@ -51,9 +51,13 @@ typedef struct SENNA_CHK_ {
 
 SENNA_CHK *SENNA_CHK_new(const char *path, const char *subpath);
 
-int *SENNA_CHK_forward(SENNA_CHK *chk, const int *sentence_words,
+void SENNA_CHK_forward_basic(SENNA_CHK *chk, const int *sentence_words,
                        const int *sentence_caps, const int *sentence_posl,
                        TonicSuiteApp app);
+
+int* SENNA_CHK_forward_noDjiNN(SENNA_CHK *chk, const int *sentence_words,
+                       const int *sentence_caps, const int *sentence_posl,
+                       TonicSuiteApp& app);
 
 void SENNA_CHK_free(SENNA_CHK *chk);
 

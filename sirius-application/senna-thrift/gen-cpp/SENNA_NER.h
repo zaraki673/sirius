@@ -60,10 +60,15 @@ typedef struct SENNA_NER_ {
 
 SENNA_NER *SENNA_NER_new(const char *path, const char *subpath);
 
-int *SENNA_NER_forward(SENNA_NER *ner, const int *sentence_words,
+void SENNA_NER_forward_basic(SENNA_NER *ner, const int *sentence_words,
                        const int *sentence_caps, const int *sentence_gazl,
                        const int *sentence_gazm, const int *sentence_gazo,
-                       const int *sentence_gazp, TonicSuiteApp app);
+                       const int *sentence_gazp, TonicSuiteApp& app);
+
+int *SENNA_NER_forward_noDjiNN(SENNA_NER *ner, const int *sentence_words,
+                       const int *sentence_caps, const int *sentence_gazl,
+                       const int *sentence_gazm, const int *sentence_gazo,
+                       const int *sentence_gazp, TonicSuiteApp& app);
 
 void SENNA_NER_free(SENNA_NER *ner);
 

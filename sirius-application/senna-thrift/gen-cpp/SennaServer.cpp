@@ -158,6 +158,74 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 	}
     
     }	
+    else if (app.tast == "chk"){
+	 TonicSuiteApp pos_app = app;
+	 pos_app.task = "pos";
+   	 pos_app.network = vm["common"].as<string>() + "configs/" + "pos.prototxt";
+   	 pos_app.weights = vm["common"].as<string>() + "weights/" + "pos.caffemodel";
+    
+    	if (!pos_app.djinn) {
+     	 pos_app.net = new Net<float>(pos_app.network);
+     	 pos_app.net->CopyTrainedLayersFrom(pos_app.weights);
+   	 }
+   	 strcpy(pos_app.pl.req_name, pos_app.task.c_str());
+   	 pos_app.pl.size =
+       		 pos->window_size *
+       		 (pos->ll_word_size + pos->ll_caps_size + pos->ll_suff_size);
+
+   	 if (pos_app.djinn){
+		SENNA_POS_forward_basic(pos, tokens->word_idx, tokens->caps_			idx,tokens->suff_idx, pos_app);
+                (char *)(pos_app->output_state) = request_handler(pos_app.pl.req			_name, (char *)pos_app.pl.data);
+
+                 pos->labels = SENNA_realloc(pos->labels, sizeof(int), pos_app.p			l.num);
+                SENNA_nn_viterbi(pos->labels, pos->viterbi_score_init,
+                   pos->viterbi_score_trans, pos->output_state,
+                   pos->output_state_size, pos_app.pl.num);
+	}else{
+		reshape(pos_app.net, pos_app.pl.num * pos_app.pl.size);
+                SENNA_POS_forward_basic(pos, tokens->word_idx, tokens->caps_idx,
+                                   tokens->suff_idx, pos_app);
+                pos_labels = SENNA_POS_forward_noDjiNN(pos, tokens->word_idx, tokens->caps_idx,
+                                   tokens->suff_idx, pos_app);
+	}
+
+	if (app.djinn){
+		SENNA_CHK_forward_basic(chk, tokens->word_idx, tokens->caps_idx,
+                                   pos_labels, app);
+		(char*)(chk->output_state) = request_handler(app.pl.req_name ,(char *)app.pl.data);
+		 chk->labels = SENNA_realloc(chk->labels, sizeof(int), app.pl.num);
+ 		 SENNA_nn_viterbi(chk->labels, chk->viterbi_score_init,
+                   chk->viterbi_score_trans, chk->output_state,
+                   chk->output_state_size, app.pl.num);
+	}else{
+		free(pos_app.net);
+		reshape(app.net, app.pl.num * app.pl.size);
+		SENNA_CHK_forward_basic(chk, tokens->word_idx, tokens->caps_idx,
+                                   pos_labels, app);
+		chk_labels = SENNA_CHK_forward_noDjiNN(chk, tokens->word_idx, tokens->caps_idx, pos_labels, app);
+	}
+ 
+    }else if (app.task == "ner"){
+	if (app.djinn){
+		SENNA_NER_forward_basic(ner, tokens->word_idx, tokens->caps_idx,
+                                   tokens->gazl_idx, tokens->gazm_idx,
+                                   tokens->gazo_idx, tokens->gazp_idx, app);
+		(char*)(ner->output_state) = request_handler(app.pl.req_name, app.pl.data);		
+   	   ner->labels = SENNA_realloc(ner->labels, sizeof(int), app.pl.num);
+ 	     SENNA_nn_viterbi(ner->labels, ner->viterbi_score_init,
+                   ner->viterbi_score_trans, ner->output_state,
+                   ner->output_state_size, app.pl.num);
+   	}else{
+		reshape(app.net, app.pl.num * app.pl.size);
+		SENNA_NER_forward_basic(ner, tokens->word_idx, tokens->caps_idx,
+                                   tokens->gazl_idx, tokens->gazm_idx,
+                                   tokens->gazo_idx, tokens->gazp_idx, app);
+		ner_labels = SENNA_NER_forward_noDjiNN(ner, tokens->word_idx, tokens->caps_idx,
+                                   tokens->gazl_idx, tokens->gazm_idx,
+                                   tokens->gazo_idx, tokens->gazp_idx, app);
+		
+	}
+     }
 
 
 
@@ -173,6 +241,27 @@ class SennaServiceHandler : virtual public SennaServiceIf {
     }
     //end of sentence
 
+
+    // clean up
+    SENNA_Tokenizer_free(tokenizer);
+ 
+    SENNA_POS_free(pos);
+    SENNA_CHK_free(chk);
+    SENNA_NER_free(ner);
+
+    SENNA_Hash_free(word_hash);
+    SENNA_Hash_free(caps_hash);
+    SENNA_Hash_free(suff_hash);
+    SENNA_Hash_free(gazt_hash);
+
+    SENNA_Hash_free(gazl_hash);
+    SENNA_Hash_free(gazm_hash);
+    SENNA_Hash_free(gazo_hash);
+    SENNA_Hash_free(gazp_hash);
+
+    SENNA_Hash_free(pos_hash);
+
+   if (!app.djinn) free(app.net);
       printf("senna_all\n");
   }
 

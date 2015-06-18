@@ -6,9 +6,9 @@
 
 extern bool debug;
 
-int *SENNA_CHK_forward(SENNA_CHK *chk, const int *sentence_words,
+void SENNA_CHK_forward_basic(SENNA_CHK *chk, const int *sentence_words,
                        const int *sentence_caps, const int *sentence_posl,
-                       TonicSuiteApp app) {
+                       TonicSuiteApp& app) {
   chk->input_state = SENNA_realloc(
       chk->input_state, sizeof(float),
       (app.pl.num + chk->window_size - 1) *
@@ -43,7 +43,29 @@ int *SENNA_CHK_forward(SENNA_CHK *chk, const int *sentence_words,
            (char *)(chk->input_state + idx * input_size),
            chk->window_size * input_size * sizeof(float));
   }
+}
 
+
+int* SENNA_CHK_forward_noDjiNN(SENNA_CHK *chk, const int *sentence_words,
+                       const int *sentence_caps, const int *sentence_posl,
+                       TonicSuiteApp& app){
+    float loss;
+    vector<Blob<float> *> in_blobs = app.net->input_blobs();
+    in_blobs[0]->set_cpu_data((float *)app.pl.data);
+    vector<Blob<float> *> out_blobs = app.net->ForwardPrefilled(&loss);
+    memcpy((chk->output_state), out_blobs[0]->cpu_data(),
+           app.pl.num * (chk->output_state_size) * sizeof(float));
+
+    chk->labels = SENNA_realloc(chk->labels, sizeof(int), app.pl.num);
+    
+    SENNA_nn_viterbi(chk->labels, chk->viterbi_score_init,
+                   chk->viterbi_score_trans, chk->output_state,
+                   chk->output_state_size, app.pl.num);
+
+    return chk->labels;
+}
+
+/*
   if (app.djinn) {
     SOCKET_send(app.socketfd, (char *)app.pl.data,
                 chk->window_size * input_size * sizeof(float) * app.pl.num,
@@ -66,7 +88,7 @@ int *SENNA_CHK_forward(SENNA_CHK *chk, const int *sentence_words,
                    chk->output_state_size, app.pl.num);
 
   return chk->labels;
-}
+}*/
 
 SENNA_CHK *SENNA_CHK_new(const char *path, const char *subpath) {
   SENNA_CHK *chk = SENNA_malloc(sizeof(SENNA_CHK), 1);
