@@ -78,9 +78,14 @@ public class QADaemon {
 			TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
 			//TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
 			
-			System.out.println("Starting the question-answer server at port " + port + "...");
-			server.serve();
-			System.out.println("Server started");
+			Thread t1 = new Thread(new Runnable() {
+			    public void run() {
+		         	System.out.println("Starting the question-answer server at port " + port + "...");
+					server.serve();
+					System.out.println("Server started");
+			    }
+			});  
+			t1.start();
 
 			// Register this server with the command center
 			//int port = 9091;
@@ -94,6 +99,8 @@ public class QADaemon {
 			MachineData mDataObj = new MachineData("localhost", port);
 			client.registerService("QA", mDataObj);
 			transport.close();
+
+			t1.join();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
