@@ -20,6 +20,7 @@
 #include <sox.h>
 #include <cstdlib> //07-12-15 for arg passing
 #include <boost/thread.hpp>
+#include <boost/bind.hpp>
 
 #include "KaldiService.h"
 #include "subproc.h"
@@ -206,7 +207,7 @@ int main(int argc, char **argv) {
 	TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
 
 	std::cout << "Starting the automatic speech recognition server on port " << port << "..." << std::endl;
-	boost::thread serverThread(server.serve);
+	boost::thread serverThread = new boost::thread(boost::bind(&TSimpleServer::serve, &server));
 
 	//register service
 	boost::shared_ptr<TTransport> cmdsocket(new TSocket("localhost", cmdcenterport));
