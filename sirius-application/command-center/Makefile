@@ -1,7 +1,8 @@
 CXX = g++
-CXX_FLAGS =
+CXX_FLAGS = -I/usr/local/boost_1_58_0
 
-LINK_FLAGS = -lopencv_core \
+LINK_FLAGS = -L/usr/local/boost_1_58_0/stage/lib \
+			 -lopencv_core \
 			 -lopencv_highgui \
                          -lopencv_imgproc \
                          -lopencv_nonfree \
@@ -13,10 +14,13 @@ LINK_FLAGS = -lopencv_core \
                          -lboost_program_options \
                          -lboost_filesystem \
                          -lboost_system \
+			 -lboost_thread \
 			 -lboost_regex \
+			 -lboost_thread \
 			 -lprotobuf \
                          -ltesseract \
-			 -lthrift
+			 -lthrift \
+			 -pthread
 
 TARGET_CLIENT = ccclient
 TARGET_SERVER = ccserver

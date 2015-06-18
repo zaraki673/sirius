@@ -14,5 +14,7 @@ service QAService
 
 	string askFactoidThriftDebug(1:string question),
 
-	list<string> askListThrift(1:string question)
+	list<string> askListThrift(1:string question),
+
+	void ping()
 }
