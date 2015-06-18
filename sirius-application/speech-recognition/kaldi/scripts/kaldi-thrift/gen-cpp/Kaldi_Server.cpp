@@ -19,6 +19,7 @@
 #include <sstream>
 #include <sox.h>
 #include <cstdlib> //07-12-15 for arg passing
+#include <boost/thread.hpp>
 
 #include "KaldiService.h"
 #include "subproc.h"
@@ -220,6 +221,8 @@ int main(int argc, char **argv) {
 	cmdclient.registerService("ASR", mDataObj);
 	cmdtransport->close();
  
+ 	//end when server thread ends
+ 	serverThread.join();
 	
 	// server.serve();
 	return 0;
