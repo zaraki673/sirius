@@ -25,4 +25,4 @@ In the first one, start up the serve with this command:
 
 In the second one, run the client with a .wav file:
 
-`$ ./client ../../inputs/questions/what.is.the.speed.of.light.wav`
+`$ ./client ../../../inputs/questions/what.is.the.speed.of.light.wav`
