@@ -12,14 +12,13 @@ export CLASSPATH=~/thrift-0.9.2/lib/java/build/libthrift-0.9.2.jar:~/thrift-0.9.
 
 # Add my classes to class path
 # NOTE: these class paths are only necessary when running the program
-export CLASSPATH=$CLASSPATH:~/sirius/sirius-application/question-answer/openephyra-thrift:~/sirius/sirius-application/question-answer/openephyra-thrift/gen-java
-# export CLASSPATH=$CLASSPATH:.:gen-java ##ERROR: cannot find or load main class QADaemon
-# (This fails, because I move up a directory!)
+export CLASSPATH=$CLASSPATH:~/sirius/sirius-application/openephyra-thrift:~/sirius/sirius-application/openephyra-thrift/gen-java
+
 # Add command center to class path
 export CLASSPATH=$CLASSPATH:~/sirius/sirius-application/command-center/gen-java
 
 # Add open ephyra libraries to class path; start from top directory (question-answer)
-cd ..;
+cd ../question-answer
 
 export CLASSPATH=$CLASSPATH:bin:lib/ml/maxent.jar:lib/ml/minorthird.jar:lib/nlp/jwnl.jar:lib/nlp/lingpipe.jar:lib/nlp/opennlp-tools.jar:lib/nlp/plingstemmer.jar:lib/nlp/snowball.jar:lib/nlp/stanford-ner.jar:lib/nlp/stanford-parser.jar:lib/nlp/stanford-postagger.jar:lib/qa/javelin.jar:lib/search/bing-search-java-sdk.jar:lib/search/googleapi.jar:lib/search/indri.jar:lib/search/yahoosearch.jar:lib/util/commons-logging.jar:lib/util/gson.jar:lib/util/htmlparser.jar:lib/util/log4j.jar:lib/util/trove.jar:lib/util/servlet-api.jar:lib/util/jetty-all.jar:lib/util/commons-codec-1.9.jar
 
@@ -30,7 +29,4 @@ export INDRI_INDEX=`pwd`/wiki_indri_index/
 #fi
 
 # arg0 = qa server port ; arg1 = cmd center port
-java -Djava.library.path=lib/search/ -server -Xms1024m -Xmx2048m QADaemon $1 $2 #9090
-
-#java QADaemon
-#java -agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n QADaemon
+java -Djava.library.path=lib/search/ -server -Xms1024m -Xmx2048m QADaemon $1 $2
