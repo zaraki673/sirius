@@ -5,7 +5,7 @@ To run on iOS
 
 1. Navigate to the [iOS Folder](platforms/ios)
 2. Open SiriusMobile.xcodeproj
-3. Plug in iOS device and change target to your device
+3. Plug in iOS device and change target to your device (assuming you have a developer's license)
 4. Run
 
 To run on Android
