@@ -11,6 +11,6 @@ To run on iOS
 To run on Android
 
 1. Open Android Studio
-2. Open the [Android Folder](sirius-mobile/sirius-mobile-application/source/platforms/android)
+2. Open the [Android Folder](platforms/android)
 3. Plug in Android Device
 4. Run
