@@ -3,7 +3,7 @@ This folder contains the code for the Sirius Mobile Application, built using Apa
 
 To run on iOS
 
-1. Navigate to the [iOS Folder](sirius-mobile/sirius-mobile-application/source/platforms/ios)
+1. Navigate to the [iOS Folder](platforms/ios)
 2. Open SiriusMobile.xcodeproj
 3. Plug in iOS device and change target to your device
 4. Run
