@@ -28,7 +28,7 @@ public:
 		     << ":" << mDataObj.port << ", serviceType = " << serviceType
 		     << endl;
 
-		registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new ServiceData(mDataObj.name, mDataObj.port));
+		registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new ServiceData(mDataObj.name, mDataObj.port)));
 		
 		// registeredServices.insert( std::pair<std::string, MachineData>(serviceType, mDataObj) );
 	
@@ -158,12 +158,12 @@ public:
 			ResponseData *asrresp = (ResponseData *) asrstatus;
 			ResponseData *immresp = (ResponseData *) immstatus;
 			assert(asrresp && immresp);
-			question = asrresp->getResponse() + " " + immresp->getResponse();
+		*/
+			question = asrworker_obj.returnValue + " " + immworker_obj.returnValue;
 			cout << "Your new question is: " << question << endl;
 			qa->transport->open();
 			qa->client.askFactoidThrift(_return, question);
 			qa->transport->close();
-		*/
 		}
 		else if (data.audioData != "")
 		{
