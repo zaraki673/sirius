@@ -7,19 +7,27 @@
 
 ##Starting the command center:
 1) Generate the client/server stubs
-```thrift --gen cpp --gen java commandcenter.thrift```
+```
+thrift --gen cpp --gen java commandcenter.thrift
+```
 (see <https://thrift.apache.org/>)
 
 2) Compile the command center
-```make```
+```
+make
+```
 
 3) Start the command center
-```./ccserver <port>```
+```
+./ccserver <port>
+```
 
 
 ##Sending a request to the server:
 1) Generate the command center thrift source code in your language of choice
-```thrift --gen <language> commandcenter.thrift```
+```
+thrift --gen <language> commandcenter.thrift
+```
 
 2) Step (1) will create a new directory, gen-<language>/ 
 in this directory. Look at the generated code and include them
@@ -33,7 +41,9 @@ Check commandcenter.thrift or the generated source code if you're not sure how t
 
 ##Registering a service with the command center:
 1) Generate the command center thrift source code in your language of choice
-```thrift --gen <language> commandcenter.thrift```
+```
+thrift --gen <language> commandcenter.thrift
+```
 
 2) Step (1) will create a new directory, gen-<language>/ 
 in this directory. Look at the generated code and include them
