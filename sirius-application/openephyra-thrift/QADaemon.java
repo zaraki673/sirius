@@ -84,7 +84,6 @@ public class QADaemon {
 			    public void run() {
 		         	System.out.println("Starting the question-answer server at port " + port + "...");
 					server.serve();
-					System.out.println("Server started");
 			    }
 			});  
 			t1.start();

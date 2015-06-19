@@ -28,9 +28,7 @@ public:
 		     << ":" << mDataObj.port << ", serviceType = " << serviceType
 		     << endl;
 
-
-		ServiceData *sd = new ServiceData(mDataObj.name, mDataObj.port);
-		registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new AsrServiceData(sd)) );
+		registeredServices.insert( std::pair<std::string, ServiceData*>(serviceType, new ServiceData(mDataObj.name, mDataObj.port));
 		
 		// registeredServices.insert( std::pair<std::string, MachineData>(serviceType, mDataObj) );
 	
@@ -353,7 +351,7 @@ private:
 				}
 			}
 			//sleep
-			boost::posix_time::seconds sleepTime(10);
+			boost::posix_time::seconds sleepTime(60);
 			boost::this_thread::sleep(sleepTime);
 
 		}
