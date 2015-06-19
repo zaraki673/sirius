@@ -8,14 +8,11 @@ Derived from main.cpp in DjiNN
 #include <ctime>
 #include <cmath>
 #include <boost/chrono/thread_clock.hpp>
-#include "timer.h"
-
-extern map<string, Net<float>*> nets;
-extern bool debug;
-extern bool gpu;
+#include "time"
 
 //thread.h
 #include <vector>
+#include <map>
 #include "caffe/caffe.hpp"
 
 using caffe::Blob;
@@ -61,6 +58,11 @@ using namespace ::apache::thrift::server;
 using boost::shared_ptr;
 
 //SennaServer.cpp
+
+extern map<string, Net<float>*> nets;
+extern bool debug;
+extern bool gpu;
+
 
 class SennaServiceHandler : virtual public SennaServiceIf {
  public:
