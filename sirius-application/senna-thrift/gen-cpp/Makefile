@@ -1,5 +1,6 @@
 COMMON=~/djinn-master/common
-include $(COMMON)/Makefile.config
+CAFFE=~/caffe-0.9-beta
+include $(COMMON)/Makefile.config 
 
 CXX = g++
 CXX_FLAGS  = -O3 \
@@ -8,7 +9,8 @@ CXX_FLAGS  = -O3 \
                          -fpermissive \
                          -I$(COMMON)/include \
                          -I$(CAFFE)/include \
-                         -I$(CUDA)/include
+                         -I$(CUDA)/include \
+                         -I/usr/local/include 
 
 ifeq ($(CPU_ONLY), 1)
     CXX_FLAGS  += -DCPU_ONLY
@@ -31,20 +33,38 @@ TARGET_SERVER = sennaServer
 
 INCLUDES_DIR = /home/jesswu/thriftSenna/sirius/sirius-application/senna-thrift/gen-cpp
 
+
 # File names
 EXEC = sennaClient
-SOURCES = $(wildcard $(SRC)/*.cpp) $(COMMON)/src/tonic.cpp SennaClient.cpp SennaService.cpp
+SOURCES = $(wildcard $(SRC)/*.cpp) tonic.cpp SennaClient.cpp SennaService.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 
 # Main target
 $(EXEC): $(OBJECTS) Makefile ;  $(CXX) $(OBJECTS) -o $(EXEC) $(LINK_FLAGS)
 
+all: $(SOURCES) $(EXECUTABLE)
+
 SennaService.o : SennaService.cpp
 	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
+
+SennaService_constants.o : SennaService_constants.cpp
+	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
+
+SennaService_types.o : SennaService_types.cpp
+	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
+
+SennaServer.o : SennaServer.cpp
+	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
+
+SennaClient.o : SennaClient.cpp
+	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
+
+
+
 
 # To obtain object files
 %.o: %.cpp Makefile ;  $(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 # To remove generated files
-clean: ; rm -f $(EXEC) $(SRC)/*.o $(COMMON)/src/*.o
+clean: ; rm -f $(EXEC) *.o 
 
