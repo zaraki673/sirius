@@ -67,9 +67,9 @@ int main(int argc, char **argv) {
 		client.handleRequest(answer, capital_italy);
 		cout << "ANSWER = " << answer << endl;*/
 
-		cout << "///// ASR-QA /////" << endl;
+		/*cout << "///// ASR-QA /////" << endl;
 		client.handleRequest(answer, capital_italy);
-		cout << "ANSWER = " << answer << endl;
+		cout << "ANSWER = " << answer << endl;*/
 
 		cout << "\n///// ASR-QA-IMM /////" << endl;
 		client.handleRequest(answer, how_tall);

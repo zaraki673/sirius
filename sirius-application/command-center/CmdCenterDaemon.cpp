@@ -1,10 +1,8 @@
 #include "CmdCenterDaemon.h"
 
-//---- Functions designed for multithreading with pthreads ----//
-// NOTE: These functions CANNOT be declared as members of a class
-// when using pthreads. See stackoverflow, cannot-convert-voidmyclassvoid-to...
-void *immWorker(void *arg);
-void *asrWorker(void *arg);
+//---- Functions designed for multithreading ----//
+void immWorker(void *arg);
+void asrWorker(void *arg);
 
 //---- Utilities ----//
 std::string parseImgFile(const std::string& immRetVal);
@@ -126,29 +124,21 @@ public:
 		// and voice query
 		if ((data.audioData != "") && (data.imgData != ""))
 		{
-//			cout << "Starting ASR-IMM-QA pipeline..." << endl;
-			//---- Run asr and image matching in parallel
-//			//---Image matching
-//			imm->transport->open();
-//			imm->client.match_img(immRetVal, binary_img);
-//			imm->transport->close();
-//			cout << "IMG = " << immRetVal << endl;
-//			// image filename parsing
-//			try
-//			{
-//				immRetVal = parseImgFile(immRetVal);
-//			}
-//			catch (BadImgFileException)
-//			{
-//				cout << "Cmd Center: BadImgFileException" << endl;
-//				throw;
-//			}
-
-			///////////////////////////////////////////////////////////
-			// NOTE: declaring a void **s and passing that to pthread_join
-			// doesn't work.
 			cout << "Now trying the threading imm method" << endl;
-			pthread_t thr[2];
+			//boost::thread asrthread(boost::bind(&CommandCenterHandler::asrWorker, this, (void *) asr));
+			//boost::thread immthread(boost::bind(&CommandCenterHandler::immWorker, this, (void *) imm));
+			AsrWorker asrworker_obj;
+			ImmWorker immworker_obj;
+			boost::function<void()> asrfunc = boost::bind(&AsrWorker::execute, &asrworker_obj, (void *) asr);
+			boost::function<void()> immfunc = boost::bind(&ImmWorker::execute, &immworker_obj, (void *) imm);
+			boost::thread asrthread(asrfunc);
+			boost::thread immthread(immfunc);
+			asrthread.join();
+			immthread.join();
+			cout << "Boost thread success!" << endl;
+			cout << "ASR == " << asrworker_obj.returnValue << endl;
+			cout << "IMM == " << immworker_obj.returnValue << endl;
+		/*	pthread_t thr[2];
 			int rc;
 			void *asrstatus = NULL;
 			void *immstatus = NULL;
@@ -164,15 +154,9 @@ public:
 			pthread_join(thr[1], &immstatus);
 			assert(immstatus && asrstatus);
 			cout << "SUCCESS!" << endl;
-
-			///////////////////////////////////////////////////////////
-
-//			//---Speech recognition
-//			asr->transport->open();
-//			asr->client.kaldi_asr(asrRetVal, binary_audio);
-//			asr->transport->close();
-			
+		*/	
 			//---Question answer
+		/*
 			ResponseData *asrresp = (ResponseData *) asrstatus;
 			ResponseData *immresp = (ResponseData *) immstatus;
 			assert(asrresp && immresp);
@@ -181,6 +165,7 @@ public:
 			qa->transport->open();
 			qa->client.askFactoidThrift(_return, question);
 			qa->transport->close();
+		*/
 		}
 		else if (data.audioData != "")
 		{
@@ -262,7 +247,7 @@ private:
 	// select available servers easily, for a given key.
 	std::multimap<std::string, ServiceData*> registeredServices;
 	// std::multimap<std::string, MachineData> registeredServices;
-	// boost::thread heartbeatThread;
+	boost::thread heartbeatThread;
 
 	ServiceData* assignService(const std::string type) {
 		//load balancer for service assignment
@@ -279,6 +264,50 @@ private:
 			throw(AssignmentFailedException(type + " requested, but not found"));
 			return NULL;
 		}
+	}
+
+	//---- Functions designed for multithreading ----//
+	void immWorker(void *arg)
+	{
+		std::string immRetVal = "";
+		ImmServiceData *imm = (ImmServiceData *) arg;
+		imm->transport->open();
+		imm->client.match_img(immRetVal, imm->img);
+		imm->transport->close();
+		cout << "imm worker thread... IMG = " << immRetVal << endl;
+		// image filename parsing
+		try
+		{
+			immRetVal = parseImgFile(immRetVal);
+		}
+		catch (BadImgFileException)
+		{
+			cout << "Cmd Center: BadImgFileException" << endl;
+			pthread_exit(NULL);
+		}
+	
+		// Package response
+		ResponseData *resp = new ResponseData(immRetVal);
+		void *ret = (void *) resp;
+		// NOTE: there doesn't appear to be functional difference between
+		// return() and pthread_exit() in this case.
+		//return ret;
+		//pthread_exit(ret);
+	}
+	
+	void asrWorker(void *arg)
+	{
+		std::string asrRetVal = "";
+		AsrServiceData *asr = (AsrServiceData *) arg;
+		asr->transport->open();
+		asr->client.kaldi_asr(asrRetVal, asr->audio);
+		asr->transport->close();
+		cout << "asr worker thread... ASR = " << asrRetVal << endl;
+	
+		ResponseData *resp = new ResponseData(asrRetVal);
+		void *ret = (void *) resp;
+		//return ret;
+		//pthread_exit(ret);
 	}
 
 	void heartbeatManager(){
@@ -331,7 +360,6 @@ private:
 		
 		cout << "heartbeat manager finished" << endl;
 	}
-
 };
 
 int main(int argc, char **argv) {
@@ -377,49 +405,6 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-//---- Functions designed for multithreading with pthreads ----//
-void *immWorker(void *arg)
-{
-	std::string immRetVal = "";
-	ImmServiceData *imm = (ImmServiceData *) arg;
-	imm->transport->open();
-	imm->client.match_img(immRetVal, imm->img);
-	imm->transport->close();
-	cout << "imm worker thread... IMG = " << immRetVal << endl;
-	// image filename parsing
-	try
-	{
-		immRetVal = parseImgFile(immRetVal);
-	}
-	catch (BadImgFileException)
-	{
-		cout << "Cmd Center: BadImgFileException" << endl;
-		pthread_exit(NULL);
-	}
-
-	// Package response
-	ResponseData *resp = new ResponseData(immRetVal);
-	void *ret = (void *) resp;
-	// NOTE: there doesn't appear to be functional difference between
-	// return() and pthread_exit() in this case.
-	//return ret;
-	pthread_exit(ret);
-}
-
-void *asrWorker(void *arg)
-{
-	std::string asrRetVal = "";
-	AsrServiceData *asr = (AsrServiceData *) arg;
-	asr->transport->open();
-	asr->client.kaldi_asr(asrRetVal, asr->audio);
-	asr->transport->close();
-	cout << "asr worker thread... ASR = " << asrRetVal << endl;
-
-	ResponseData *resp = new ResponseData(asrRetVal);
-	void *ret = (void *) resp;
-	pthread_exit(ret);
-}
-
 std::string parseImgFile(const std::string& immRetVal)
 {
 	// Everything must be escaped twice
@@ -445,4 +430,24 @@ std::string parseImgFile(const std::string& immRetVal)
 	return outstr;
 }
 
+//---- Functions designed for multithreading ----//
+void ImmWorker::execute(void *arg)
+{
+	ImmServiceData *imm = (ImmServiceData *) arg;
+	imm->transport->open();
+	imm->client.match_img(returnValue, imm->img);
+	imm->transport->close();
+	cout << "imm worker thread... IMG = " << returnValue << endl;
+	// TODO: EXCEPTION HANDLING WITH BOOST
+	// image filename parsing
+	returnValue = parseImgFile(returnValue);
+}
 
+void AsrWorker::execute(void *arg)
+{
+	AsrServiceData *asr = (AsrServiceData *) arg;
+	asr->transport->open();
+	asr->client.kaldi_asr(returnValue, asr->audio);
+	asr->transport->close();
+	cout << "asr worker thread... ASR = " << returnValue << endl;
+}
