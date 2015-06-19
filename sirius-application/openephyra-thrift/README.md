@@ -1,27 +1,40 @@
-##Question Answer Thrift
+##Open Ephyra
 
-- Generate client/server stubs:
+Open Ephyra is an open-source framework for question answering
+developed at Carnegie Mellon.
 
-`thrift --gen cpp qaservice.thrift`
+Two versions of Open Ephyra are included in Sirius. The original version
+can be compiled by running `./compile-sirius-servers.sh` in sirius-application/.
 
-`thrift --gen java qaservice.thrift`
+The version in this directory uses Apache Thrift. It belongs to a collection of services that
+connect with the new Sirius command center.
 
-- Compile server:
+####Basic Setup
+Generate client/server stubs:
+
+```
+thrift --gen cpp qaservice.thrift
+thrift --gen java qaservice.thrift
+```
+
+Compile server:
 
 `./compile-qa-server-thrift.sh`
 
-- Start server:
+Start server:
 
-`./start-qa-server-thrift.sh`
+PORT = the port you are starting on
+
+CMDCENTERPORT = the port the command center has started on
+
+`./start-qa-server-thrift.sh (PORT) (CMDCENTER-PORT)`
 
 ####Troubleshooting
-######Errors when starting the server:
-Problem as of 06/07/15
-- Error message:
+Error message:
 
   `org.apache.thrift.transport.TTransportException: java.net.ConnectException: Connection refused`
 
-- Solution:  The QA service automatically tries to register with the command center
+Solution:  The QA service automatically tries to register with the command center
   at the port specified in start-qa-server-thrift.sh.
   If the command center is not running, then the registration fails,
   and this message is reported.
