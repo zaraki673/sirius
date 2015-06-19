@@ -123,8 +123,6 @@ public:
 		if ((data.audioData != "") && (data.imgData != ""))
 		{
 			cout << "Now trying the threading imm method" << endl;
-			//boost::thread asrthread(boost::bind(&CommandCenterHandler::asrWorker, this, (void *) asr));
-			//boost::thread immthread(boost::bind(&CommandCenterHandler::immWorker, this, (void *) imm));
 			AsrWorker asrworker_obj;
 			ImmWorker immworker_obj;
 			boost::function<void()> asrfunc = boost::bind(&AsrWorker::execute, &asrworker_obj, (void *) asr);
@@ -136,29 +134,7 @@ public:
 			cout << "Boost thread success!" << endl;
 			cout << "ASR == " << asrworker_obj.returnValue << endl;
 			cout << "IMM == " << immworker_obj.returnValue << endl;
-		/*	pthread_t thr[2];
-			int rc;
-			void *asrstatus = NULL;
-			void *immstatus = NULL;
-			if ((rc = pthread_create(&thr[0], NULL, asrWorker, (void *) asr)))
-			{
-				cerr << "error: pthread_create: " << rc << endl;
-			}
-			if ((rc = pthread_create(&thr[1], NULL, immWorker, (void *) imm)))
-			{
-				cerr << "error: pthread_create: " << rc << endl;
-			}
-			pthread_join(thr[0], &asrstatus);
-			pthread_join(thr[1], &immstatus);
-			assert(immstatus && asrstatus);
-			cout << "SUCCESS!" << endl;
-		*/	
-			//---Question answer
-		/*
-			ResponseData *asrresp = (ResponseData *) asrstatus;
-			ResponseData *immresp = (ResponseData *) immstatus;
-			assert(asrresp && immresp);
-		*/
+
 			question = asrworker_obj.returnValue + " " + immworker_obj.returnValue;
 			cout << "Your new question is: " << question << endl;
 			qa->transport->open();
@@ -262,50 +238,6 @@ private:
 			throw(AssignmentFailedException(type + " requested, but not found"));
 			return NULL;
 		}
-	}
-
-	//---- Functions designed for multithreading ----//
-	void immWorker(void *arg)
-	{
-		std::string immRetVal = "";
-		ImmServiceData *imm = (ImmServiceData *) arg;
-		imm->transport->open();
-		imm->client.match_img(immRetVal, imm->img);
-		imm->transport->close();
-		cout << "imm worker thread... IMG = " << immRetVal << endl;
-		// image filename parsing
-		try
-		{
-			immRetVal = parseImgFile(immRetVal);
-		}
-		catch (BadImgFileException)
-		{
-			cout << "Cmd Center: BadImgFileException" << endl;
-			pthread_exit(NULL);
-		}
-	
-		// Package response
-		ResponseData *resp = new ResponseData(immRetVal);
-		void *ret = (void *) resp;
-		// NOTE: there doesn't appear to be functional difference between
-		// return() and pthread_exit() in this case.
-		//return ret;
-		//pthread_exit(ret);
-	}
-	
-	void asrWorker(void *arg)
-	{
-		std::string asrRetVal = "";
-		AsrServiceData *asr = (AsrServiceData *) arg;
-		asr->transport->open();
-		asr->client.kaldi_asr(asrRetVal, asr->audio);
-		asr->transport->close();
-		cout << "asr worker thread... ASR = " << asrRetVal << endl;
-	
-		ResponseData *resp = new ResponseData(asrRetVal);
-		void *ret = (void *) resp;
-		//return ret;
-		//pthread_exit(ret);
 	}
 
 	void heartbeatManager(){
