@@ -28,6 +28,7 @@ LINK_FLAGS = $(LIBRARY_DIRS) \
                          $(CAFFE)/lib/libcaffe.so
 
 SRC=src
+GEN=gen-cpp
 LIBS=-lthrift
 
 TARGET_CLIENT = sennaClient
@@ -38,21 +39,26 @@ INCLUDE_DIRS = /home/jesswu/thriftSenna/sirius/sirius-application/senna-thrift/g
 
 # File names
 EXEC = sennaClient
-SOURCES = $(wildcard *.cpp)  SennaService.cpp SennaClient.cpp 
-OBJECTS = $(SOURCES:.cpp=.o)
+SOURCES = $(wildcard $(SRC)/*.cpp) $(wildcard $(GEN)/*.cpp)
+OBJECTS = $(SOURCES:.cpp=.o) 
+
+SERVER_OBJ = $(OBJECTS) SennaServer.o
+CLIENT_OBJ = $(SOURCES:.cpp=.o) sennaClient.o
 
 # Main target
-$(EXEC): $(OBJECTS) Makefile ;  $(CXX) $(OBJECTS) -o $(EXEC)  $(LINK_FLAGS) $(LIBS)
+#$(EXEC): $(OBJECTS) Makefile ;  $(CXX) $(OBJECTS) -o $(EXEC)  $(LIBS) $(LINK_FLAGS)
+all: $(TARGET_SERVER) 
 
-all: $(SOURCES) $(EXECUTABLE)
+$(TARGET_SERVER): $(SERVER_OBJ) SennaServer.cpp ;
+	 $(CXX) $(SERVER_OBJ) -o $(EXEC)  $(LIBS) $(LINK_FLAGS)
 
-
-
+$(TARGET_CLIENT): $(CLIENT_OBJ) ;
+	 $(CXX) $(CLIENT_OBJ) -o $(EXEC)  $(LIBS) $(LINK_FLAGS)
 
 
 
 # To obtain object files
-%.o: %.cpp Makefile ;  $(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
+%.o: %.cpp Makefile ;  $(CXX) -I$(INCLUDE_DIRS) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 # To remove generated files
 clean: ; rm -f $(EXEC) *.o 

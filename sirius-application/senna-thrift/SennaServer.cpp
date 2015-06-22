@@ -23,12 +23,13 @@ using caffe::shared_ptr;
 using caffe::Timer;
 using caffe::vector;
 
-#include "SennaService.h"
+#include "gen-cpp/SennaService.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TBufferTransports.h>
 #include "tonic.h"
+#include "timer.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -43,12 +44,13 @@ using caffe::vector;
 
 #include "boost/program_options.hpp"
 
-#include "SENNA_utils.h"
-#include "SENNA_Hash.h"
-#include "SENNA_Tokenizer.h"
-#include "SENNA_POS.h"
-#include "SENNA_CHK.h"
-#include "SENNA_NER.h"
+#include "src/SENNA_utils.h"
+#include "src/SENNA_Hash.h"
+#include "src/SENNA_Tokenizer.h"
+#include "src/SENNA_POS.h"
+#include "src/SENNA_CHK.h"
+#include "src/SENNA_NER.h"
+#include "src/SENNA_nn.h"
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -56,6 +58,7 @@ using namespace ::apache::thrift::transport;
 using namespace ::apache::thrift::server;
 
 using boost::shared_ptr;
+namespace po = boost::program_options;
 
 //SennaServer.cpp
 
@@ -77,6 +80,8 @@ class SennaServiceHandler : virtual public SennaServiceIf {
       pt0_labels = NULL;
       pos_labels = NULL;
       ner_labels = NULL;
+
+
 
       /* inputs */
       word_hash = SENNA_Hash_new(opt_path, "hash/words.lst");
@@ -144,7 +149,7 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 	if (app.djinn){
 		SENNA_POS_forward_basic(pos, tokens->word_idx, tokens->caps_idx,
                                    tokens->suff_idx, app);
-		(char *)(pos->output_state) = request_handler(app.pl.req_name, (char *)app.			pl.data);
+	   pos->output_state = (float *)request_handler(app.pl.req_name, (char *)app.pl.data);
 		 
 		 pos->labels = SENNA_realloc(pos->labels, sizeof(int), app.pl.num);
   		SENNA_nn_viterbi(pos->labels, pos->viterbi_score_init,
@@ -160,7 +165,7 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 	}
     
     }	
-    else if (app.tast == "chk"){
+    else if (app.task == "chk"){
 	 TonicSuiteApp pos_app = app;
 	 pos_app.task = "pos";
    	 pos_app.network = vm["common"].as<string>() + "configs/" + "pos.prototxt";
@@ -176,10 +181,10 @@ class SennaServiceHandler : virtual public SennaServiceIf {
        		 (pos->ll_word_size + pos->ll_caps_size + pos->ll_suff_size);
 
    	 if (pos_app.djinn){
-		SENNA_POS_forward_basic(pos, tokens->word_idx, tokens->caps_			idx,tokens->suff_idx, pos_app);
-                (char *)(pos_app->output_state) = request_handler(pos_app.pl.req			_name, (char *)pos_app.pl.data);
+		SENNA_POS_forward_basic(pos, tokens->word_idx, tokens->caps_idx,tokens->suff_idx, pos_app);
+                (pos->output_state) = (float *)request_handler(pos_app.pl.req_name, (char *)pos_app.pl.data);
 
-                 pos->labels = SENNA_realloc(pos->labels, sizeof(int), pos_app.p			l.num);
+                 pos->labels = SENNA_realloc(pos->labels, sizeof(int), pos_app.pl.num);
                 SENNA_nn_viterbi(pos->labels, pos->viterbi_score_init,
                    pos->viterbi_score_trans, pos->output_state,
                    pos->output_state_size, pos_app.pl.num);
@@ -194,7 +199,7 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 	if (app.djinn){
 		SENNA_CHK_forward_basic(chk, tokens->word_idx, tokens->caps_idx,
                                    pos_labels, app);
-		(char*)(chk->output_state) = request_handler(app.pl.req_name ,(char *)app.pl.data);
+		(chk->output_state) = (float *)request_handler(app.pl.req_name ,(char *)app.pl.data);
 		 chk->labels = SENNA_realloc(chk->labels, sizeof(int), app.pl.num);
  		 SENNA_nn_viterbi(chk->labels, chk->viterbi_score_init,
                    chk->viterbi_score_trans, chk->output_state,
@@ -212,7 +217,7 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 		SENNA_NER_forward_basic(ner, tokens->word_idx, tokens->caps_idx,
                                    tokens->gazl_idx, tokens->gazm_idx,
                                    tokens->gazo_idx, tokens->gazp_idx, app);
-		(char*)(ner->output_state) = request_handler(app.pl.req_name, app.pl.data);		
+		(ner->output_state) = (float *)request_handler(app.pl.req_name, app.pl.data);		
    	   ner->labels = SENNA_realloc(ner->labels, sizeof(int), app.pl.num);
  	     SENNA_nn_viterbi(ner->labels, ner->viterbi_score_init,
                    ner->viterbi_score_trans, ner->output_state,
@@ -269,10 +274,12 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 
  protected:
   TonicSuiteApp app;
+  SENNA_Tokenizer *tokenizer;
+  po::variables_map vm;
 
   //initializes the TonicSuiteApp which just stores inputs
   //don't think we'll need to use this 
-  void setTonicApp(const& TonicInput& tInput){
+  void setTonicApp(const TonicInput & tInput){
 	app.task = tInput.task;
 	app.network = tInput.network;
 	app.weights = tInput.weights;
@@ -339,9 +346,20 @@ class SennaServiceHandler : virtual public SennaServiceIf {
    		 return (void*)1;
  	 } else
  		 LOG(INFO) << "Task " << req_name << " forward pass.";
-	 
+	
+   /*If we want to multithread, use this
+  int sock_elts = SOCKET_rxsize(socknum);
+  if (sock_elts < 0) {
+    LOG(ERROR) << "Error num incoming elts.";
+    return (void*)1;
+  }*/
+    /*For now, single thread, so sock_elts = 1*/
+    int sock_elts = 1;
+    LOG(INFO) << "Elements received on socket " << sock_elts << endl;
+
+
 	 // reshape input dims if incoming data != current net config
-	LOG(INFO) << "Elements received on socket " << sock_elts << endl;
+	
 
 	reshape(nets[req_name], sock_elts);
 
@@ -366,7 +384,7 @@ class SennaServiceHandler : virtual public SennaServiceIf {
 		LOG(INFO) << "Reading from socket.";
 		//socket_send
 		//type cast: float* in, void* data
-		in = (char*) data;
+		in = (float*) data;
 	
     		if (warmup && gpu) {
 			float loss;

@@ -23,17 +23,18 @@ Derived from nlp-client.cpp from Tonic
 #include "SENNA_NER.h"
 */
 
-#include "socket.h"
-#include "tonic.h"
+#include "src/socket.h"
+#include "src/tonic.h"
 
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 
-#include "SennaService.h"
-#include "SennaService_types.h"
-#include "SennaService_constants.h"
-
+#include "gen-cpp/SennaService.h"
+/*
+#include "gen-cpp/SennaService_types.h"
+#include "gen-cpp/SennaService_constants.h"
+*/
 using namespace std;
 using namespace apache::thrift;
 using namespace apache::thrift::protocol;
