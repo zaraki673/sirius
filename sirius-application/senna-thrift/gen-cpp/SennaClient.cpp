@@ -30,8 +30,9 @@ Derived from nlp-client.cpp from Tonic
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 
-#include "../gen-cpp/SennaService.h"
-#include "../gen-cpp/SennaService_types.h"
+#include "SennaService.h"
+#include "SennaService_types.h"
+#include "SennaService_constants.h"
 
 using namespace std;
 using namespace apache::thrift;
@@ -96,8 +97,9 @@ int main(int argc, char *argv[]) {
 
   try {
     transport->open();
-
-    client.senna_all(tInput);
+    TonicInput tInput;
+    string retString;
+    client.senna_all(retString, tInput);
     
     /*try {
      // client.calculate(1, work);

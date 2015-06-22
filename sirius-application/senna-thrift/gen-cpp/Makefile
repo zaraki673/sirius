@@ -1,5 +1,5 @@
-COMMON=~/djinn-master/common
-CAFFE=~/caffe-0.9-beta
+COMMON=/home/jesswu/djinn-master/common
+CAFFE=/home/jesswu/caffe-0.9-beta
 include $(COMMON)/Makefile.config 
 
 CXX = g++
@@ -10,7 +10,7 @@ CXX_FLAGS  = -O3 \
                          -I$(COMMON)/include \
                          -I$(CAFFE)/include \
                          -I$(CUDA)/include \
-                         -I/usr/local/include 
+                         -I/usr/local/include
 
 ifeq ($(CPU_ONLY), 1)
     CXX_FLAGS  += -DCPU_ONLY
@@ -24,40 +24,29 @@ LINK_FLAGS = $(LIBRARY_DIRS) \
                          -lglog \
                          -lrt \
                          -lpthread \
+						 -lthrift \
                          $(CAFFE)/lib/libcaffe.so
 
 SRC=src
+LIBS=-lthrift
 
 TARGET_CLIENT = sennaClient
 TARGET_SERVER = sennaServer
 
-INCLUDES_DIR = /home/jesswu/thriftSenna/sirius/sirius-application/senna-thrift/gen-cpp
+INCLUDE_DIRS = /home/jesswu/thriftSenna/sirius/sirius-application/senna-thrift/gen-cpp
 
 
 # File names
 EXEC = sennaClient
-SOURCES = $(wildcard $(SRC)/*.cpp) tonic.cpp SennaClient.cpp SennaService.cpp
+SOURCES = $(wildcard *.cpp)  SennaService.cpp SennaClient.cpp 
 OBJECTS = $(SOURCES:.cpp=.o)
 
 # Main target
-$(EXEC): $(OBJECTS) Makefile ;  $(CXX) $(OBJECTS) -o $(EXEC) $(LINK_FLAGS)
+$(EXEC): $(OBJECTS) Makefile ;  $(CXX) $(OBJECTS) -o $(EXEC)  $(LINK_FLAGS) $(LIBS)
 
 all: $(SOURCES) $(EXECUTABLE)
 
-SennaService.o : SennaService.cpp
-	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
-SennaService_constants.o : SennaService_constants.cpp
-	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
-
-SennaService_types.o : SennaService_types.cpp
-	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
-
-SennaServer.o : SennaServer.cpp
-	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
-
-SennaClient.o : SennaClient.cpp
-	$(CXX) -c $(CXX_FLAGS) $(EXTRA_FLAGS) $< -o $@
 
 
 

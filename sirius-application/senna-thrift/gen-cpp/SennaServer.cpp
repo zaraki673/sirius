@@ -8,7 +8,7 @@ Derived from main.cpp in DjiNN
 #include <ctime>
 #include <cmath>
 #include <boost/chrono/thread_clock.hpp>
-#include "time"
+//#include "time"
 
 //thread.h
 #include <vector>
