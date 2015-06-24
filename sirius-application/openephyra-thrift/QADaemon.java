@@ -73,11 +73,11 @@ public class QADaemon {
 		}
 	}
 
-	public static void simple(QAService.Processor processor, int port, int cmdcenterport) {
+	public static void simple(QAService.Processor processor, final int port, int cmdcenterport) {
 		try {
 			// Start the question-answer server
 			TServerTransport serverTransport = new TServerSocket(port);
-			TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
+			final TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
 			//TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
 			
 			Thread t1 = new Thread(new Runnable() {

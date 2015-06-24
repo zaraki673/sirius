@@ -12,6 +12,10 @@ thrift --gen cpp --gen java commandcenter.thrift
 ```
 (see <https://thrift.apache.org/>)
 
+Also, make sure that all object files that are not made by
+the command center Makefile are available. (Run make in 
+../openephyra-thrift)
+
 2) Compile the command center
 ```
 make
