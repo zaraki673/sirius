@@ -372,21 +372,21 @@ std::string parseImgFile(const std::string& immRetVal)
 //---- Functions designed for multithreading ----//
 void ImmWorker::execute(void *arg)
 {
-	ImmServiceData *imm = (ImmServiceData *) arg;
-	imm->transport->open();
-	imm->client.send_request(returnValue, imm->img);
-	imm->transport->close();
-	cout << "imm worker thread... IMG = " << returnValue << endl;
-	// TODO: EXCEPTION HANDLING WITH BOOST
-	// image filename parsing
-	returnValue = parseImgFile(returnValue);
+	// ImmServiceData *imm = (ImmServiceData *) arg;
+	// imm->transport->open();
+	// imm->client.send_request(returnValue, imm->img);
+	// imm->transport->close();
+	// cout << "imm worker thread... IMG = " << returnValue << endl;
+	// // TODO: EXCEPTION HANDLING WITH BOOST
+	// // image filename parsing
+	// returnValue = parseImgFile(returnValue);
 }
 
 void AsrWorker::execute(void *arg)
 {
-	AsrServiceData *asr = (AsrServiceData *) arg;
-	asr->transport->open();
-	asr->client.kaldi_asr(returnValue, asr->audio);
-	asr->transport->close();
-	cout << "asr worker thread... ASR = " << returnValue << endl;
+	// AsrServiceData *asr = (AsrServiceData *) arg;
+	// asr->transport->open();
+	// asr->client.kaldi_asr(returnValue, asr->audio);
+	// asr->transport->close();
+	// cout << "asr worker thread... ASR = " << returnValue << endl;
 }
