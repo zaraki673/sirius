@@ -1,4 +1,4 @@
-n the file "detect.cpp" you have to change line 339 to make it point to the direct where the landmark db is(in red in the example)
+In the file "detect.cpp" you have to change line 339 to make it point to the direct where the landmark db is(in red in the example)
 Line 339:
  fs::path p = fs::system_complete("/home/hailong/sirius/sirius-application/image-matching/matching/landmarks/db");
 
