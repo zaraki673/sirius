@@ -49,9 +49,20 @@ function onload() {
     // document.getElementById("asr").value = storage.getItem("asr");
     // document.getElementById("imm").value = storage.getItem("imm");
     // document.getElementById("qa").value = storage.getItem("qa");
+    document.getElementById('V1').addEventListener('click',function(e){
+        swapViews('v1','v2');
+    });
+    document.getElementById('V2').addEventListener('click',function(e){
+        swapViews('v2','v1');
+    });
+}
+window.addEventListener("load", onload);
+
+function swapViews(one, two) {
+    document.getElementById(one).style.display = 'block';
+    document.getElementById(two).style.display = 'none';
 }
 
-window.addEventListener("load", onload);
 
 function updateDefaults(key, value) {
     storage.setItem(key, value);
@@ -75,17 +86,17 @@ function clear() {
 }
 
 function clearAudio() {
-    console.log("audio cleared");
     audio = null;
     encodedAudioData = "";
     $('#audio_file').empty();
+    console.log("audio cleared");
 }
 
 function clearImage() {
-    console.log("image cleared");
     image = null;
     encodedImageData = "";
     $('#image_file').empty();
+    console.log("image cleared");
 }
 
 function clearText() {
@@ -93,45 +104,98 @@ function clearText() {
     $('#question').value = "";
 }
 
+function getPhoto() {
+    // Retrieve image file location from specified source
+    navigator.camera.getPicture(getPhotoSuccess, getPhotoFail, { 
+        quality: 50,
+        destinationType: navigator.camera.DestinationType.FILE_URI,
+        sourceType: Camera.PictureSourceType.PHOTOLIBRARY 
+    });
+}
+document.getElementById("getImage").addEventListener("click",getPhoto);
+
+function getPhotoSuccess(imageURI) {
+    //save as image
+    imageURI = imageURI.replace('file://', '');
+    console.log(imageURI);
+    image = new MediaFile();
+    image.fullPath = imageURI;
+    image.name = imageURI.substr(imageURI.lastIndexOf('/') + 1);
+    var temp = (imageURI.search('tmp') > -1);
+    processImage(temp);
+}
+
+function getPhotoFail(message) {
+    alert(message);
+}
+
 // Called when capture operation is finished
 function captureImageSuccess(mediaFiles) {
     var i, len;
     for (i = 0, len = mediaFiles.length; i < len; i += 1) {
-        //uploadFile(mediaFiles[i]);
         image = mediaFiles[i];
-        $('#image_file').empty();
-        $('#image_file').append(image.name);
-        $('#image_file').append("<button class='btnX' id='clearImage' style='margin-left:5px'>X</button>");
-        document.getElementById("clearImage").addEventListener("click",clearImage);
-        getFS(image, "image");
+        console.log(image.size);
+        processImage(true); //always saves to temp so always true
     }
+}
+
+function processImage(temp) {
+    $('#image_file').empty();
+    $('#image_file').append("<canvas id='image_viewer' width='100' height='100'> </canvas> <br>");
+
+    var tmpImage = new Image();
+    tmpImage.onload = function() {
+        var canvas = document.getElementById('image_viewer');
+        var ctx = canvas.getContext('2d');
+        //draw image, anchor at (0,0) with size xi, yi into canvas anchor at (0,0) within xc, yc
+        ctx.drawImage(tmpImage, 0, 0, tmpImage.width, tmpImage.height,
+                                0, 0, 100, 100);
+        encodedImageData = canvas.toDataURL("image/jpeg", 1); //jpeg, quality 0 -> 1
+        console.log(encodedImageData);
+    }
+    tmpImage.src = image.fullPath;
+    
+    // $('#image_viewer').drawImage(tmpImage, 0, 0, 100, 100);
+    // $('#image_file').append("<img src='" + image.fullPath + "' style='width:80px;height:80px;'>");
+    $('#image_file').append("<p>");
+    $('#image_file').append(image.name);
+    $('#image_file').append("<input class='btnIconSmall' type='image' id='clearImage' src='img/x.png'>");
+    $('#image_file').append("</p>");
+    document.getElementById("clearImage").addEventListener("click",clearImage);
+    // encodedImageData = $('#image_viewer').toDataURL("image/jpeg");
+    // console.log(encodedImageData);
+    // if(temp) {
+    //     getFS(image, "image", LocalFileSystem.TEMPORARY);    
+    // } else {
+    //     getFS(image, "image", LocalFileSystem.PERSISTENT);
+    // }
 }
 
 function captureAudioSuccess(mediaFiles) {
     var i, len;
     for (i = 0, len = mediaFiles.length; i < len; i += 1) {
-        //uploadFile(mediaFiles[i]);
         audio = mediaFiles[i];
-        $('#audio_file').empty();
-        $('#audio_file').append(audio.name);
-        $('#audio_file').append("<button class='btn2' id='playAudio' style='margin-left:3px'>Play</button>");
-        $('#audio_file').append("<button class='btnX' id='clearAudio' style='margin-left:5px'>X</button>");
-        document.getElementById("playAudio").addEventListener("click",playAudio);
-        document.getElementById("clearAudio").addEventListener("click",clearAudio);
-        getFS(audio, "audio");
-        // $('#audio_file').append("<button class='btn2' id='pauseAudio'>Pause</button>");
-        // $('#audio_file').append("<button class='btn2' id='stopAudio'>Stop</button>");
-        // <p id='audio_position'></p>
-        // $('#audio_file').append("<p id='audio_position'></p>");
-        // document.getElementById("pauseAudio").addEventListener("click",pauseAudio);
-        // document.getElementById("stopAudio").addEventListener("click",stopAudio);
+        processAudio();
     }
+}
+
+function processAudio() {
+    $('#audio_file').empty();
+    $('#audio_file').append(audio.name);
+    $('#audio_file').append("<input class='btnIconSmall' type='image' id='playAudio' src='img/play.png'>");
+    // $('#audio_file').append("<button class='btnX' id='clearAudio' style='margin-left:5px'>X</button>");
+    $('#audio_file').append("<input class='btnIconSmall' type='image' id='clearAudio' src='img/x.png'>");
+    document.getElementById("playAudio").addEventListener("click",playAudio);
+    document.getElementById("clearAudio").addEventListener("click",clearAudio);
+    getFS(audio, "audio", LocalFileSystem.TEMPORARY);
 }
 
 // Called if something bad happens.
 function captureError(error) {
     var msg = 'An error occurred during capture: ' + error.code;
-    navigator.notification.alert(msg, null, 'Uh oh!');
+    if(error.code != 3) {
+        navigator.notification.alert(msg, null, 'Uh oh!'); 
+    }
 }
 
 // A button will call this function
@@ -171,26 +235,16 @@ function onError(error) {
           'message: ' + error.message + '\n');
 }
 
-// function getPhoto() {
-//     // Retrieve image file location from specified source
-//     navigator.camera.getPicture(captureImageSuccess, captureError, {
-//         quality: 30,
-//         targetWidth: 600,
-//         targetHeight: 600,
-//         destinationType: destinationType.FILE_URI,
-//         sourceType: pictureSource.PHOTOLIBRARY
-//     });
-// }
-// document.getElementById("getImage").addEventListener("click",getPhoto;
-
-function getFS(file, type){
+//temporary determine which function gets called back
+//fix this an template the functions
+function getFS(file, type, fs){
     if(file){
         if(type == "audio") {
             console.log("audio file lookup");
-            window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFSAudio, fail);
+            window.requestFileSystem(fs, 0, gotFSAudio, fail);
         } else {
             console.log("image file lookup");
-            window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFSImage, fail);
+            window.requestFileSystem(fs, 0, gotFSImage, fail);
         }
     } else {
         console.log("No file recorded!");
@@ -221,6 +275,8 @@ function readDataUrlAudio(file) {
         encodedAudioData = String(evt.target.result);
     };
     reader.readAsDataURL(file);
+    //adding immediate send
+    askServer();
 }
 
 function readDataUrlImage(file) {
@@ -246,12 +302,6 @@ function sendFile(){
         var transport = new Thrift.TXHRTransport(addr);
         var protocol  = new Thrift.TJSONProtocol(transport);
         var client = new FileTransferSvcClient(protocol);
-
-
-        // var qType = new QueryType();
-        // qType.ASR = !!audio;
-        // qType.IMM = !!image;
-        // qType.QA = true;
 
         var audioFormat = "", imageFormat = "";
         if(encodedAudioData) {
@@ -290,25 +340,6 @@ function sendFile(){
 
      getResponse(uuid);
 }
-// document.getElementById("thriftMessage").addEventListener("click",getFS);
-
-// function ping(){
-//     console.log("Pinging server");
-//     var addr = getAddress(getItem('port'), 'fts');
-//     console.log(addr);
-//     var transport = new Thrift.TXHRTransport(addr);
-//     var protocol  = new Thrift.TJSONProtocol(transport);
-//     //var client    = new CommandCenterClient(protocol);
-//     var client = new FileTransferSvcClient(protocol);
-    
-//     var msg = client.ping();
-//     $('#response').empty();
-//     $('#response').append("<p>" + msg + "</p>");
-//     console.log(msg);
-//     //client.ping( function() { console.log("pinged server"); } );
-//     console.log("Client Created");
-// }
-// document.getElementById("sendToServer").addEventListener("click",ping);
 
 var timeoutFunc;
 
@@ -362,48 +393,6 @@ function askServer() {
 }
 document.getElementById("askServer").addEventListener("click",askServer);
 
-// function sendToServer() {
-    
-//     if(image){
-//         // uploadFile(image);
-//         $('#response').empty();
-//         $('#response').append("<p>Sending...</p>");
-//         type = "image/jpeg";
-//         headers = {
-//             Connection: "Close",
-//             'Content-Type': String(type)
-//         };
-//         uploadFile(image, getAddress(getItem('imm')), type, headers);
-//     } else {
-//         if(audio){
-//             $('#response').empty();
-//             $('#response').append("<p>Sending...</p>");
-//             type = "audio/wav";
-//             headers = {
-//                 Connection: "Close",
-//                 'Content-Type': String(type + '; rate=16000')
-//                 // 'Content-Type': String(type)
-//             };
-//             // if(String(window.device.platform) == "iOS"){
-//             //     window.encodeAudio(audio.fullPath, success, fail);
-//             // }
-//             uploadFile(audio, getAddress(getItem('asr')), type, headers);
-//         } else {
-//             //send text to server
-//             q = document.getElementById("question").value
-//             if(q) {
-//                 $('#response').empty();
-//                 $('#response').append("<p>Sending...</p>");
-//                 queryServer(q);
-//             } else {
-//                 $('#response').empty();
-//                 $('#response').append("<p>Nothing to send</p>");
-//             }
-//         }
-//     }
-// }
-// document.getElementById("sendToServer").addEventListener("click",sendToServer);
-
 function getItem(key) {
     return document.getElementById(key).value;
 }
@@ -411,44 +400,6 @@ function getItem(key) {
 function getAddress(port, destination) {
     return 'http://' + getItem('ip') + ':' + port + '/' + destination;
 }
-
-// function queryServer(query) {
-//     q = getAddress(getItem('qa')) + '?query=' + query;
-//     $.get(q).done(function( data ) {
-//         processResponse(data);
-//     });
-// }
-
-// // Upload files to server
-// function uploadFile(mediaFile, addr, type, headers) {
-//     var ft = new FileTransfer(),
-//         path = mediaFile.fullPath,
-//         name = mediaFile.name;
-
-//     var options = new FileUploadOptions();
-//     options.fileKey = 'file';
-//     // options.fileName = name.replace(name.substr(0, name.lastIndexOf('/')+1), '/tmp/');
-//     options.fileName = name;
-//     options.mimeType = type;
-//     options.chunkedMode = false;
-//     options.headers = headers;
-
-//     ft.upload(
-//         path,
-//         encodeURI(addr),
-//         function(result) {
-//             console.log('Upload success: ' + result.responseCode);
-//             console.log("Response: " + result.response);
-//             console.log(result.bytesSent + ' bytes sent');
-//             processResponse(result.response);
-//         },
-//         function(error) {
-//             $('#response').empty();
-//             $('#response').append("<p>Error uploading file</p>");
-//             console.log('Error uploading file ' + path + ': ' + error.code);
-//         },
-//         options);
-// }
 
 function processResponse(data) {
     if(data) {

@@ -41,29 +41,35 @@
     </head>
     <body>
         <div class="app">
+
             <div id="ip_info">
-                <label for="ip">IP: </label><input type="text" id="ip" name="ip" size="20" onchange="updateDefaults(this.id, this.value)" /> <br>
-                <label for="port">Port: </label><input type="text" id="port" name="port" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
-                <!-- <label for="asr">ASR: </label><input type="text" id="asr" name="asr" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
-                <label for="imm">IMM: </label><input type="text" id="imm" name="imm" size="5" onchange="updateDefaults(this.id, this.value)" /> <br>
-                <label for="qa">QA: </label><input type="text" id="qa" name="qa" size="5" onchange="updateDefaults(this.id, this.value)" /> <br> -->
+                <label for="ip">IP: </label>
+                <input type="text" id="ip" name="ip" size="20" onchange="updateDefaults(this.id, this.value)" /> <br>
+                <label for="port">Port: </label>
+                <input type="text" id="port" name="port" size="5" onchange="updateDefaults(this.id, this.value)" /> 
+                <!-- <div id="versions" style="margin-left:75%"> -->
+                <button class="btn-sm" id="V2" style="margin-left:20px; margin-right:0px">V2</button>
+                <button class="btn-sm" id="V1" style="margin-left:0px">V1</button>
+                <!-- </div> -->
+                <br>
             </div>
             <br>
-            <textarea id="question" rows="3" placeholder="Type your question" onchange="updateText(this.value)"></textarea>
-            <p>OR</p>
-            <button class="btn" id="captureImage">Capture Image</button>
-            <button class="btn" id="captureAudio">Capture Audio</button> 
-            <!-- <button class="btn" id="getImage">Choose Image</button> -->
+            <div id="v1" style="display:none">
+                <textarea id="question" rows="3" placeholder="Type your question" onchange="updateText(this.value)"></textarea>
+            </div>
             
             <br>
-            <div id="image_file"></div>
+            <div id="image_file">
+                <canvas id='image_viewer' width='100' height='100'> </canvas> <br>
+            </div>
             <div id="audio_file"></div> 
             <br>
 
-            <button class="btn" id="askServer">Ask Sirius</button>
-            <!-- <button class="btn" id="thriftMessage">Send File</button>
-            <button class="btn" id="sendToServer">Ping</button>
-            <button class="btn" id="getResponse">Get Resp</button>  -->
+            <div id="v2">
+                <input class="btnIcon" type="image" id="getImage" src="img/gallery.png"></input>
+                <input class="btnIcon" type="image" id="captureImage" src="img/camera.png"></input>
+                <input class="btnIcon" type="image" id="captureAudio" src="img/microphone2.png"></input>
+            </div>
             <br>
             <div id="response"></div>
         </div>
