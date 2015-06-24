@@ -15,7 +15,7 @@ public:
 	{
 		registeredServices = std::multimap<std::string, ServiceData*>();
 		// registeredServices = std::multimap<std::string, MachineData>();
-		boost::thread *heartbeatThread = new boost::thread(boost::bind(&CommandCenterHandler::heartbeatManager, this));
+		//boost::thread *heartbeatThread = new boost::thread(boost::bind(&CommandCenterHandler::heartbeatManager, this));
 		
 	}
 
