@@ -241,54 +241,54 @@ private:
 	}
 
 	void heartbeatManager(){
-		cout << "heartbeat manager started" << endl;
-		std::multimap<std::string, ServiceData*>::iterator it;
-		while(true) {
-			for(it = registeredServices.begin(); it != registeredServices.end(); ++it){
-				//TO DO: add locking 
-				std::string type = it->first;
-				try{
-					if(type == "ASR") {
-						AsrServiceData *asr = new AsrServiceData(it->second);
-						asr->transport->open();
-						asr->client.ping();
-						asr->transport->close();
-					} else if(type == "IMM") {
-						ImmServiceData *imm = new ImmServiceData(it->second);
-						imm->transport->open();
-						imm->client.ping();
-						imm->transport->close();
-					} else if(type == "QA") {
-						QaServiceData *qa = new QaServiceData(it->second);
-						qa->transport->open();
-						qa->client.ping();
-						qa->transport->close();
-					} else {
-						cout << "Found unknown type --" << type << "-- in registered services" << endl;
-					}
-				} catch(...) {
-					//remove from list
-					registeredServices.erase(it);
-					cout << "There are now " << registeredServices.size() << " registered services" << endl;
-					cout << "LIST OF REGISTERED SERVICES:" << endl;
-					std::multimap<std::string, ServiceData*>::iterator it;
-					// std::multimap<std::string, MachineData>::iterator it;
-					for (it = registeredServices.begin(); it != registeredServices.end(); ++it)
-					{
-						cout << "\t" << it->first << endl;
-						     // << it->second->name << ":"
-						     // << (*it).second.port << endl;
-					}
-					break;
-				}
-			}
-			//sleep
-			boost::posix_time::seconds sleepTime(60);
-			boost::this_thread::sleep(sleepTime);
+		// cout << "heartbeat manager started" << endl;
+		// std::multimap<std::string, ServiceData*>::iterator it;
+		// while(true) {
+		// 	for(it = registeredServices.begin(); it != registeredServices.end(); ++it){
+		// 		//TO DO: add locking 
+		// 		std::string type = it->first;
+		// 		try{
+		// 			if(type == "ASR") {
+		// 				AsrServiceData *asr = new AsrServiceData(it->second);
+		// 				asr->transport->open();
+		// 				asr->client.ping();
+		// 				asr->transport->close();
+		// 			} else if(type == "IMM") {
+		// 				ImmServiceData *imm = new ImmServiceData(it->second);
+		// 				imm->transport->open();
+		// 				imm->client.ping();
+		// 				imm->transport->close();
+		// 			} else if(type == "QA") {
+		// 				QaServiceData *qa = new QaServiceData(it->second);
+		// 				qa->transport->open();
+		// 				qa->client.ping();
+		// 				qa->transport->close();
+		// 			} else {
+		// 				cout << "Found unknown type --" << type << "-- in registered services" << endl;
+		// 			}
+		// 		} catch(...) {
+		// 			//remove from list
+		// 			registeredServices.erase(it);
+		// 			cout << "There are now " << registeredServices.size() << " registered services" << endl;
+		// 			cout << "LIST OF REGISTERED SERVICES:" << endl;
+		// 			std::multimap<std::string, ServiceData*>::iterator it;
+		// 			// std::multimap<std::string, MachineData>::iterator it;
+		// 			for (it = registeredServices.begin(); it != registeredServices.end(); ++it)
+		// 			{
+		// 				cout << "\t" << it->first << endl;
+		// 				     // << it->second->name << ":"
+		// 				     // << (*it).second.port << endl;
+		// 			}
+		// 			break;
+		// 		}
+		// 	}
+		// 	//sleep
+		// 	boost::posix_time::seconds sleepTime(60);
+		// 	boost::this_thread::sleep(sleepTime);
 
-		}
+		// }
 		
-		cout << "heartbeat manager finished" << endl;
+		// cout << "heartbeat manager finished" << endl;
 	}
 };
 
