@@ -122,20 +122,29 @@ public:
 		// and voice query
 		if ((data.audioData != "") && (data.imgData != ""))
 		{
-			cout << "Now trying the threading imm method" << endl;
-			AsrWorker asrworker_obj;
-			ImmWorker immworker_obj;
-			boost::function<void()> asrfunc = boost::bind(&AsrWorker::execute, &asrworker_obj, (void *) asr);
-			boost::function<void()> immfunc = boost::bind(&ImmWorker::execute, &immworker_obj, (void *) imm);
-			boost::thread asrthread(asrfunc);
-			boost::thread immthread(immfunc);
-			asrthread.join();
-			immthread.join();
-			cout << "Boost thread success!" << endl;
-			cout << "ASR == " << asrworker_obj.returnValue << endl;
-			cout << "IMM == " << immworker_obj.returnValue << endl;
+			asr->transport->open();
+			asr->client.kaldi_asr(asrRetVal, binary_audio);
+			asr->transport->close();
 
-			question = asrworker_obj.returnValue + " " + immworker_obj.returnValue;
+			imm->transport->open();
+			imm->client.send_request(immRetVal, binary_img);
+			imm->transport->close();
+
+			// cout << "Now trying the threading imm method" << endl;
+			// AsrWorker asrworker_obj;
+			// ImmWorker immworker_obj;
+			// boost::function<void()> asrfunc = boost::bind(&AsrWorker::execute, &asrworker_obj, (void *) asr);
+			// boost::function<void()> immfunc = boost::bind(&ImmWorker::execute, &immworker_obj, (void *) imm);
+			// boost::thread asrthread(asrfunc);
+			// boost::thread immthread(immfunc);
+			// asrthread.join();
+			// immthread.join();
+			// cout << "Boost thread success!" << endl;
+			// cout << "ASR == " << asrworker_obj.returnValue << endl;
+			// cout << "IMM == " << immworker_obj.returnValue << endl;
+
+			// question = asrworker_obj.returnValue + " " + immworker_obj.returnValue;
+			question = asrRetVal + " " + parseImgFile(immRetVal);
 			cout << "Your new question is: " << question << endl;
 			qa->transport->open();
 			qa->client.askFactoidThrift(_return, question);
