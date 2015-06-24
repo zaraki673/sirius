@@ -27,9 +27,9 @@
 
 // Thrift-generated stubs for communicating with registered
 // services
-#include "~/clarityeco/qa/sirius/gen-cpp/QAService.h"
-#include "~/clarityeco/asr/sirius/gen-cpp/KaldiService.h"
-#include "~/clarityeco/imm/sirius/gen-cpp/ImageMatchingService.h"
+#include "/home/twurman/clarityeco/qa/sirius/gen-cpp/QAService.h"
+#include "/home/twurman/clarityeco/asr/sirius/gen-cpp/KaldiService.h"
+#include "/home/twurman/clarityeco/imm/sirius/gen-cpp/ImageMatchingService.h"
 
 // Boost libraries
 #include <boost/regex.hpp>
