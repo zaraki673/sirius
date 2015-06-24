@@ -167,7 +167,7 @@ public:
 		else if (data.imgData != "")
 		{
 			imm->transport->open();
-			imm->client.match_img(_return, binary_img);
+			imm->client.send_request(_return, binary_img);
 			imm->transport->close();
 		}
 		else

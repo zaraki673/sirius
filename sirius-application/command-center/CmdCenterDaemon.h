@@ -27,9 +27,9 @@
 
 // Thrift-generated stubs for communicating with registered
 // services
-#include "../openephyra-thrift/gen-cpp/QAService.h"
-#include "../speech-recognition/kaldi/kaldi-thrift/gen-cpp/KaldiService.h"
-#include "../image-matching/matching-thrift/ImageMatchingService.h"
+#include "~/clarityeco/qa/sirius/gen-cpp/QAService.h"
+#include "~/clarityeco/asr/sirius/gen-cpp/KaldiService.h"
+#include "~/clarityeco/imm/sirius/gen-cpp/ImageMatchingService.h"
 
 // Boost libraries
 #include <boost/regex.hpp>
