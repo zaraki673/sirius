@@ -32,12 +32,12 @@ int main(int argc, char **argv) {
 
 		//Audio Files
 		//ifstream fin_audio("test.wav",ios::binary);
-		ifstream fin_audio("what.is.the.capital.of.italy.wav",ios::binary);
+		ifstream fin_audio("../inputs/questions/what.is.the.capital.of.italy.wav",ios::binary);
 		ostringstream ostrm_audio;
 		ostrm_audio <<fin_audio.rdbuf();
 		std::string capital_italy_audio_file(ostrm_audio.str());
 		
-		ifstream fin_audio01("how.tall.is.this.wav",ios::binary);
+		ifstream fin_audio01("../inputs/real/how.tall.is.this.wav",ios::binary);
 		ostringstream ostrm_audio01;
 		ostrm_audio01 <<fin_audio01.rdbuf();
 		std::string how_tall_audio_file(ostrm_audio01.str());	
@@ -67,13 +67,13 @@ int main(int argc, char **argv) {
 		client.handleRequest(answer, capital_italy);
 		cout << "ANSWER = " << answer << endl;*/
 
-		/*cout << "///// ASR-QA /////" << endl;
+		cout << "///// ASR-QA /////" << endl;
 		client.handleRequest(answer, capital_italy);
-		cout << "ANSWER = " << answer << endl;*/
-
-		cout << "\n///// ASR-QA-IMM /////" << endl;
-		client.handleRequest(answer, how_tall);
 		cout << "ANSWER = " << answer << endl;
+
+		/*cout << "\n///// ASR-QA-IMM /////" << endl;
+		client.handleRequest(answer, how_tall);
+		cout << "ANSWER = " << answer << endl;*/
 
 		transport->close();
 		
