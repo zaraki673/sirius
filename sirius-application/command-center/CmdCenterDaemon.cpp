@@ -365,7 +365,7 @@ void ImmWorker::execute(void *arg)
 {
 	ImmServiceData *imm = (ImmServiceData *) arg;
 	imm->transport->open();
-	imm->client.match_img(returnValue, imm->img);
+	imm->client.send_request(returnValue, imm->img);
 	imm->transport->close();
 	cout << "imm worker thread... IMG = " << returnValue << endl;
 	// TODO: EXCEPTION HANDLING WITH BOOST
