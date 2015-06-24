@@ -28,7 +28,7 @@
 // Thrift-generated stubs for communicating with registered
 // services
 #include "../openephyra-thrift/gen-cpp/QAService.h"
-#include "../speech-recognition/kaldi/scripts/kaldi-thrift/gen-cpp/KaldiService.h"
+#include "../speech-recognition/kaldi/kaldi-thrift/gen-cpp/KaldiService.h"
 #include "../image-matching/matching-thrift/ImageMatchingService.h"
 
 // Boost libraries
