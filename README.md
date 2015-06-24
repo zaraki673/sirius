@@ -25,3 +25,6 @@ See [Sirius-suite](http://sirius.clarity-lab.org/sirius-suite) for more informat
 
 [sirius-web](sirius-web) contains a web front-end server to make requests to
 Sirius.  
+
+## Sirius-mobile
+[sirius-mobile](sirius-mobile) contains both and Android and iOS version of the Sirius Mobile App built using Apache Cordova

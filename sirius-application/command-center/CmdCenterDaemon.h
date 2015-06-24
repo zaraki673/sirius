@@ -126,4 +126,18 @@ private:
 	std::string response;
 };
 
+class AsrWorker
+{
+public:
+	void execute(void *arg);
+	std::string returnValue;
+};
+
+class ImmWorker
+{
+public:
+	void execute(void *arg);
+	std::string returnValue;
+};
+
 #endif

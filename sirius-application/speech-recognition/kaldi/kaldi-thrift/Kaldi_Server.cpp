@@ -20,12 +20,12 @@
 #include <sox.h>
 #include <cstdlib> //07-12-15 for arg passing
 
-#include "KaldiService.h"
+#include "gen-cpp/KaldiService.h"
 #include "subproc.h"
-#include "CommandCenter.h"
-#include "commandcenter_types.h"
-//#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.h"
-//#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.h"
+//#include "CommandCenter.h"
+//#include "commandcenter_types.h"
+#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/CommandCenter.h"
+#include "/home/momo/Research/sirius/sirius-application/command-center/gen-cpp/commandcenter_types.h"
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>

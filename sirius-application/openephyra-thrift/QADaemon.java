@@ -1,3 +1,6 @@
+// Open Ephyra
+import info.ephyra.*;
+
 // Thrift java libraries 
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TServer.Args;
@@ -36,7 +39,7 @@ public class QADaemon {
 			if (args.length == 2)
 			{
 				tmp_port = Integer.parseInt(args[0].trim());
-				tmp_cmdcenterport = Integer.parseInt(args[1].trim());	
+				tmp_cmdcenterport = Integer.parseInt(args[1].trim());
 			}
 			else if (args.length == 1)
 			{
@@ -52,7 +55,6 @@ public class QADaemon {
 			// Local vars must not change to ensure that inner classes are synced.
 			final int port = tmp_port;
 			final int cmdcenterport = tmp_cmdcenterport;
-
 			// the handler implements the generated java interface
 			// that was originally specified in the thrift file.
 			// When it's called, an Open Ephyra object is created.
@@ -87,8 +89,6 @@ public class QADaemon {
 			t1.start();
 
 			// Register this server with the command center
-			//int port = 9091;
-			//int cmdcenterport = 8081;
 			TTransport transport = new TSocket("localhost", cmdcenterport);
 			transport.open();
 			TProtocol protocol = new TBinaryProtocol(transport);

@@ -1,3 +1,4 @@
+//package info.ephyra;
 // This handler implements the services provided to the client.
 
 // Open Ephyra packages
@@ -61,6 +62,65 @@ import qastubs.QAService;
 public class QAServiceHandler implements QAService.Iface {
 	private OpenEphyra oe;
 
+	// This is a copy of the initFactoid() function
+	// found in OpenEphyra.java. There are probably better
+	// ways to enable multithreading.
+/*
+	protected void initFactoidThrift() {
+		// question analysis
+		System.out.println("Initializing dictionaries for question analysis...");
+		Ontology wordNet = new WordNet();
+		// - dictionaries for term extraction
+		QuestionAnalysis.clearDictionaries();
+		QuestionAnalysis.addDictionary(wordNet);
+		// - ontologies for term expansion
+		QuestionAnalysis.clearOntologies();
+		QuestionAnalysis.addOntology(wordNet);
+		
+		// query generation
+		System.out.println("Adding query generators...");
+		QueryGeneration.clearQueryGenerators();
+		QueryGeneration.addQueryGenerator(new BagOfWordsG());
+		QueryGeneration.addQueryGenerator(new BagOfTermsG());
+		QueryGeneration.addQueryGenerator(new PredicateG());
+		QueryGeneration.addQueryGenerator(new QuestionInterpretationG());
+		QueryGeneration.addQueryGenerator(new QuestionReformulationG());
+		
+		// search
+		System.out.println("Adding search tools...");
+		// - knowledge miners for unstructured knowledge sources
+		Search.clearKnowledgeMiners();
+//		Search.addKnowledgeMiner(new BingKM());
+//		Search.addKnowledgeMiner(new GoogleKM());
+//		Search.addKnowledgeMiner(new YahooKM());
+		for (String[] indriIndices : IndriKM.getIndriIndices())
+			Search.addKnowledgeMiner(new IndriKM(indriIndices, false));
+//		for (String[] indriServers : IndriKM.getIndriServers())
+//			Search.addKnowledgeMiner(new IndriKM(indriServers, true));
+		// - knowledge annotators for (semi-)structured knowledge sources
+		Search.clearKnowledgeAnnotators();
+		
+		// answer extraction and selection
+		System.out.println("Adding answer selection filters...");
+		// (the filters are applied in this order)
+		AnswerSelection.clearFilters();
+		// - answer extraction filters
+		AnswerSelection.addFilter(new AnswerTypeFilter());
+		AnswerSelection.addFilter(new AnswerPatternFilter());
+		//AnswerSelection.addFilter(new WebDocumentFetcherFilter());
+		AnswerSelection.addFilter(new PredicateExtractionFilter());
+		AnswerSelection.addFilter(new FactoidsFromPredicatesFilter());
+		AnswerSelection.addFilter(new TruncationFilter());
+		// - answer selection filters
+		AnswerSelection.addFilter(new StopwordFilter());
+		AnswerSelection.addFilter(new QuestionKeywordsFilter());
+		AnswerSelection.addFilter(new ScoreNormalizationFilter(OpenEphyra.NORMALIZER));
+		AnswerSelection.addFilter(new ScoreCombinationFilter());
+		AnswerSelection.addFilter(new FactoidSubsetFilter());
+		AnswerSelection.addFilter(new DuplicateFilter());
+		AnswerSelection.addFilter(new ScoreSorterFilter());
+	}
+*/
 	public QAServiceHandler()
 	{
 		System.out.println("QAServiceHandler() ctor: creating a new OE obj\n");
@@ -70,6 +130,8 @@ public class QAServiceHandler implements QAService.Iface {
 		MsgPrinter.enableErrorMsgs(true);
 
 		oe = new OpenEphyra(dir);
+		//System.out.println("QAServiceHandler() ctor: initializing qa pipeline\n");
+		//initFactoidThrift();
 	}
 
 	public String askFactoidThrift(String question)

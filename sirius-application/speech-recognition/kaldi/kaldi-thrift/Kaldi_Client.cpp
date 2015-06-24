@@ -9,7 +9,7 @@
 #include <thrift/transport/TBufferTransports.h>          
 #include <thrift/transport/TTransportUtils.h>
 
-#include "KaldiService.h"
+#include "gen-cpp/KaldiService.h"
 
 using namespace std;
 using namespace apache::thrift;
