@@ -141,7 +141,7 @@ function captureImageSuccess(mediaFiles) {
 
 function processImage(temp) {
     $('#image_file').empty();
-    $('#image_file').append("<canvas id='image_viewer' width='150' height='150'> </canvas> <br>");
+    $('#image_file').append("<canvas id='image_viewer' width='100' height='100'> </canvas> <br>");
 
     var tmpImage = new Image();
     tmpImage.onload = function() {
@@ -149,7 +149,7 @@ function processImage(temp) {
         var ctx = canvas.getContext('2d');
         //draw image, anchor at (0,0) with size xi, yi into canvas anchor at (0,0) within xc, yc
         ctx.drawImage(tmpImage, 0, 0, tmpImage.width, tmpImage.height,
-                                0, 0, 150, 150);
+                                0, 0, 100, 100);
         encodedImageData = canvas.toDataURL("image/jpeg", 1); //jpeg, quality 0 -> 1
         console.log(encodedImageData);
     }
@@ -181,12 +181,12 @@ function captureAudioSuccess(mediaFiles) {
 
 function processAudio() {
     $('#audio_file').empty();
-    $('#audio_file').append(audio.name);
-    $('#audio_file').append("<input class='btnIconSmall' type='image' id='playAudio' src='img/play.png'>");
-    // $('#audio_file').append("<button class='btnX' id='clearAudio' style='margin-left:5px'>X</button>");
-    $('#audio_file').append("<input class='btnIconSmall' type='image' id='clearAudio' src='img/x.png'>");
-    document.getElementById("playAudio").addEventListener("click",playAudio);
-    document.getElementById("clearAudio").addEventListener("click",clearAudio);
+    // $('#audio_file').append(audio.name);
+    // $('#audio_file').append("<input class='btnIconSmall' type='image' id='playAudio' src='img/play.png'>");
+    // // $('#audio_file').append("<button class='btnX' id='clearAudio' style='margin-left:5px'>X</button>");
+    // $('#audio_file').append("<input class='btnIconSmall' type='image' id='clearAudio' src='img/x.png'>");
+    // document.getElementById("playAudio").addEventListener("click",playAudio);
+    // document.getElementById("clearAudio").addEventListener("click",clearAudio);
     getFS(audio, "audio", LocalFileSystem.TEMPORARY);
 }
 
@@ -273,10 +273,10 @@ function readDataUrlAudio(file) {
         console.log("Read as data URL");
         console.log(evt.target.result);
         encodedAudioData = String(evt.target.result);
+        askServer();
     };
     reader.readAsDataURL(file);
     //adding immediate send
-    askServer();
 }
 
 function readDataUrlImage(file) {
@@ -345,7 +345,7 @@ var timeoutFunc;
 
 function getResponse(uuid) {
     // var msg = "Waiting for response...";
-    var msg = "Waiting for response...    <button class='btnX' id='cancelRequest' style='margin-left:5px'>X</button>";
+    var msg = "Waiting for response...    <input class='btnIconSmall' type='image' id='cancelRequest' src='img/x.png'>";
     updateResponseDiv(msg);
     document.getElementById("cancelRequest").addEventListener("click",cancelRequest);
 
