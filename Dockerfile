@@ -16,7 +16,8 @@ RUN apt-get update;\
 	git wget unzip \
 	libfaac-dev vim sudo aptitude \
 	python-pip python-dev subversion\
-	build-essential
+	build-essential\
+	openjdk-7-jdk
 RUN pip install --upgrade pip
 RUN pip install --upgrade virtualenv
 RUN pip install pickledb
